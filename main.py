@@ -67,7 +67,7 @@ async def delete(datetime):
         pass
 
 #method that logs data from slash commands
-def log(ip, message, exc, flag):   
+def log(ip, message, exc, flag, datetime):   
     if os.path.exists(dir_path + get_path() + "logs" + get_path() + "logs.txt"): 
         datetime = get_time()
         if ((str(ip) in IPS) or (str(ip) == IPS)):
@@ -208,19 +208,23 @@ def home():
     if request.method == 'POST':
 
         try:
-            ip = request.headers.get('X-Forwarded-For', request.remote_addr)
                 
             print(request.form)
             
             func_name = request.form.get('func_name')
             datetime = request.form.get('datetime')
             input_list = request.form.get('input_list')
+            user_id = request.form.get('id')
             input_list = input_list.replace("[", "").replace("]", "").replace("'", "").split(', ')
             print(input_list)
             if not (func_name == "drivers" or func_name == "constructors"):
-                result = "/res/output/" + command(ip, input_list, func_name.lower(), datetime) + ".png"
+                result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
             else:
-                result = "/res/stnd/" + func_name.upper() + "STANDINGS.png"
+                try:
+                    result = "/res/stnd/" + func_name.upper() + "STANDINGS.png"
+                    log(user_id, str(func_name), "", False, datetime)
+                except Exception as exc:
+                    log(user_id, str(func_name), str(exc), True, datetime)
             return jsonify({'result': result}), 200    
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
@@ -228,7 +232,7 @@ def home():
 
 
 #command
-def command(ip, input_list, comm, datetime):
+def command(user_id, input_list, comm, datetime):
   
     try:
         
@@ -397,7 +401,7 @@ def command(ip, input_list, comm, datetime):
             inputs = inputs + " " + str(fixed_inputs[i])
         message = "/" + comm + inputs
 
-        log(ip, message, "", False)
+        log(user_id, message, "", False, datetime)
 
         if comm == "fastest":
             fastest_func(fixed_inputs, datetime)
@@ -452,7 +456,7 @@ def command(ip, input_list, comm, datetime):
         if os.path.exists(dir_path + get_path() + "logs" + get_path() + "logs.txt"): 
             print(exc)
         
-        log(ip, message, exc + "\n", True)
+        log(user_id, message, exc + "\n", True, datetime)
         exc = fix_exc(exc, fixed_inputs, comm)
         
         return exc
