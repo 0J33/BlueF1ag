@@ -132,7 +132,7 @@ def make_img(datetime, text):
         draw.text((10, y), line, fill=(255, 255, 255), font=font)
         y += line_height + line_spacing
     # Save the image
-    img.save(dir_path + get_path() + "output" + get_path() + datetime + ".png", "PNG")
+    img.save(dir_path + get_path() + "res" + get_path() + "output" + get_path() + datetime + ".png", "PNG")
 
 
 
@@ -197,7 +197,7 @@ def fastest_func(input_list, datetime):
         f"{session.event.year} {session.event['EventName']} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")")
     plt.setp(ax.get_xticklabels(), fontsize=7)
 
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -313,7 +313,7 @@ def laps_func(input_list, datetime):
     ax.set_xlabel("Lap Number")
     ax.set_ylabel("Lap Time")
     ax.legend()
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -384,7 +384,7 @@ def time_func(input_list, datetime):
     ax.set_xlabel('Time')
     ax.set_ylabel('Speed [Km/h]')
     ax.legend()
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -453,7 +453,7 @@ def distance_func(input_list, datetime):
     ax.set_xlabel('Distance in m')
     ax.set_ylabel('Speed km/h')
     ax.legend()
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -534,7 +534,7 @@ def delta_func(input_list, datetime):
     plt.suptitle("Lap Comparison\n" +
                  f"{session.event.year} {session.event['EventName']} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")")
 
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -609,7 +609,7 @@ def gear_func(input_list, datetime):
     cbar.set_ticks(np.arange(1.5, 9.5))
     cbar.set_ticklabels(np.arange(1, 9))
 
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -699,7 +699,7 @@ def speed_func(input_list, datetime):
     legend = mpl.colorbar.ColorbarBase(
         cbaxes, norm=normlegend, cmap=colormap, orientation="horizontal")
 
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -878,7 +878,7 @@ def tel_func(input_list, datetime):
     # set labels to absolute values and with integer representation
     ax[6].set_yticklabels([round(abs(tick), 1) for tick in ticks])
 
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -1109,7 +1109,7 @@ def cornering_func(input_list, datetime):
     plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" +
                  d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=20)
 
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -1250,7 +1250,7 @@ def tires_func(input_list, datetime):
             f"{session.event.year} {session.event['EventName']} {sn}\n Lap {sl} - Tire Comparison")
 
     generate_minisector_plot(sl, sn)
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -1330,7 +1330,7 @@ def strategy_func(input_list, datetime):
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_visible(False)
 
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -1491,7 +1491,7 @@ def sectors_func(input_list, datetime):
     plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn} - Fastest Sectors\n" +
                  d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=25)
 
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
@@ -1563,7 +1563,7 @@ def rt_func(input_list, datetime):
 
     ax.legend()
 
-    plt.savefig(dir_path + get_path() + "output" + get_path() +
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
                 str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
