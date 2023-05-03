@@ -453,6 +453,9 @@ def command(user_id, input_list, comm, datetime):
 
     return datetime
 
+def home():
+    return ("Backend is running.")
+
 def run():
   app.run(host='0.0.0.0',port=2222)
 
