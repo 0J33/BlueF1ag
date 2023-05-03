@@ -172,39 +172,6 @@ def fix_exc(exc, fixed_inputs, comm):
         exc = "An unknown error occured.\n"
     return exc
 
-#send email
-def send_email():
-
-    try:
-        from env import email_sender, email_password, email_reciever, server
-    except:
-        email_sender = os.getenv("MAIL")
-        email_password = os.getenv("PASS")
-        email_reciever = os.getenv("MAIL")
-        server = os.getenv("SERVER")
-        
-    subject = "Backend"
-    if server == "main":
-        body = "Main backend server is online."
-    else:
-        body = "Backup backend server is online."
-
-    em = EmailMessage()
-    em['From'] = email_sender
-    em['To'] = email_reciever
-    em['Subject'] = subject
-
-    context = ssl.create_default_context()
-    
-    em.set_content(body)
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-        smtp.login(email_sender, email_password)
-        smtp.sendmail(
-            email_sender, email_reciever,
-            em.as_string())
-        
-    print("Email sent")
-
 #command
 def command(user_id, input_list, comm, datetime):
   
@@ -465,7 +432,6 @@ def home():
     
 def run():
   app.run(host='0.0.0.0',port=2222)
-  send_email()
   delete_all()
 
 def keep_alive():
