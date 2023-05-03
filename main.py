@@ -228,6 +228,9 @@ def home():
             return jsonify({'result': result}), 200    
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
+        
+    else:
+        return ("Backend is running.")
     
 
 
@@ -452,10 +455,6 @@ def command(user_id, input_list, comm, datetime):
         return exc
 
     return datetime
-
-@app.route('/')
-def home():
-    return ("Backend is running.")
 
 def run():
   app.run(host='0.0.0.0',port=2222)
