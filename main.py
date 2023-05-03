@@ -51,7 +51,6 @@ set_font()
 if os.path.exists(dir_path + get_path() + "doc_cache"):
     fastf1.Cache.enable_cache(dir_path + get_path() + "doc_cache")
 
-
 queue = []
 
 #delete files after sending
@@ -172,7 +171,6 @@ def fix_exc(exc, fixed_inputs, comm):
     else:
         exc = "An unknown error occured.\n"
     return exc
-
 
 #send email
 def send_email():
