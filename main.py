@@ -52,9 +52,10 @@ if os.path.exists(dir_path + get_path() + "doc_cache"):
     fastf1.Cache.enable_cache(dir_path + get_path() + "doc_cache")
 
 
+queue = []
 
 #delete files after sending
-async def delete(datetime):
+def delete(datetime):
     try:
         os.remove(dir_path + get_path() + "output" + get_path() + str(datetime) + '.png')
     except:
@@ -64,6 +65,11 @@ async def delete(datetime):
         os.remove(dir_path + get_path() + "output" + get_path() + str(datetime) + '.txt')         
     except:
         pass
+
+#delete all files
+def delete_all():
+    for i in queue:
+        delete(i)
 
 #method that logs data from slash commands
 def log(user_id, message, exc, flag, datetime):   
@@ -167,20 +173,25 @@ def fix_exc(exc, fixed_inputs, comm):
         exc = "An unknown error occured.\n"
     return exc
 
+
 #send email
 def send_email():
 
     if os.path.exists(dir_path + get_path() + "server.txt"):
     
         try:
-            from env import email_sender, email_password, email_reciever
+            from env import email_sender, email_password, email_reciever, server
         except:
             email_sender = os.getenv("MAIL")
             email_password = os.getenv("PASS")
             email_reciever = os.getenv("MAIL")
+            server = os.getenv("SERVER")
             
         subject = "Backend"
-        body = "Backend is online."
+        if server == "main":
+            body = "Main backend server is online."
+        else:
+            body = "Backup backend server is online."
 
         em = EmailMessage()
         em['From'] = email_sender
@@ -197,42 +208,6 @@ def send_email():
                 em.as_string())
             
         print("Email sent")
-
-app = Flask('', static_folder='res')
-
-@app.route('/', methods=['GET', 'POST'])
-def home():
-        
-    if request.method == 'POST':
-
-        try:
-                
-            print(request.form)
-            
-            func_name = request.form.get('func_name')
-            datetime = request.form.get('datetime')
-            input_list = request.form.get('input_list')
-            user_id = request.form.get('id')
-            input_list = input_list.replace("[", "").replace("]", "").replace("'", "").split(', ')
-            print(input_list)
-            print(func_name)
-            if not (func_name.lower() == "drivers" or func_name.lower() == "constructors"):
-                result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
-            else:
-                try:
-                    result = "/res/stnd/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
-                    log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
-                except Exception as exc:
-                    print(str(exc))
-                    log(user_id, str(func_name) + "\n" + str(input_list), str(exc), True, datetime)
-            return jsonify({'result': result}), 200    
-        except Exception as exc:
-            return jsonify({'error': str(exc)}), 400
-        
-    else:
-        return ("Backend is running.")
-    
-
 
 #command
 def command(user_id, input_list, comm, datetime):
@@ -454,10 +429,48 @@ def command(user_id, input_list, comm, datetime):
         
         return exc
 
+    queue.append(datetime)
     return datetime
 
+#flask server
+app = Flask('', static_folder='res')
+
+@app.route('/', methods=['GET', 'POST'])
+def home():
+        
+    if request.method == 'POST':
+
+        try:
+                
+            print(request.form)
+            
+            func_name = request.form.get('func_name')
+            datetime = request.form.get('datetime')
+            input_list = request.form.get('input_list')
+            user_id = request.form.get('id')
+            input_list = input_list.replace("[", "").replace("]", "").replace("'", "").split(', ')
+            print(input_list)
+            print(func_name)
+            if not (func_name.lower() == "drivers" or func_name.lower() == "constructors"):
+                result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
+            else:
+                try:
+                    result = "/res/stnd/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
+                    log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
+                except Exception as exc:
+                    print(str(exc))
+                    log(user_id, str(func_name) + "\n" + str(input_list), str(exc), True, datetime)
+            return jsonify({'result': result}), 200    
+        except Exception as exc:
+            return jsonify({'error': str(exc)}), 400
+        
+    else:
+        return ("Backend is running.")
+    
 def run():
   app.run(host='0.0.0.0',port=2222)
+  send_email()
+  delete_all()
 
 def keep_alive():
     t = Thread(target=run)
