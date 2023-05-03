@@ -453,6 +453,7 @@ def command(user_id, input_list, comm, datetime):
 
     return datetime
 
+@app.route('/')
 def home():
     return ("Backend is running.")
 
