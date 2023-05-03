@@ -67,10 +67,9 @@ async def delete(datetime):
         pass
 
 #method that logs data from slash commands
-def log(ip, message, exc, flag, datetime):   
+def log(user_id, message, exc, flag, datetime):   
     if os.path.exists(dir_path + get_path() + "logs" + get_path() + "logs.txt"): 
-        datetime = get_time()
-        if ((str(ip) in IPS) or (str(ip) == IPS)):
+        if ((user_id in IDS)):
             if flag:
                 testf = open(dir_path + get_path() + "logs" + get_path() + "devexc.txt","a")
             else:
@@ -82,7 +81,7 @@ def log(ip, message, exc, flag, datetime):
                 testf = open(dir_path + get_path() + "logs" + get_path() + "exc.txt","a") 
             else:
                 testf = open(dir_path + get_path() + "logs" + get_path() + "logs.txt","a")
-            testf.write(str(ip) + "\n" + str(message) + "\n" + str(exc) + str(datetime) + "\n\n")
+            testf.write(str(user_id) + "\n" + str(message) + "\n" + str(exc) + str(datetime) + "\n\n")
             testf.close()
 
 #fix exception string
@@ -217,14 +216,16 @@ def home():
             user_id = request.form.get('id')
             input_list = input_list.replace("[", "").replace("]", "").replace("'", "").split(', ')
             print(input_list)
-            if not (func_name == "drivers" or func_name == "constructors"):
+            print(func_name)
+            if not (func_name.lower() == "drivers" or func_name.lower() == "constructors"):
                 result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
             else:
                 try:
-                    result = "/res/stnd/" + func_name.upper() + "STANDINGS.png"
-                    log(user_id, str(func_name), "", False, datetime)
+                    result = "/res/stnd/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
+                    log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
                 except Exception as exc:
-                    log(user_id, str(func_name), str(exc), True, datetime)
+                    print(str(exc))
+                    log(user_id, str(func_name) + "\n" + str(input_list), str(exc), True, datetime)
             return jsonify({'result': result}), 200    
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
@@ -464,7 +465,7 @@ def command(user_id, input_list, comm, datetime):
     return datetime
 
 def run():
-  app.run(host='0.0.0.0',port=1111)
+  app.run(host='0.0.0.0',port=2222)
 
 def keep_alive():
     t = Thread(target=run)
