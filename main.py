@@ -37,7 +37,6 @@ import ssl
 import smtplib
 from env import *
 from funcs import *
-from update import *
 import warnings
 import platform
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -412,16 +411,6 @@ def command(user_id, input_list, comm, datetime):
             schedule_func(fixed_inputs, datetime)
         elif comm == "event":
             event_func(fixed_inputs, datetime)
-        elif comm == "drivers":
-            try:
-                driver_func(fixed_inputs, datetime)
-            except: 
-                pass
-        elif comm == "constructors":
-            try:
-                const_func(fixed_inputs, datetime)
-            except: 
-                pass
         elif comm == "laps":
             laps_func(fixed_inputs, datetime)
         elif comm == "time":
