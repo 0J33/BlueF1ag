@@ -63,7 +63,8 @@ def delete_all():
         os.remove(file_path)
 
 #method that logs data from slash commands
-def log(user_id, message, exc, flag, datetime):   
+def log(user_id, message, exc, flag, datetime):  
+    datetime = datetime.replace("-", " ").replace(".", ":") 
     if os.path.exists(dir_path + get_path() + "logs" + get_path() + "logs.txt"): 
         dev = ""
         log = "logs"
