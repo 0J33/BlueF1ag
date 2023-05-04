@@ -51,24 +51,16 @@ set_font()
 if os.path.exists(dir_path + get_path() + "doc_cache"):
     fastf1.Cache.enable_cache(dir_path + get_path() + "doc_cache")
 
-queue = []
-
-#delete files after sending
-def delete(datetime):
-    try:
-        os.remove(dir_path + get_path() + "output" + get_path() + str(datetime) + '.png')
-    except:
-        pass
-        
-    try:
-        os.remove(dir_path + get_path() + "output" + get_path() + str(datetime) + '.txt')         
-    except:
-        pass
-
 #delete all files
 def delete_all():
-    for i in queue:
-        delete(i)
+    folder_path = dir_path + get_path() + "res" + get_path() + "output"
+    print(folder_path)
+    # Get a list of all files in the folder
+    file_list = os.listdir(folder_path)
+    # Loop through each file and delete it
+    for file_name in file_list:
+        file_path = os.path.join(folder_path, file_name)
+        os.remove(file_path)
 
 #method that logs data from slash commands
 def log(user_id, message, exc, flag, datetime):   
@@ -431,8 +423,8 @@ def home():
         return ("Backend is running.")
     
 def run():
-  app.run(host='0.0.0.0',port=2222)
-  delete_all()
+    delete_all()
+    app.run(host='0.0.0.0',port=2222)
 
 def keep_alive():
     t = Thread(target=run)
