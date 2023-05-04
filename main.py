@@ -415,7 +415,7 @@ def home():
             return jsonify({'error': str(exc)}), 400
         
     else:
-        return ("Backend is running.")
+        return (web)
     
 def run():
     try:
