@@ -65,20 +65,15 @@ def delete_all():
 #method that logs data from slash commands
 def log(user_id, message, exc, flag, datetime):   
     if os.path.exists(dir_path + get_path() + "logs" + get_path() + "logs.txt"): 
+        dev = ""
+        log = "logs"
         if ((user_id in IDS)):
-            if flag:
-                testf = open(dir_path + get_path() + "logs" + get_path() + "devexc.txt","a")
-            else:
-                testf = open(dir_path + get_path() + "logs" + get_path() + "devlogs.txt","a")
-            testf.write(str(message) + "\n" + str(exc) + str(datetime) + "\n\n")
-            testf.close()
-        else:
-            if flag:
-                testf = open(dir_path + get_path() + "logs" + get_path() + "exc.txt","a") 
-            else:
-                testf = open(dir_path + get_path() + "logs" + get_path() + "logs.txt","a")
-            testf.write(str(user_id) + "\n" + str(message) + "\n" + str(exc) + str(datetime) + "\n\n")
-            testf.close()
+            dev = "dev"
+        if flag:
+            log = "exc"
+        testf = open(dir_path + get_path() + "logs" + get_path() + dev + log + ".txt","a")
+        testf.write(str(user_id) + "\n" + str(message) + "\n" + str(exc) + str(datetime) + "\n\n")
+        testf.close()
 
 #fix exception string
 def fix_exc(exc, fixed_inputs, comm):
@@ -423,7 +418,10 @@ def home():
         return ("Backend is running.")
     
 def run():
-    delete_all()
+    try:
+        delete_all()
+    except:
+        pass
     app.run(host='0.0.0.0',port=2222)
 
 def keep_alive():
