@@ -378,7 +378,7 @@ def command(user_id, input_list, comm, datetime):
         log(user_id, message, exc + "\n", True, datetime)
         exc = fix_exc(exc, fixed_inputs, comm)
         
-        return exc
+        raise Exception(exc)
 
     queue.append(datetime)
     return datetime
