@@ -1,10 +1,10 @@
 # Blue F1ag
 
-[Blue F1ag](https://ojee.net/bluef1ag) is a Discord bot that provides F1 data through graphs for fans to analyze. 
-[Add Blue F1ag to your discord server](https://ojee.net/bluef1ag-inv) 
-[Blue F1ag Support Server](https://ojee.net/bluef1ag-support) 
-[Blue F1ag ToS](https://ojee.net/bluef1ag-tos) 
-[Blue F1ag Privacy Policy](https://ojee.net/bluef1ag-priv)
+[Blue F1ag](https://ojee.net/bluef1ag) is a Discord bot that provides F1 data through graphs for fans to analyze.  
+[Add Blue F1ag to your discord server](https://ojee.net/bluef1ag-inv)  
+[Blue F1ag Support Server](https://ojee.net/bluef1ag-support)  
+[Blue F1ag ToS](https://ojee.net/bluef1ag-tos)  
+[Blue F1ag Privacy Policy](https://ojee.net/bluef1ag-priv)  
 
 # Requirements
 
