@@ -46,6 +46,7 @@ dir_path = r"" + str(pathlib.Path(__file__).parent.resolve())
 queue = []
 
 
+
 def wait_for_turn(datetime):
     if queue[0] == datetime:
         return
@@ -197,11 +198,11 @@ def fastest_func(input_list, datetime):
         f"{session.event.year} {session.event['EventName']} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")")
     plt.setp(ax.get_xticklabels(), fontsize=7)
 
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def results_func(input_list, datetime):
 
@@ -224,6 +225,7 @@ def results_func(input_list, datetime):
         msg2[2:])
     
     make_img(datetime, msg2)
+    return "success"
 
 def schedule_func(input_list, datetime):
 
@@ -246,6 +248,7 @@ def schedule_func(input_list, datetime):
             j = j+2
 
     make_img(datetime, n)
+    return "success"
 
 def event_func(input_list, datetime):
 
@@ -264,6 +267,7 @@ def event_func(input_list, datetime):
     msg = "Event:\n" + msg
 
     make_img(datetime, msg)
+    return "success"
 
 def laps_func(input_list, datetime):
 
@@ -313,11 +317,11 @@ def laps_func(input_list, datetime):
     ax.set_xlabel("Lap Number")
     ax.set_ylabel("Lap Time")
     ax.legend()
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def time_func(input_list, datetime):
 
@@ -384,11 +388,11 @@ def time_func(input_list, datetime):
     ax.set_xlabel('Time')
     ax.set_ylabel('Speed [Km/h]')
     ax.legend()
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def distance_func(input_list, datetime):
 
@@ -453,11 +457,11 @@ def distance_func(input_list, datetime):
     ax.set_xlabel('Distance in m')
     ax.set_ylabel('Speed km/h')
     ax.legend()
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def delta_func(input_list, datetime):
 
@@ -534,11 +538,11 @@ def delta_func(input_list, datetime):
     plt.suptitle("Lap Comparison\n" +
                  f"{session.event.year} {session.event['EventName']} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")")
 
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def gear_func(input_list, datetime):
 
@@ -609,11 +613,11 @@ def gear_func(input_list, datetime):
     cbar.set_ticks(np.arange(1.5, 9.5))
     cbar.set_ticklabels(np.arange(1, 9))
 
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def speed_func(input_list, datetime):
 
@@ -699,11 +703,11 @@ def speed_func(input_list, datetime):
     legend = mpl.colorbar.ColorbarBase(
         cbaxes, norm=normlegend, cmap=colormap, orientation="horizontal")
 
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def tel_func(input_list, datetime):
 
@@ -878,11 +882,11 @@ def tel_func(input_list, datetime):
     # set labels to absolute values and with integer representation
     ax[6].set_yticklabels([round(abs(tick), 1) for tick in ticks])
 
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def cornering_func(input_list, datetime):
 
@@ -1109,11 +1113,11 @@ def cornering_func(input_list, datetime):
     plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" +
                  d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=20)
 
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def tires_func(input_list, datetime):
 
@@ -1250,11 +1254,11 @@ def tires_func(input_list, datetime):
             f"{session.event.year} {session.event['EventName']} {sn}\n Lap {sl} - Tire Comparison")
 
     generate_minisector_plot(sl, sn)
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def strategy_func(input_list, datetime):
 
@@ -1330,11 +1334,11 @@ def strategy_func(input_list, datetime):
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_visible(False)
 
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def sectors_func(input_list, datetime):
 
@@ -1491,11 +1495,11 @@ def sectors_func(input_list, datetime):
     plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn} - Fastest Sectors\n" +
                  d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=25)
 
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"
 
 def rt_func(input_list, datetime):
 
@@ -1563,8 +1567,8 @@ def rt_func(input_list, datetime):
 
     ax.legend()
 
-    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() +
-                str(datetime) + '.png', bbox_inches='tight')
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)
     queue.remove(datetime)
+    return "success"

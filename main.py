@@ -314,58 +314,63 @@ def command(user_id, input_list, comm, datetime):
         for i in range(len(fixed_inputs)):
             inputs = inputs + " " + str(fixed_inputs[i])
         message = "/" + comm + inputs
-
-        log(user_id, message, "", False, datetime)
+        
+        print("STARTED " + message + " " + datetime)
 
         if comm == "fastest":
-            fastest_func(fixed_inputs, datetime)
+            res = fastest_func(fixed_inputs, datetime)
         elif comm == "results":
-            results_func(fixed_inputs, datetime)
+            res = results_func(fixed_inputs, datetime)
         elif comm == "schedule":
-            schedule_func(fixed_inputs, datetime)
+            res = schedule_func(fixed_inputs, datetime)
         elif comm == "event":
-            event_func(fixed_inputs, datetime)
+            res = event_func(fixed_inputs, datetime)
         elif comm == "laps":
-            laps_func(fixed_inputs, datetime)
+            res = laps_func(fixed_inputs, datetime)
         elif comm == "time":
-            time_func(fixed_inputs, datetime)
+            res = time_func(fixed_inputs, datetime)
         elif comm == "distance":
-            distance_func(fixed_inputs, datetime)
+            res = distance_func(fixed_inputs, datetime)
         elif comm == "delta":
-            delta_func(fixed_inputs, datetime)
+            res = delta_func(fixed_inputs, datetime)
         elif comm == "gear":
-            gear_func(fixed_inputs, datetime)
+            res = gear_func(fixed_inputs, datetime)
         elif comm == "speed":
-            speed_func(fixed_inputs, datetime)
+            res = speed_func(fixed_inputs, datetime)
         elif comm == "telemetry":
-            tel_func(fixed_inputs, datetime)
+            res = tel_func(fixed_inputs, datetime)
         elif comm == "cornering":
-            cornering_func(fixed_inputs, datetime)
+            res = cornering_func(fixed_inputs, datetime)
         elif comm == "tires":
-            tires_func(fixed_inputs, datetime)
+            res = tires_func(fixed_inputs, datetime)
         elif comm == "strategy":
-            strategy_func(fixed_inputs, datetime)
+            res = strategy_func(fixed_inputs, datetime)
         elif comm == "sectors":
-            sectors_func(fixed_inputs, datetime)
+            res = sectors_func(fixed_inputs, datetime)
         elif comm == "racetrace":
-            rt_func(fixed_inputs, datetime)
-    
-        if os.path.exists(dir_path + get_path() + "logs" + get_path() + "logs.txt"): 
+            res = rt_func(fixed_inputs, datetime)
+            
+        if res !="success" or res == None:
+            raise Exception("Inter Server Error. Please try again.")
+        else:
             print("FINISHED " + message + " " + datetime)
+                
+            exc = ""
+            flag = False
     
     except Exception as exc:
         
         exc = str(exc)
+        flag = True
         
         if os.path.exists(dir_path + get_path() + "logs" + get_path() + "logs.txt"): 
             print(exc)
-        
-        log(user_id, message, exc + "\n", True, datetime)
+            
         exc = fix_exc(exc, fixed_inputs, comm)
         
         raise Exception(exc)
 
-    queue.append(datetime)
+    log(user_id, message, exc, flag, datetime)
     return datetime
 
 #flask server
