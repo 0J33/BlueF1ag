@@ -196,7 +196,7 @@ def command(user_id, input_list, comm, datetime):
         
         if (comm == "laps" or comm == "time" or comm == "distance" or comm == "racetrace"):
             if (comm == "racetrace"):
-                driver_list = input_list[2].split("/")
+                driver_list = input_list[2]
             else:
                 driver_list = input_list[3]
                 
