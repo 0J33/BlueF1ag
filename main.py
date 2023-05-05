@@ -377,16 +377,11 @@ def home():
     if request.method == 'POST':
 
         try:
-                
-            print(request.form)
-            
             func_name = request.form.get('func_name')
             datetime = request.form.get('datetime')
             input_list = request.form.get('input_list')
             user_id = request.form.get('id')
             input_list = input_list.replace("[", "").replace("]", "").replace("'", "").split(', ')
-            print(input_list)
-            print(func_name)
             if not (func_name.lower() == "drivers" or func_name.lower() == "constructors"):
                 result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
             else:
