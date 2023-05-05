@@ -196,26 +196,11 @@ def command(user_id, input_list, comm, datetime):
         
         if (comm == "laps" or comm == "time" or comm == "distance" or comm == "racetrace"):
             if (comm == "racetrace"):
-                driver_list = input_list[2]
+                driver_list = input_list[2].split("/")
             else:
                 driver_list = input_list[3]
                 
-            drivers = []
-            
-            i=0
-            driver=""
-            while(i<len(driver_list)):
-                if(driver_list[i]!=' '):
-                    driver = driver + driver_list[i]
-                    i=i+1
-                else:
-                    driver = driver.upper()[:3]
-                    drivers.append(driver[:3])
-                    driver = ""
-                    i=i+1
-            driver = driver.upper()[:3]
-            drivers.append(driver[:3])
-            driver = ""
+            drivers = driver_list.split("/")
         
             fixed_inputs.append(drivers)
         
