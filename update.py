@@ -196,7 +196,7 @@ def driver_func(yr):
 
     # Save the plot
     #plt.show()
-    plt.savefig(dir_path + "\\data\\stnd\\" + str(yr) + "_DRIVERS_STANDINGS" + '.png')
+    plt.savefig(dir_path + "\\res\\stnd\\" + str(yr) + "_DRIVERS_STANDINGS" + '.png')
 
 
 
@@ -363,7 +363,7 @@ def const_func(yr):
 
     # Save the plot
     #plt.show()
-    plt.savefig(dir_path + "\\data\\stnd\\" + str(yr) + "_CONSTRUCTORS_STANDINGS" + '.png')
+    plt.savefig(dir_path + "\\res\\stnd\\" + str(yr) + "_CONSTRUCTORS_STANDINGS" + '.png')
 
 
 
