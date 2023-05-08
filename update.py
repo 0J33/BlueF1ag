@@ -398,6 +398,112 @@ def update_from(i):
             print(str(exc) + "\nFAILED UPDATE " + str(i))
         i -= 1
 
+
+
+import csv
+import datetime
+import fastf1
+import numpy as np
+
+try:
+    fastf1.Cache.enable_cache("doc_cache")
+except: 
+    pass
+
+def get_years(func):
+    years = []
+    func = func.lower()
+    if func == "results" or func == "schedule" or func == "drivers":
+        for i in range(1950, datetime.datetime.now().year+1):
+            years.append(i)
+    elif func == "constructors":
+        for i in range(1958, datetime.datetime.now().year+1):
+            years.append(i)
+    else:
+        for i in range(2018, datetime.datetime.now().year+1):
+            years.append(i)
+    return years[::-1]
+
+def get_races(yr):
+    pass
+
+def get_sessions(yr, rc):
+    yr = int(yr)
+    sessions = []
+    i=1
+    while True:
+        sess = 'Session' + str(i)
+        fastf1_obj = fastf1.get_event(yr, rc)
+        try: 
+            sessions.append((getattr(fastf1_obj, sess)))
+        except:
+            break
+        i+=1
+    return sessions
+ 
+def get_drivers(yr, rc, sn):
+    session = fastf1.get_session(yr, rc, sn)
+    session.load()
+    laps = session.laps
+    ls = set(tuple(x) for x in laps[['Driver']].values.tolist())
+    lis = [x[0] for x in ls]
+    return lis
+
+def get_laps(yr, rc, sn):
+    session = fastf1.get_session(yr, rc, sn)
+    session.load()
+    laps = session.laps
+    ls = set(tuple(x) for x in laps[['LapNumber']].values.tolist())
+    lis = sorted([int(x[0]) for x in ls])
+    max = int(np.max(lis))
+    return max
+
+def get_distance(yr, rc, sn):
+    session = fastf1.get_session(yr, rc, sn)
+    session.load()
+    laps = session.load_laps(with_telemetry=True)
+    car_data = laps.pick_fastest().get_car_data().add_distance()
+    maxdist = int(np.max(car_data['Distance']))
+    return maxdist
+
+def make_csv():
+    yr = datetime.datetime.now().year
+    races = get_races(yr)
+    for rc in races:
+        sessions = get_sessions(yr, rc)
+        for sn in sessions:
+            file = open('website/data.txt', 'r')
+            text = file.read()
+            file.close()
+            print("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn))
+            if text.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
+                pass
+            else:
+                try:
+                    drivers = get_drivers(yr, rc, sn)
+                    laps = get_laps(yr, rc, sn)
+                    distance = get_distance(yr, rc, sn)
+                    file = open('website/data.txt', 'a')
+                    file.write("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
+                    file.close()
+                except:
+                    pass
+          
+def update_races():
+    for yr in range(1950, datetime.datetime.now().year+1):
+        schedule = fastf1.get_event_schedule(yr)
+        df = schedule[['EventName']]
+        df = df.values
+        df = df.tolist()
+        df = str(df).replace("[","").replace("]","").replace("'","")
+        file = open("res/races.txt", "a")
+        file.write(str(yr) + ":" + df + "\n")
+        file.close()
+                
 # update(yr)
 
 # update_from(yr)
+
+# make_csv()
+
+# update_races()
