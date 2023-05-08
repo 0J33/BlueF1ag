@@ -425,7 +425,17 @@ def get_years(func):
     return years[::-1]
 
 def get_races(yr):
-    pass
+    file = open("res/data.txt", "r")
+    text = file.read()
+    file.close()
+    records = text.split("\n")
+    res = ""
+    for record in records:
+        if record.__contains__(str(yr)):
+            res = record[5:].split(",")
+    for i in range(len(res)):
+        res[i] = res[i].strip()
+    return res
 
 def get_sessions(yr, rc):
     yr = int(yr)
