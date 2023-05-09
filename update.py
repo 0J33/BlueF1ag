@@ -476,7 +476,7 @@ def get_distance(yr, rc, sn):
     maxdist = int(np.max(car_data['Distance']))
     return maxdist
 
-def make_csv():
+def update_data():
     yr = datetime.datetime.now().year
     races = get_races(yr)
     for rc in races:
@@ -514,6 +514,6 @@ def update_races():
 
 # update_from(yr)
 
-# make_csv()
+# update_data()
 
 # update_races()
