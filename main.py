@@ -1,3 +1,4 @@
+import aiohttp
 from flask import Flask
 from threading import Thread
 import asyncio
@@ -29,7 +30,7 @@ from matplotlib.ticker import MaxNLocator
 import matplotlib.font_manager as fm
 from time import time, ctime
 import time as tm
-from datetime import datetime
+from datetime import datetime as dt
 import datetime
 from matplotlib import dates
 from email.message import EmailMessage
@@ -373,6 +374,24 @@ def command(user_id, input_list, comm, datetime):
     log(user_id, message, exc, flag, datetime)
     return datetime
 
+#get standings
+def get_standings(input_list):
+    response = requests.get(SERVER + "/standings")
+    res = response.text
+    res = res.split(",")
+    s1 = SERVER + res[0]
+    s2 = SERVER + res[1]
+    response1 = requests.get(s1)
+    response2 = requests.get(s2)
+    res1 = response1.content
+    res2 = response2.content
+    with open("res/stnd/" + str(input_list[0]) + "_DRIVERS_STANDINGS.png", "wb") as file:
+        file.write(res1)
+        file.close()
+    with open("res/stnd/" + str(input_list[0]) + "_CONSTRUCTORS_STANDINGS.png", "wb") as file:
+        file.write(res2)
+        file.close()
+
 #flask server
 app = Flask('', static_folder='res')
 
@@ -392,6 +411,7 @@ def home():
     if request.method == 'POST':
 
         try:
+            dtyr = dt.now().year
             func_name = request.form.get('func_name')
             datetime = request.form.get('datetime')
             input_list = request.form.get('input_list')
@@ -401,6 +421,11 @@ def home():
                 result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
             else:
                 try:
+                    try:
+                        if int(input_list[0]) == dtyr:
+                            get_standings(input_list)
+                    except Exception as exc:
+                        print(exc + "\nSTANDINGS ERROR")
                     result = "/res/stnd/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
                     log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
                 except Exception as exc:
