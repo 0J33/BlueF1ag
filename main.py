@@ -436,8 +436,8 @@ def home():
             return jsonify({'error': str(exc)}), 400
         
     else:
-        return (web)
-    
+        return "Backend is running."
+
 def run():
     try:
         delete_all()
