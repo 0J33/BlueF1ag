@@ -405,6 +405,15 @@ def autocomplete():
     file.close()
     return data + "\n\n\n\n" + races_data
 
+@app.route('/update', methods=['GET', 'POST'])
+def update():
+    try:
+        update_races()
+        update_data()
+        return "success"
+    except:
+        return "fail"
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
         

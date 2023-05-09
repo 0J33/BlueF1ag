@@ -476,16 +476,36 @@ def get_distance(yr, rc, sn):
     maxdist = int(np.max(car_data['Distance']))
     return maxdist
 
+def update_races():
+    for yr in range(1950, datetime.datetime.now().year+1):
+        if str(yr) not in open("res/races.txt").read():
+            schedule = fastf1.get_event_schedule(yr)
+            df = schedule[['EventName']]
+            df = df.values
+            df = df.tolist()
+            df = str(df).replace("[","").replace("]","").replace("'","")
+            file = open("res/races.txt", "a")
+            file.write(str(yr) + ":" + df + "\n")
+            file.close()
+
 def update_data():
     yr = datetime.datetime.now().year
-    races = get_races(yr)
+    races = []
+    file = open('res/races.txt', 'r')
+    data = file.read()
+    file.close()
+    data = data.split("\n")
+    for i in range(1, len(data)):
+        if str(yr) in data[i]:
+            races = data[i][5:].split(",")
+            break
     for rc in races:
+        rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
-            file = open('website/data.txt', 'r')
+            file = open('res/data.txt', 'r')
             text = file.read()
             file.close()
-            print("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn))
             if text.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
                 pass
             else:
@@ -493,27 +513,16 @@ def update_data():
                     drivers = get_drivers(yr, rc, sn)
                     laps = get_laps(yr, rc, sn)
                     distance = get_distance(yr, rc, sn)
-                    file = open('website/data.txt', 'a')
+                    file = open('res/data.txt', 'a')
                     file.write("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
                     file.close()
                 except:
                     pass
-          
-def update_races():
-    for yr in range(1950, datetime.datetime.now().year+1):
-        schedule = fastf1.get_event_schedule(yr)
-        df = schedule[['EventName']]
-        df = df.values
-        df = df.tolist()
-        df = str(df).replace("[","").replace("]","").replace("'","")
-        file = open("res/races.txt", "a")
-        file.write(str(yr) + ":" + df + "\n")
-        file.close()
-                
+                     
 # update(yr)
 
 # update_from(yr)
 
-# update_data()
-
 # update_races()
+
+# update_data()
