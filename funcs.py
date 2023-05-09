@@ -177,7 +177,6 @@ def fastest_func(input_list, datetime):
             color = 'grey'
         team_colors.append(color)
 
-    fig, ax = plt.subplots()
     ax.barh(fastest_laps.index,
             fastest_laps['LapTimeDelta'], color=team_colors, edgecolor='grey')
     ax.set_yticks(fastest_laps.index)
