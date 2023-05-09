@@ -4,6 +4,9 @@ doc_cache/
 logs/
 output/
 
+res/data.txt
+res/races.txt
+
 env.py
 backup.py
 count.py
