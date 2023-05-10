@@ -408,6 +408,7 @@ def autocomplete():
 @app.route('/update', methods=['GET', 'POST'])
 def update():
     try:
+        get_standings(datetime.datetime.now().year)
         update_races()
         update_data()
         return "success"
@@ -420,7 +421,6 @@ def home():
     if request.method == 'POST':
 
         try:
-            dtyr = dt.now().year
             func_name = request.form.get('func_name')
             datetime = request.form.get('datetime')
             input_list = request.form.get('input_list')
@@ -430,11 +430,6 @@ def home():
                 result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
             else:
                 try:
-                    try:
-                        if int(input_list[0]) == dtyr:
-                            get_standings(input_list)
-                    except Exception as exc:
-                        print(exc + "\nSTANDINGS ERROR")
                     result = "/res/stnd/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
                     log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
                 except Exception as exc:
