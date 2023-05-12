@@ -258,7 +258,7 @@ def schedule_func(input_list, datetime):
     schedule = fastf1.get_event_schedule(yr)
     msg = schedule[['EventDate', 'EventName', 'EventFormat']]
     msg = tabulate.tabulate(msg.values, headers=msg.columns, tablefmt='fancy_grid')
-    text = tabulate.tabulate([["Schedule"]], tablefmt='fancy_grid')
+    text = tabulate.tabulate([[str(yr) + " Schedule"]], tablefmt='fancy_grid')
 
     make_img(datetime, text + "\n" + msg)
     return "success"
@@ -272,13 +272,17 @@ def event_func(input_list, datetime):
     lines = str(msg).splitlines()
     l1 = []
     l2 = []
+    rc = ""
     for line in lines:
-        l1.append(line[:17].strip())
-        l2.append(line[17:].strip())
+        if "Name:" not in line:
+            l1.append(line[:17].strip())
+            l2.append(line[17:].strip())
+        if "EventName" in line:
+            rc = line[17:].strip()
     list = [l1, l2]
     list = np.array(list).T.tolist() 
     msg = tabulate.tabulate(list, tablefmt='fancy_grid')
-    text = tabulate.tabulate([["Event"]], tablefmt='fancy_grid')
+    text = tabulate.tabulate([[str(yr) + " " + rc + " Event Data"]], tablefmt='fancy_grid')
 
     make_img(datetime, text + "\n" + msg)
     return "success"
@@ -1586,3 +1590,6 @@ def rt_func(input_list, datetime):
     rstall(plt)
     queue.remove(datetime)
     return "success"
+
+schedule_func([2023], get_datetime())
+event_func([2023, "Abu Dhabi"], get_datetime())
