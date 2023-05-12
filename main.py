@@ -426,6 +426,9 @@ def home():
             input_list = request.form.get('input_list')
             user_id = request.form.get('id')
             input_list = input_list.replace("[", "").replace("]", "").replace("'", "").split(', ')
+            for i in range(len(input_list)):
+                if input_list[i] == "None":
+                    input_list[i] = None
             if not (func_name.lower() == "drivers" or func_name.lower() == "constructors"):
                 result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
             else:
