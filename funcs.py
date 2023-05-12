@@ -1600,5 +1600,3 @@ def rt_func(input_list, datetime):
     rstall(plt)
     queue.remove(datetime)
     return "success"
-
-event_func([2023, "Abu Dhabi"], get_datetime())
