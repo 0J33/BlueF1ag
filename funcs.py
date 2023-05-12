@@ -41,6 +41,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()
 mpl.use('Agg')
 pd.set_option('display.max_rows', None)
+pd.set_option('display.max_colwidth', None)
 
 dir_path = r"" + str(pathlib.Path(__file__).parent.resolve())
 
@@ -232,10 +233,12 @@ def results_func(input_list, datetime):
         msg2 = msg[['BroadcastName', 'TeamName']]
     sn = session.event.get_session_name(sn)
     text = f"{session.event.year} {session.event['EventName']} {sn}"
-    print(text)
+
     text = tabulate.tabulate([[text]], tablefmt='fancy_grid')
     
     msg2 = tabulate.tabulate(msg2.values, headers=msg2.columns, tablefmt='fancy_grid')
+    
+    msg2 = msg2.replace("BroadcastName", "Driver       ").replace("TeamName", "Team    ")
     
     if session.event.get_session_name(sn).lower() == "qualifying" or session.event.get_session_name(sn).lower() == "sprint shootout":
         msg2 = msg2.replace(".0 0 days", "   0 days").replace(".0                    NaT", "                      NaT").replace("0 days 00:", "").replace("                    Q", "       Q").replace("                   NaT", "      NaT").replace("000 ", " ").replace("000\n", "\n").replace("NaT", "   ")
@@ -258,6 +261,8 @@ def schedule_func(input_list, datetime):
     schedule = fastf1.get_event_schedule(yr)
     msg = schedule[['EventDate', 'EventName', 'EventFormat']]
     msg = tabulate.tabulate(msg.values, headers=msg.columns, tablefmt='fancy_grid')
+    msg = msg.replace("EventDate", "Date     ").replace("EventName", "Name     ").replace("EventFormat", "Format     ")
+    msg = msg.replace("testing", "Testing").replace("conventional", "Conventional").replace("sprint_shootout", "Sprint Shootout").replace("sprint", "Sprint")
     text = tabulate.tabulate([[str(yr) + " Schedule"]], tablefmt='fancy_grid')
 
     make_img(datetime, text + "\n" + msg)
@@ -275,13 +280,18 @@ def event_func(input_list, datetime):
     rc = ""
     for line in lines:
         if "Name:" not in line:
-            l1.append(line[:17].strip())
+            if line[:17].strip() == "OfficialEventName":
+                l1.append("Official Event Name")
+            else:
+                l1.append(line[:17].strip())
             l2.append(line[17:].strip())
         if "EventName" in line:
             rc = line[17:].strip()
     list = [l1, l2]
     list = np.array(list).T.tolist() 
     msg = tabulate.tabulate(list, tablefmt='fancy_grid')
+    msg = msg.replace("RoundNumber ", "Round Number").replace("EventDate ", "Event Date").replace("EventName ", "Event Name").replace("EventFormat ","Event Format").replace("Session1 ", "Session 1").replace("Session1Date  ", "Session 1 Date").replace("Session2 ", "Session 2").replace("Session2Date  ", "Session 2 Date").replace("Session3 ", "Session 3").replace("Session3Date  ", "Session 3 Date").replace("Session4 ", "Session 4").replace("Session4Date  ", "Session 4 Date").replace("Session5 ", "Session 5").replace("Session5Date  ", "Session 5 Date").replace("F1ApiSupport  ", "F1 Api Support")
+    msg = msg.replace("conventional", "Conventional").replace("sprint_shootout", "Sprint Shootout").replace("sprint", "Sprint")
     text = tabulate.tabulate([[str(yr) + " " + rc + " Event Data"]], tablefmt='fancy_grid')
 
     make_img(datetime, text + "\n" + msg)
@@ -1591,5 +1601,4 @@ def rt_func(input_list, datetime):
     queue.remove(datetime)
     return "success"
 
-schedule_func([2023], get_datetime())
 event_func([2023, "Abu Dhabi"], get_datetime())
