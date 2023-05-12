@@ -18,6 +18,7 @@ from fastf1.core import Laps
 from matplotlib import pyplot as plt
 import matplotlib.pyplot as plt
 import pandas as pd
+import tabulate
 from timple.timedelta import strftimedelta
 from matplotlib.colors import ListedColormap
 from matplotlib.collections import LineCollection
@@ -114,24 +115,34 @@ def rstall(plt):
 
 def make_img(datetime, text):
     # Create a new image with a white background
-    text = str(text)
     line_height = 60
     line_spacing = 10
     lines = text.split('\n')
-    height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing) + 55
-    width = max([len(line) for line in lines]) * 33 + 25
+    height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing) + 25
+    width = max([len(line) for line in lines]) * 36 + 25
 
     # Create a new image with a white background
-    img = Image.new('RGB', (width, height), color=(30, 31, 34))
+    img = Image.new('RGB', (width, height), color=(0, 0, 0))
     # Create a new ImageDraw object
     draw = ImageDraw.Draw(img)
-    # Define the console font to use (change to a font installed on your system)
-    font = ImageFont.truetype("consola.ttf", 60)
+
+    # Define the fonts to use (change to fonts installed on your system)
+    interval_font = ImageFont.truetype(dir_path + get_path() + "fonts" + get_path() + "Interval Bold.otf", 60)
+    consola_font = ImageFont.truetype("consola.ttf", 70)
+
     # Draw the text on the image
     y = 10
     for line in lines:
-        draw.text((10, y), line, fill=(255, 255, 255), font=font)
+        x = 10
+        for char in line:
+            # Use the "consola" font for characters that are not supported by the "Interval Bold" font
+            if not interval_font.getmask(char).getbbox():
+                draw.text((x, y), char, fill=(255, 255, 255), font=consola_font)
+            else:
+                draw.text((x, y), char, fill=(255, 255, 255), font=interval_font)
+            x += interval_font.getsize(char)[0]
         y += line_height + line_spacing
+
     # Save the image
     img.save(dir_path + get_path() + "res" + get_path() + "output" + get_path() + datetime + ".png", "PNG")
 
@@ -213,40 +224,43 @@ def results_func(input_list, datetime):
     session.load()
 
     msg = session.results
-    if session.event.get_session_name(sn).lower() == "qualifying":
-        msg2 = str(msg[['BroadcastName', 'TeamName', 'Position', 'Q1', 'Q2', 'Q3']]).replace(".0 0 days", "   0 days").replace(".0                    NaT", "                      NaT").replace("0 days 00:", "").replace("                    Q", "       Q").replace("                   NaT", "      NaT").replace("000 ", " ").replace("000\n", "\n").replace("NaT", "   ")
+    if session.event.get_session_name(sn).lower() == "qualifying" or session.event.get_session_name(sn).lower() == "sprint shootout":
+        msg2 = msg[['BroadcastName', 'TeamName', 'Position', 'Q1', 'Q2', 'Q3']] 
     elif session.event.get_session_name(sn).lower() == "race" or session.event.get_session_name(sn).lower() == "sprint":
-        msg2 = (f" {msg[['BroadcastName', 'TeamName', 'Position', 'Status', 'Points']]}").replace(".0", "  ")
+        msg2 = msg[['BroadcastName', 'TeamName', 'Position', 'Status', 'Points']] 
     else:
-        msg2 = f" {msg[['BroadcastName', 'TeamName']]}"
+        msg2 = msg[['BroadcastName', 'TeamName']]
     sn = session.event.get_session_name(sn)
-    msg2 = f"{session.event.year} {session.event['EventName']} {sn}" + "\n" + (
-        msg2[2:])
+    text = f"{session.event.year} {session.event['EventName']} {sn}"
+    print(text)
+    text = tabulate.tabulate([[text]], tablefmt='fancy_grid')
     
-    make_img(datetime, msg2)
+    msg2 = tabulate.tabulate(msg2.values, headers=msg2.columns, tablefmt='fancy_grid')
+    
+    if session.event.get_session_name(sn).lower() == "qualifying" or session.event.get_session_name(sn).lower() == "sprint shootout":
+        msg2 = msg2.replace(".0 0 days", "   0 days").replace(".0                    NaT", "                      NaT").replace("0 days 00:", "").replace("                    Q", "       Q").replace("                   NaT", "      NaT").replace("000 ", " ").replace("000\n", "\n").replace("NaT", "   ")
+        msg2 = msg2.replace("Q1                    ", "Q1       ").replace("Q2                    ", "Q2       ").replace("Q3                    ", "Q3       ")
+        msg2 = msg2.replace("═══════════════════════╤════════════════════════╤════════════════════════╕", "══════════╤═══════════╤═══════════╕")
+        msg2 = msg2.replace("═══════════════════════╧════════════════════════╧════════════════════════╛", "══════════╧═══════════╧═══════════╛")
+        msg2 = msg2.replace("───────────────────────┼────────────────────────┼────────────────────────┤", "──────────┼───────────┼───────────┤")
+        msg2 = msg2.replace("═══════════════════════╪════════════════════════╪════════════════════════╡", "══════════╪═══════════╪═══════════╡")
+        msg2 = msg2.replace("                        │", "           │")
+    elif session.event.get_session_name(sn).lower() == "race" or session.event.get_session_name(sn).lower() == "sprint":
+        msg2 = msg2.replace(".0", "  ")
+
+    make_img(datetime, text + "\n" + msg2)
     return "success"
 
 def schedule_func(input_list, datetime):
-
+    
     yr = input_list[0]
 
     schedule = fastf1.get_event_schedule(yr)
-    msg = f" {schedule[['EventDate', 'EventName', 'EventFormat']]}"
-    msg = msg[4:]
-    msg = "Schedule:\n" + msg
-    j = 0
-    n = ""
-    while (j < len(msg)):
-        if ((msg[j] != '0' and msg[j] != '1' and msg[j] != '2' and msg[j] != '3' and msg[j] != '4' and msg[j] != '5' and msg[j] != '6' and msg[j] != '7' and msg[j] != '8' and msg[j] != '9')):
-            n = n + msg[j]
-            j = j+1
-        elif (msg[j-1] == ':' or msg[j+2] == ':' or msg[j+4] == '-' or msg[j+2] == '-' or msg[j-1] == '-'):
-            n = n + msg[j] + msg[j+1]
-            j = j+2
-        else:
-            j = j+2
+    msg = schedule[['EventDate', 'EventName', 'EventFormat']]
+    msg = tabulate.tabulate(msg.values, headers=msg.columns, tablefmt='fancy_grid')
+    text = tabulate.tabulate([["Schedule"]], tablefmt='fancy_grid')
 
-    make_img(datetime, n)
+    make_img(datetime, text + "\n" + msg)
     return "success"
 
 def event_func(input_list, datetime):
@@ -254,18 +268,19 @@ def event_func(input_list, datetime):
     yr = input_list[0]
     rc = input_list[1]
 
-    event = fastf1.get_event(yr, rc)
-    msg = str(event)
-    i = 0
-    j = 0
-    while (i < len(msg)):
-        if (msg[i] == ',' and msg[i+1] == ' ' and msg[i+2] == 'd' and msg[i+3] == 't'):
-            j = i
-        i = i+1
-    msg = msg[:j]
-    msg = "Event:\n" + msg
+    msg = fastf1.get_event(yr, rc)
+    lines = str(msg).splitlines()
+    l1 = []
+    l2 = []
+    for line in lines:
+        l1.append(line[:17].strip())
+        l2.append(line[17:].strip())
+    list = [l1, l2]
+    list = np.array(list).T.tolist() 
+    msg = tabulate.tabulate(list, tablefmt='fancy_grid')
+    text = tabulate.tabulate([["Event"]], tablefmt='fancy_grid')
 
-    make_img(datetime, msg)
+    make_img(datetime, text + "\n" + msg)
     return "success"
 
 def laps_func(input_list, datetime):
