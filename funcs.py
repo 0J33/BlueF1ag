@@ -82,28 +82,31 @@ def get_path():
     return path
 
 def get_sess(yr, rc, sn):
+    
+    #if session number
     try:
         rc = int(rc)
         session = fastf1.get_session(yr, rc, sn)
-        session.load()
-        fix = session.laps.pick_fastest()
+    #if session not number
     except:
         try:
+            #check if test
             if rc.lower().__contains__("preseason") or rc.lower().__contains__("pre-season") or rc.lower().__contains__("pre season") or rc.lower().__contains__("testing") or rc.lower().__contains__("test"):
+                print("\n\n\ntest\n\n\n")
                 try:
                     session = fastf1.get_testing_session(yr, 1, sn)
-                    session.load()
-                    fix = session.laps.pick_fastest()
-                except Exception as exc:
+                except:
                     session = fastf1.get_testing_session(yr, 2, sn)
+            #not test
             else:
                 session = fastf1.get_session(yr, rc, sn)
-                session.load()
-                fix = session.laps.pick_fastest()
         except:
             session = fastf1.get_session(yr, rc, sn)
-            session.load()
-            fix = session.laps.pick_fastest()
+    session.load()
+    try:
+        fix = session.laps.pick_fastest()
+    except:
+        pass
     return session
 
 def rstall(plt):
