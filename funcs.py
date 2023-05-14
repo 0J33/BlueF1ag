@@ -226,9 +226,9 @@ def results_func(input_list, datetime):
 
     msg = session.results
     if session.event.get_session_name(sn).lower() == "qualifying" or session.event.get_session_name(sn).lower() == "sprint shootout":
-        msg2 = msg[['BroadcastName', 'TeamName', 'Position', 'Q1', 'Q2', 'Q3']] 
+        msg2 = msg[['Position', 'BroadcastName', 'TeamName', 'Q1', 'Q2', 'Q3']] 
     elif session.event.get_session_name(sn).lower() == "race" or session.event.get_session_name(sn).lower() == "sprint":
-        msg2 = msg[['BroadcastName', 'TeamName', 'Position', 'Status', 'Points']] 
+        msg2 = msg[['Position', 'BroadcastName', 'TeamName', 'Points', 'Status']] 
     else:
         msg2 = msg[['BroadcastName', 'TeamName']]
     sn = session.event.get_session_name(sn)
@@ -259,7 +259,7 @@ def schedule_func(input_list, datetime):
     yr = input_list[0]
 
     schedule = fastf1.get_event_schedule(yr)
-    msg = schedule[['EventDate', 'EventName', 'EventFormat']]
+    msg = schedule[['EventName', 'EventDate', 'EventFormat']]
     msg = tabulate.tabulate(msg.values, headers=msg.columns, tablefmt='fancy_grid')
     msg = msg.replace("EventDate", "Date     ").replace("EventName", "Name     ").replace("EventFormat", "Format     ")
     msg = msg.replace("testing", "Testing").replace("conventional", "Conventional").replace("sprint_shootout", "Sprint Shootout").replace("sprint", "Sprint")
