@@ -38,6 +38,7 @@ import ssl
 import smtplib
 from env import *
 from funcs import *
+from git_func import *
 import warnings
 import platform
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -66,16 +67,23 @@ def delete_all():
 #method that logs data from slash commands
 def log(user_id, message, exc, flag, datetime):  
     datetime = datetime.replace("-", " ").replace(".", ":") 
-    if os.path.exists(dir_path + get_path() + "logs" + get_path() + "logs.txt"): 
-        dev = ""
-        log = "logs"
-        if ((user_id in IDS)):
-            dev = "dev"
-        if flag:
-            log = "exc"
-        testf = open(dir_path + get_path() + "logs" + get_path() + dev + log + ".txt","a")
-        testf.write(str(user_id) + "\n" + str(message) + "\n" + str(exc) + str(datetime) + "\n\n")
-        testf.close()
+    file = ""
+    gist_id = None
+    if (not user_id in IDS and not flag):
+        file = "logs"
+        gist_id = GH_GIST_ID_LOGS
+    elif (not user_id in IDS and flag):
+        file = "exc"
+        gist_id = GH_GIST_ID_EXC
+    elif (user_id in IDS and not flag):
+        file = "devlogs"
+        gist_id = GH_GIST_ID_DEVLOGS
+    elif (user_id in IDS and flag):
+        file = "devexc"
+        gist_id = GH_GIST_ID_DEVEXC
+    content = (str(user_id) + "\n" + str(message) + "\n" + str(exc) + "\n" + str(datetime) + "\n\n")
+    old = read_gist(gist_id, file)
+    update_gist(old + content, gist_id, file)
 
 #fix exception string
 def fix_exc(exc, fixed_inputs, comm):
