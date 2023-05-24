@@ -10,6 +10,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import platform
 from PIL import Image, ImageDraw, ImageFont
+from env import *
+from git_func import *
 platform.system()
 
 
@@ -484,16 +486,15 @@ def update_races():
             df = df.values
             df = df.tolist()
             df = str(df).replace("[","").replace("]","").replace("'","")
-            file = open("res/races.txt", "a")
-            file.write(str(yr) + ":" + df + "\n")
-            file.close()
+            content = (str(yr) + ":" + df + "\n")
+            old = read_gist(GH_GIST_ID_RACES, "races")
+            update_gist(old + content, GH_GIST_ID_RACES, "races")
+            
 
 def update_data():
     yr = datetime.datetime.now().year
     races = []
-    file = open('res/races.txt', 'r')
-    data = file.read()
-    file.close()
+    old = read_gist(GH_GIST_ID_DATA, "data")
     data = data.split("\n")
     for i in range(1, len(data)):
         if str(yr) in data[i]:
@@ -503,19 +504,15 @@ def update_data():
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
-            file = open('res/data.txt', 'r')
-            text = file.read()
-            file.close()
-            if text.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
+            if old.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
                 pass
             else:
                 try:
                     drivers = get_drivers(yr, rc, sn)
                     laps = get_laps(yr, rc, sn)
                     distance = get_distance(yr, rc, sn)
-                    file = open('res/data.txt', 'a')
-                    file.write("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
-                    file.close()
+                    content = ("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
+                    update_gist(old + content, GH_GIST_ID_DATA, "data")
                 except:
                     pass
                      
