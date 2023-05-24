@@ -405,13 +405,9 @@ app = Flask('', static_folder='res')
 
 @app.route('/autocomplete', methods=['GET', 'POST'])
 def autocomplete():
-    file = open(dir_path + get_path() + "res" + get_path() + "data.txt", "r")
-    data = file.read()
-    file.close()
-    file = open(dir_path + get_path() + "res" + get_path() + "races.txt", "r")
-    races_data = file.read()
-    file.close()
-    return data + "\n\n\n\n" + races_data
+    data = read_gist(GH_GIST_ID_DATA, "data")
+    races = read_gist(GH_GIST_ID_RACES, "races")
+    return data + "\n\n\n\n" + races
 
 @app.route('/update', methods=['GET', 'POST'])
 def update():
