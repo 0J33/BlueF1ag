@@ -490,17 +490,17 @@ def update_races():
             old = read_gist(GH_GIST_ID_RACES, "races")
             update_gist(old + content, GH_GIST_ID_RACES, "races")
             
-
 def update_data():
     yr = datetime.datetime.now().year
-    races = []
+    races_list = []
+    races = read_gist(GH_GIST_ID_RACES, "races")
     old = read_gist(GH_GIST_ID_DATA, "data")
-    data = data.split("\n")
+    data = races.split("\n")
     for i in range(1, len(data)):
         if str(yr) in data[i]:
-            races = data[i][5:].split(",")
+            races_list = data[i][5:].split(",")
             break
-    for rc in races:
+    for rc in races_list:
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
@@ -512,7 +512,7 @@ def update_data():
                     laps = get_laps(yr, rc, sn)
                     distance = get_distance(yr, rc, sn)
                     content = ("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
-                    update_gist(old + content, GH_GIST_ID_DATA, "data")
+                    update_gist((read_gist(GH_GIST_ID_DATA, "data")) + content, GH_GIST_ID_DATA, "data")
                 except:
                     pass
                      
