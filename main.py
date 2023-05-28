@@ -81,7 +81,7 @@ def log(user_id, message, exc, flag, datetime):
     elif (user_id in IDS and flag):
         file = "devexc"
         gist_id = GH_GIST_ID_DEVEXC
-    content = (str(user_id) + "\n" + str(message) + "\n" + str(exc) + "\n" + str(datetime) + "\n\n")
+    content = (str(user_id) + "\n" + str(message) + "\n" + str(exc) + str(datetime) + "\n\n")
     old = read_gist(gist_id, file)
     update_gist(old + content, gist_id, file)
 
