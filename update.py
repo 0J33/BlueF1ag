@@ -49,11 +49,21 @@ def drvr(driver_standings):
 #main
 def driver_func(yr):
     
+    from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
     def ergast_retrieve(api_endpoint: str):
         url = f'https://ergast.com/api/f1/{api_endpoint}.json'
-        response = requests.get(url).json()
         
-        return response['MRData']
+        try:
+            # Disable SSL verification
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            
+            response = requests.get(url, verify=False, timeout=300)  # Set the timeout duration to 10 seconds
+            response.raise_for_status()  # Raise an exception for any HTTP errors
+            return response.json()['MRData']
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+            return None
 
     colors = ["#333333", "#444444", "#555555", "#666666", "#777777", "#888888", "#999999", "#AAAAAA", "#BBBBBB", "#CCCCCC"]
     color_counter = 0
@@ -223,11 +233,21 @@ def constr(constructor_standings):
 #main
 def const_func(yr):
     
+    from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
     def ergast_retrieve(api_endpoint: str):
         url = f'https://ergast.com/api/f1/{api_endpoint}.json'
-        response = requests.get(url).json()
         
-        return response['MRData']
+        try:
+            # Disable SSL verification
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            
+            response = requests.get(url, verify=False, timeout=300)  # Set the timeout duration to 10 seconds
+            response.raise_for_status()  # Raise an exception for any HTTP errors
+            return response.json()['MRData']
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+            return None
 
     colors = ["#333333", "#444444", "#555555", "#666666", "#777777", "#888888", "#999999", "#AAAAAA", "#BBBBBB", "#CCCCCC"]
     color_counter = 0
@@ -516,7 +536,7 @@ def update_data():
                 except:
                     pass
                      
-# update(yr)
+update(yr)
 
 # update_from(yr)
 
