@@ -536,7 +536,7 @@ def update_data():
                 except:
                     pass
                      
-update(yr)
+# update(yr)
 
 # update_from(yr)
 
