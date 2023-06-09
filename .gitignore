@@ -1,7 +1,8 @@
 __pycache__/
 
 doc_cache/
-output/
+res/output/
+res/stnd/
 
 env.py
 backup.py

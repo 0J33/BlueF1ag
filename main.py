@@ -383,7 +383,7 @@ def command(user_id, input_list, comm, datetime):
     return datetime
 
 #get standings
-def get_standings(input_list):
+async def get_standings(input_list):
     response = requests.get(SERVER + "/standings")
     res = response.text
     res = res.split(",")
@@ -412,7 +412,7 @@ def autocomplete():
 @app.route('/update', methods=['GET', 'POST'])
 def update():
     try:
-        get_standings(datetime.datetime.now().year)
+        asyncio.run(get_standings([get_datetime()]))
         update_races()
         update_data()
         return "success"
@@ -437,6 +437,9 @@ def home():
                 result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
             else:
                 try:
+                    print(input_list[0], dt.now().year)
+                    if int(input_list[0])==dt.now().year:
+                        asyncio.run(get_standings(input_list))
                     result = "/res/stnd/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
                     log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
                 except Exception as exc:
