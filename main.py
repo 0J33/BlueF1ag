@@ -69,10 +69,15 @@ def log(user_id, message, exc, flag, datetime):
     datetime = datetime.replace("-", " ").replace(".", ":") 
     file = ""
     gist_id = None
-    if (not user_id in IDS and not flag):
+    id_flg = False
+    for i in IDS:
+        if IDS[i] in user_id:
+            id_flg = True
+            break
+    if (not id_flg and not flag):
         file = "logs"
         gist_id = GH_GIST_ID_LOGS
-    elif (not user_id in IDS and flag):
+    elif (not id_flg and flag):
         file = "exc"
         gist_id = GH_GIST_ID_EXC
     elif (user_id in IDS and not flag):
