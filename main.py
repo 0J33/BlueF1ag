@@ -389,7 +389,7 @@ def command(user_id, input_list, comm, datetime):
 
 #get standings
 async def get_standings(input_list):
-    response = requests.get(SERVER + "/standings")
+    response = requests.get((SERVER + "/standings"))
     res = response.text
     res = res.split(",")
     s1 = SERVER + res[0]
