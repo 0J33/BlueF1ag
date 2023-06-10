@@ -56,7 +56,6 @@ if os.path.exists(dir_path + get_path() + "doc_cache"):
 #delete all files
 def delete_all():
     folder_path = dir_path + get_path() + "res" + get_path() + "output"
-    print(folder_path)
     # Get a list of all files in the folder
     file_list = os.listdir(folder_path)
     # Loop through each file and delete it
@@ -71,7 +70,7 @@ def log(user_id, message, exc, flag, datetime):
     gist_id = None
     id_flg = False
     for i in IDS:
-        if IDS[i] in user_id:
+        if i in user_id:
             id_flg = True
             break
     if (not id_flg and not flag):
@@ -442,7 +441,6 @@ def home():
                 result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
             else:
                 try:
-                    print(input_list[0], dt.now().year)
                     if int(input_list[0])==dt.now().year:
                         asyncio.run(get_standings(input_list))
                     result = "/res/stnd/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
