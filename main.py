@@ -429,11 +429,10 @@ def update():
     except:
         races = "races fail"
     try:
-        update_data()
-        data = "data success"
+        data = update_data()
     except:
         data = "data fail"
-    return stnd + "\n" + races + "\n" + data
+    return stnd + "<br />" + races + "<br />" + data
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
