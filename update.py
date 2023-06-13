@@ -544,9 +544,10 @@ def update_data():
                 except:
                     if res == []:
                         msg = "No sessions updated."
+                        return msg
                     else:
                         msg = "Sessions updated:"
-                    return msg + "\n" + str(res)
+                        return msg + "\n" + str(res)
                      
 # update(yr)
 
