@@ -511,6 +511,8 @@ def update_races():
             update_gist(old + content, GH_GIST_ID_RACES, "races")
             
 def update_data():
+    res = []
+    msg = "Err"
     yr = datetime.datetime.now().year
     races_list = []
     races = read_gist(GH_GIST_ID_RACES, "races")
@@ -524,8 +526,13 @@ def update_data():
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
+            print("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn))
             if old.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
                 pass
+            elif "testing" in rc.lower():
+                pass
+            elif "emilia romagna" in rc.lower():
+                rc = "Emilia Romagna"
             else:
                 try:
                     drivers = get_drivers(yr, rc, sn)
@@ -533,8 +540,13 @@ def update_data():
                     distance = get_distance(yr, rc, sn)
                     content = ("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
                     update_gist((read_gist(GH_GIST_ID_DATA, "data")) + content, GH_GIST_ID_DATA, "data")
+                    res.append(content)
                 except:
-                    pass
+                    if res == []:
+                        msg = "No sessions updated."
+                    else:
+                        msg = "Sessions updated:"
+                    return msg + "\n" + str(res)
                      
 # update(yr)
 
@@ -542,4 +554,4 @@ def update_data():
 
 # update_races()
 
-# update_data()
+print(update_data())
