@@ -552,6 +552,6 @@ def update_data():
 
 # update_from(yr)
 
-update_races()
+# update_races()
 
 # print(update_data())
