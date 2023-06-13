@@ -554,4 +554,4 @@ def update_data():
 
 # update_races()
 
-print(update_data())
+# print(update_data())
