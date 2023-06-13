@@ -499,16 +499,16 @@ def get_distance(yr, rc, sn):
     return maxdist
 
 def update_races():
-    for yr in range(1950, datetime.datetime.now().year+1):
-        if str(yr) not in open("res/races.txt").read():
-            schedule = fastf1.get_event_schedule(yr)
-            df = schedule[['EventName']]
-            df = df.values
-            df = df.tolist()
-            df = str(df).replace("[","").replace("]","").replace("'","")
-            content = (str(yr) + ":" + df + "\n")
-            old = read_gist(GH_GIST_ID_RACES, "races")
-            update_gist(old + content, GH_GIST_ID_RACES, "races")
+    yr = datetime.datetime.now().year
+    old = read_gist(GH_GIST_ID_RACES, "races")
+    if str(yr) not in old:
+        schedule = fastf1.get_event_schedule(yr)
+        df = schedule[['EventName']]
+        df = df.values
+        df = df.tolist()
+        df = str(df).replace("[","").replace("]","").replace("'","")
+        content = (str(yr) + ":" + df + "\n")
+        update_gist(old + content, GH_GIST_ID_RACES, "races")
             
 def update_data():
     res = []
@@ -552,6 +552,6 @@ def update_data():
 
 # update_from(yr)
 
-# update_races()
+update_races()
 
 # print(update_data())
