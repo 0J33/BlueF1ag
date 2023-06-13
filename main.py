@@ -415,13 +415,25 @@ def autocomplete():
 
 @app.route('/update', methods=['GET', 'POST'])
 def update():
+    stnd = ""
+    races = ""
+    data = ""
     try:
         asyncio.run(get_standings([get_datetime()]))
-        update_races()
-        update_data()
-        return "success"
+        stnd = "stnd success"
     except:
-        return "fail"
+        stnd = "stnd fail"
+    try:
+        update_races()
+        races = "race success"
+    except:
+        races = "races fail"
+    try:
+        update_data()
+        data = "data success"
+    except:
+        data = "data fail"
+    return stnd + "\n" + races + "\n" + data
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
