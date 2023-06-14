@@ -526,13 +526,12 @@ def update_data():
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
-            print("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn))
+            if rc.__contains__("Grand Prix"):
+                rc = rc.replace("Grand Prix", "")
             if old.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
                 pass
             elif "testing" in rc.lower():
                 pass
-            elif "emilia romagna" in rc.lower():
-                rc = "Emilia Romagna"
             else:
                 try:
                     drivers = get_drivers(yr, rc, sn)
