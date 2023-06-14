@@ -526,11 +526,11 @@ def update_data():
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
+            if old.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
+                pass
             rc = rc.strip()
             if rc.__contains__("Grand Prix"):
                 rc = rc.replace("Grand Prix", "")
-            if old.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
-                pass
             elif "testing" in rc.lower():
                 pass
             else:
