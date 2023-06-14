@@ -154,20 +154,16 @@ def fix_exc(exc, fixed_inputs, comm):
         exc = "An error has occured. Try a different lap number\n"
         
     #other errors
-    elif exc.__contains__("'NoneType' object is not subscriptable") or exc.__contains__("'NaTType' object has no attribute 'upper'") or exc.__contains__("0") or exc.__contains__ ("'Lap' object has no attribute 'session'") or exc.__contains__("No such file or directory") or exc.__contains__("attempt to get argmin of an empty sequence") or exc == "":
+    elif exc.__contains__("'NoneType' object is not subscriptable") or exc.__contains__("'NaTType' object has no attribute 'upper'") or exc.__contains__("single positional indexer is out-of-bounds") or exc=="0" or exc.__contains__ ("'Lap' object has no attribute 'session'") or exc.__contains__("No such file or directory") or exc.__contains__("attempt to get argmin of an empty sequence") or exc == "":
         exc = "An unknown error occured. Please make sure you provided all the command inputs correctly.\n"
         
     #connection error
-    elif exc.__contains__("Cannot connect to host") or exc.__contains__("Unauthorized"):
+    elif exc.__contains__("Cannot connect to host") or exc.__contains__("Unauthorized") or exc.__contains__("HTTP"):
         exc = "A connection error has occured. Please try again later.\n"
         
     #api error
     elif exc.__contains__("Expecting value: line 1 column 1 (char 0)"):
         exc = "An error occured while fetching data from the API. Please try again later.\n"
-    
-    #index
-    elif exc.__contains__("single positional indexer is out-of-bounds"):
-        exc = "Index is out-of-bounds.\n"
     
     else:
         exc = "An unknown error occured.\n"
@@ -364,7 +360,7 @@ def command(user_id, input_list, comm, datetime):
             res = rt_func(fixed_inputs, datetime)
             
         if res !="success" or res == None:
-            raise Exception("Inter Server Error. Please try again.")
+            raise Exception("Internal Server Error. Please try again.")
         else:
             print("FINISHED " + message + " " + datetime)
                 
