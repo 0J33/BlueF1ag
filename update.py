@@ -526,22 +526,19 @@ def update_data():
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
+            print("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn))
             if old.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
                 pass
-            rc = rc.strip()
-            if rc.__contains__("Grand Prix"):
-                rc = rc.replace("Grand Prix", "")
             elif "testing" in rc.lower():
                 pass
             else:
                 try:
+                    print(yr, rc, sn)
                     drivers = get_drivers(yr, rc, sn)
                     laps = get_laps(yr, rc, sn)
                     distance = get_distance(yr, rc, sn)
-                    if rc.endswith(" "):
-                        rc += "Grand Prix"
                     content = ("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
-                    update_gist((read_gist(GH_GIST_ID_DATA, "data")) + content, GH_GIST_ID_DATA, "data")
+                    #update_gist((read_gist(GH_GIST_ID_DATA, "data")) + content, GH_GIST_ID_DATA, "data")
                     res.append(content)
                 except:
                     if res == []:
