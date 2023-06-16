@@ -45,6 +45,13 @@ pd.set_option('display.max_colwidth', None)
 
 dir_path = r"" + str(pathlib.Path(__file__).parent.resolve())
 
+if not os.path.exists(dir_path + get_path() + "res"):
+    os.mkdir(dir_path + get_path() + "res")
+if not os.path.exists(dir_path + get_path() + "res" + get_path() + "output"):
+    os.mkdir(dir_path + get_path() + "res" + get_path() + "output")
+if not os.path.exists(dir_path + get_path() + "res" + get_path() + "stnd"):
+    os.mkdir(dir_path + get_path() + "res" + get_path() + "stnd")
+
 queue = []
 
 
@@ -150,6 +157,7 @@ def make_img(datetime, text):
     # Save the image
     img.save(dir_path + get_path() + "res" + get_path() + "output" + get_path() + datetime + ".png", "PNG")
 
+set_font()
 
 
 def fastest_func(input_list, datetime):
