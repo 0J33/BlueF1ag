@@ -1,6 +1,7 @@
 import requests
 from env import *
 
+# read from a gist
 def read_gist(gist_id, file):
     url = f"https://api.github.com/gists/{gist_id}"
     headers = {"Authorization": f"token {GH_TOKEN}"}
@@ -12,7 +13,7 @@ def read_gist(gist_id, file):
     else:
         return "error"
 
-# Update an existing Gist
+# update a gist
 def update_gist(content, gist_id, file):
     url = f"https://api.github.com/gists/{gist_id}"
     headers = {"Authorization": f"token {GH_TOKEN}"}

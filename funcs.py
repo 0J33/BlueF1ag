@@ -43,8 +43,10 @@ mpl.use('Agg')
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_colwidth', None)
 
+# get path of file
 dir_path = r"" + str(pathlib.Path(__file__).parent.resolve())
 
+# create folders if they don't exist
 if not os.path.exists(dir_path + get_path() + "res"):
     os.mkdir(dir_path + get_path() + "res")
 if not os.path.exists(dir_path + get_path() + "res" + get_path() + "output"):
@@ -57,6 +59,7 @@ queue = []
 
 ### GENERAL FUNCTIONS ###
 
+# queue system to run mpl for functions in order
 def wait_for_turn(datetime):
     if queue[0] == datetime:
         return
@@ -64,15 +67,18 @@ def wait_for_turn(datetime):
         tm.sleep(1)
         wait_for_turn(datetime)
 
+# get_datetime helper
 def get_time():
     return ctime(time())
 
+# get current time
 def get_datetime():
     datetime = get_time()
     datetime = datetime.replace(" ", "-")
     datetime = datetime.replace(":", ".")
     return datetime
 
+# set mpl font
 def set_font():
     # set font
     fe = fm.FontEntry(
@@ -82,6 +88,7 @@ def set_font():
     fm.fontManager.ttflist.insert(0, fe)  # or append is fine
     mpl.rcParams['font.family'] = fe.name  # = 'your custom ttf font name'
 
+# get path for os
 def get_path():
     if platform.system().__contains__("Win"):
         path = "\\"
@@ -89,6 +96,7 @@ def get_path():
         path = "/"
     return path
 
+# load the session
 def get_sess(yr, rc, sn):
     
     #if session number
@@ -117,6 +125,7 @@ def get_sess(yr, rc, sn):
         pass
     return session
 
+# reset mpl
 def rstall(plt):
     plt.clf()
     plt.cla()
@@ -125,6 +134,7 @@ def rstall(plt):
     mpl.rcdefaults()
     set_font()
 
+# turn text into image
 def make_img(datetime, text):
     # Create a new image with a white background
     line_height = 60
@@ -158,6 +168,7 @@ def make_img(datetime, text):
     # Save the image
     img.save(dir_path + get_path() + "res" + get_path() + "output" + get_path() + datetime + ".png", "PNG")
 
+# set mpl font
 set_font()
 
 ### END OF GENERAL FUNCTIONS ###
@@ -1163,7 +1174,7 @@ def cornering_func(input_list, datetime):
     queue.remove(datetime)
     return "success"
 
-def tires_func(input_list, datetime):
+def tires_func(input_list, datetime): # very slow
 
     yr = input_list[0]
     rc = input_list[1]
@@ -1620,6 +1631,6 @@ def rt_func(input_list, datetime):
 ### END OF PLOTTING FUNCTIONS ###
 
 
-### If you want to test a function make sure to provide the correct input_list and datetime ###
+### If you want to run a function make sure to provide the correct input_list and datetime ###
 
 # results_func([2021, 'Abu Dhabi Grand Prix', 'Race'], get_datetime())
