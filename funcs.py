@@ -55,6 +55,7 @@ if not os.path.exists(dir_path + get_path() + "res" + get_path() + "stnd"):
 queue = []
 
 
+### GENERAL FUNCTIONS ###
 
 def wait_for_turn(datetime):
     if queue[0] == datetime:
@@ -159,6 +160,10 @@ def make_img(datetime, text):
 
 set_font()
 
+### END OF GENERAL FUNCTIONS ###
+
+
+### PLOTTING FUNCTIONS ###
 
 def fastest_func(input_list, datetime):
 
@@ -1611,3 +1616,10 @@ def rt_func(input_list, datetime):
     rstall(plt)
     queue.remove(datetime)
     return "success"
+
+### END OF PLOTTING FUNCTIONS ###
+
+
+### If you want to test a function make sure to provide the correct input_list and datetime ###
+
+# results_func([2021, 'Abu Dhabi Grand Prix', 'Race'], get_datetime())
