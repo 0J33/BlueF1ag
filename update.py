@@ -551,4 +551,4 @@ def update_data(yr):
 
 # update_races(yr)
 
-# print(update_data(yr))
+print(update_data(yr))
