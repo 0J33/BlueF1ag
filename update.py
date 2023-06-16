@@ -15,9 +15,10 @@ from git_func import *
 platform.system()
 
 
-
+# get parth of file
 dir_path = r"" + str(pathlib.Path(__file__).parent.resolve())
 
+# get path for os
 def get_path():
     if platform.system().__contains__("Win"):
         path = "\\"
@@ -25,11 +26,17 @@ def get_path():
         path = "/"
     return path
 
+# enable cache
+try:
+    ff1.Cache.enable_cache("doc_cache")
+except: 
+    pass
+
+# set yr to current year
 yr = datetime.datetime.now().year
 
 
-
-#helper
+# get driver standings
 def get_drivers_standings():
     url = "https://ergast.com/api/f1/" + str(yr) + "/driverStandings.json"
     response = requests.get(url)
@@ -37,7 +44,7 @@ def get_drivers_standings():
     drivers_standings = data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']  # noqa: E501
     return drivers_standings
 
-#text
+# gets the driver standings in text format
 def drvr(driver_standings):
     st = ""
     for _, driver in enumerate(driver_standings):
@@ -46,7 +53,7 @@ def drvr(driver_standings):
             f"{driver['position']}: {driver['Driver']['code']}, Points: {driver['points']}" + "\n"
     return st
 
-#main
+# gets the driver standings and plots them
 def driver_func(yr):
     
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -210,9 +217,7 @@ def driver_func(yr):
     #plt.show()
     plt.savefig(dir_path + "\\res\\stnd\\" + str(yr) + "_DRIVERS_STANDINGS" + '.png')
 
-
-
-#helper
+# get constructorss standings
 def get_constructors_standings():
     url = "https://ergast.com/api/f1/" + \
         str(yr) + "/constructorStandings.json"
@@ -221,7 +226,7 @@ def get_constructors_standings():
     constructors_standings = data['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings']  # noqa: E501
     return constructors_standings
 
-#text
+# get the constructors standings in text format
 def constr(constructor_standings):
     st = ""
     for _, constructor in enumerate(constructor_standings):
@@ -230,7 +235,7 @@ def constr(constructor_standings):
             f"{constructor['position']}: {constructor['Constructor']['name']}, Points: {constructor['points']}" + "\n"
     return st
 
-#main
+# get the constructors standings and plots them
 def const_func(yr):
     
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -387,9 +392,7 @@ def const_func(yr):
     #plt.show()
     plt.savefig(dir_path + "\\res\\stnd\\" + str(yr) + "_CONSTRUCTORS_STANDINGS" + '.png')
 
-
-
-#update year
+### updates standings for both drivers and constructors ###
 def update(yr):
     
     stnd = False
@@ -410,7 +413,7 @@ def update(yr):
         
     return stnd
 
-#update from year
+### updates standings for both drivers and constructors from a given year onwards ###
 def update_from(i):
     while i >= 1950:
         try:
@@ -420,18 +423,7 @@ def update_from(i):
             print(str(exc) + "\nFAILED UPDATE " + str(i))
         i -= 1
 
-
-
-import csv
-import datetime
-import fastf1
-import numpy as np
-
-try:
-    fastf1.Cache.enable_cache("doc_cache")
-except: 
-    pass
-
+### gets the years for which data is available for each function ###
 def get_years(func):
     years = []
     func = func.lower()
@@ -446,6 +438,7 @@ def get_years(func):
             years.append(i)
     return years[::-1]
 
+### get races of a given year ###
 def get_races(yr):
     file = open("res/data.txt", "r")
     text = file.read()
@@ -459,13 +452,14 @@ def get_races(yr):
         res[i] = res[i].strip()
     return res
 
+### gets sessions of a grand prix weekend ###
 def get_sessions(yr, rc):
     yr = int(yr)
     sessions = []
     i=1
     while True:
         sess = 'Session' + str(i)
-        fastf1_obj = fastf1.get_event(yr, rc)
+        fastf1_obj = ff1.get_event(yr, rc)
         try: 
             sessions.append((getattr(fastf1_obj, sess)))
         except:
@@ -473,16 +467,18 @@ def get_sessions(yr, rc):
         i+=1
     return sessions
  
+### gets drivers of a session ###
 def get_drivers(yr, rc, sn):
-    session = fastf1.get_session(yr, rc, sn)
+    session = ff1.get_session(yr, rc, sn)
     session.load()
     laps = session.laps
     ls = set(tuple(x) for x in laps[['Driver']].values.tolist())
     lis = [x[0] for x in ls]
     return lis
 
+### gets laps of a session ###
 def get_laps(yr, rc, sn):
-    session = fastf1.get_session(yr, rc, sn)
+    session = ff1.get_session(yr, rc, sn)
     session.load()
     laps = session.laps
     ls = set(tuple(x) for x in laps[['LapNumber']].values.tolist())
@@ -490,30 +486,31 @@ def get_laps(yr, rc, sn):
     max = int(np.max(lis))
     return max
 
+### gets distance of a session ###
 def get_distance(yr, rc, sn):
-    session = fastf1.get_session(yr, rc, sn)
+    session = ff1.get_session(yr, rc, sn)
     session.load()
     laps = session.load_laps(with_telemetry=True)
     car_data = laps.pick_fastest().get_car_data().add_distance()
     maxdist = int(np.max(car_data['Distance']))
     return maxdist
 
-def update_races():
-    yr = datetime.datetime.now().year
+### updates gist with races of a given year ###
+def update_races(yr):
     old = read_gist(GH_GIST_ID_RACES, "races")
     if str(yr) not in old:
-        schedule = fastf1.get_event_schedule(yr)
+        schedule = ff1.get_event_schedule(yr)
         df = schedule[['EventName']]
         df = df.values
         df = df.tolist()
         df = str(df).replace("[","").replace("]","").replace("'","")
         content = (str(yr) + ":" + df + "\n")
         update_gist(old + content, GH_GIST_ID_RACES, "races")
-            
-def update_data():
+
+### updates gist with data of all sessions of a given year and returns a list of all updated sessions ###
+def update_data(yr):
     res = []
     msg = "Err"
-    yr = datetime.datetime.now().year
     races_list = []
     races = read_gist(GH_GIST_ID_RACES, "races")
     old = read_gist(GH_GIST_ID_DATA, "data")
@@ -547,11 +544,11 @@ def update_data():
                     else:
                         msg = "Sessions updated:"
                         return msg + "\n" + str(res)
-                     
+   
 # update(yr)
 
 # update_from(yr)
 
-# update_races()
+# update_races(yr)
 
 # print(update_data())

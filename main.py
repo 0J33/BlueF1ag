@@ -46,14 +46,14 @@ platform.system()
 mpl.use('Agg')
 pd.set_option('display.max_rows', None)
 
-#set mpl font
+# set mpl font
 set_font()
 
-#enable cache
+# enable cache
 if os.path.exists(dir_path + get_path() + "doc_cache"):
     fastf1.Cache.enable_cache(dir_path + get_path() + "doc_cache")
 
-#delete all files
+# delete all files
 def delete_all():
     folder_path = dir_path + get_path() + "res" + get_path() + "output"
     # Get a list of all files in the folder
@@ -63,7 +63,7 @@ def delete_all():
         file_path = os.path.join(folder_path, file_name)
         os.remove(file_path)
 
-#method that logs data from slash commands
+# method that logs data from slash commands
 def log(user_id, message, exc, flag, datetime):  
     datetime = datetime.replace("-", " ").replace(".", ":") 
     file = ""
@@ -89,7 +89,7 @@ def log(user_id, message, exc, flag, datetime):
     old = read_gist(gist_id, file)
     update_gist(old + content, gist_id, file)
 
-#fix exception string
+# fix exception string
 def fix_exc(exc, fixed_inputs, comm):
     
     yr = fixed_inputs[0]
@@ -169,7 +169,7 @@ def fix_exc(exc, fixed_inputs, comm):
         exc = "An unknown error occured.\n"
     return exc
 
-#command
+# command
 def command(user_id, input_list, comm, datetime):
   
     try:
@@ -382,7 +382,7 @@ def command(user_id, input_list, comm, datetime):
     log(user_id, message, exc, flag, datetime)
     return datetime
 
-#get standings
+# get standings
 async def get_standings(input_list):
     response = requests.get((SERVER + "/standings"))
     res = response.text
@@ -400,15 +400,10 @@ async def get_standings(input_list):
         file.write(res2)
         file.close()
 
-#flask server
+# flask server
 app = Flask('', static_folder='res')
 
-@app.route('/autocomplete', methods=['GET', 'POST'])
-def autocomplete():
-    data = read_gist(GH_GIST_ID_DATA, "data")
-    races = read_gist(GH_GIST_ID_RACES, "races")
-    return data + "\n\n\n\n" + races
-
+# update data
 @app.route('/update', methods=['GET', 'POST'])
 def update():
     stnd = ""
@@ -430,6 +425,7 @@ def update():
         data = "data fail"
     return stnd + "<br />" + races + "<br />" + data
 
+# execute function when user submits form
 @app.route('/', methods=['GET', 'POST'])
 def home():
         
@@ -460,6 +456,7 @@ def home():
     else:
         return "Backend is running."
 
+# run the server
 def run():
     try:
         delete_all()
@@ -467,8 +464,10 @@ def run():
         pass
     app.run(host='0.0.0.0',port=2222)
 
+# keep the server running
 def keep_alive():
     t = Thread(target=run)
     t.start()
-    
+
+# keep the server running
 keep_alive()
