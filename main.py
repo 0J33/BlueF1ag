@@ -406,6 +406,7 @@ app = Flask('', static_folder='res')
 # update data
 @app.route('/update', methods=['GET', 'POST'])
 def update():
+    yr = dt.now().year
     stnd = ""
     races = ""
     data = ""
@@ -415,12 +416,12 @@ def update():
     except:
         stnd = "stnd fail"
     try:
-        update_races()
+        update_races(yr)
         races = "race success"
     except:
         races = "races fail"
     try:
-        data = update_data()
+        data = update_data(yr)
     except:
         data = "data fail"
     return stnd + "<br />" + races + "<br />" + data
