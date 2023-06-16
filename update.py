@@ -535,7 +535,7 @@ def update_data(yr):
                     laps = get_laps(yr, rc, sn)
                     distance = get_distance(yr, rc, sn)
                     content = ("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
-                    #update_gist((read_gist(GH_GIST_ID_DATA, "data")) + content, GH_GIST_ID_DATA, "data")
+                    update_gist((read_gist(GH_GIST_ID_DATA, "data")) + content, GH_GIST_ID_DATA, "data")
                     res.append(content)
                 except:
                     if res == []:
@@ -551,4 +551,4 @@ def update_data(yr):
 
 # update_races(yr)
 
-# print(update_data())
+# print(update_data(yr))
