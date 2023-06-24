@@ -411,7 +411,7 @@ def update():
     races = ""
     data = ""
     try:
-        asyncio.run(get_standings([get_datetime()]))
+        asyncio.run(get_standings([dt.now().year]))
         stnd = "stnd success"
     except:
         stnd = "stnd fail"
