@@ -523,6 +523,8 @@ def update_data(yr):
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
+            if sn == "Sprint Shootout":
+                sn = "Sprint"
             if old.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
                 pass
             elif "testing" in rc.lower():
@@ -530,13 +532,26 @@ def update_data(yr):
             else:
                 try:
                     print(yr, rc, sn)
-                    drivers = get_drivers(yr, rc, sn)
-                    laps = get_laps(yr, rc, sn)
-                    distance = get_distance(yr, rc, sn)
+                    try:
+                        drivers = get_drivers(yr, rc, sn)
+                    except Exception as exc:
+                        print(str(exc) + "\nNO DRIVERS DATA")
+                    try:
+                        laps = get_laps(yr, rc, sn)
+                    except Exception as exc:
+                        print(str(exc) + "\nNO LAPS DATA")
+                    try:
+                        distance = get_distance(yr, rc, sn)
+                    except Exception as exc:
+                        print(str(exc) + "\nNO DISTANCE DATA")
+                        distance = 0
+                        if rc.lower().__contains__("austria"):
+                            distance = 4300
                     content = ("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
                     update_gist(old + content, GH_GIST_ID_DATA, "data")
-                    res.append(content)
-                except:
+                    res.append(yr, rc, sn)
+                except Exception as exc:
+                    print(str(exc))
                     if res == []:
                         msg = "No sessions updated."
                         return msg
@@ -550,4 +565,4 @@ def update_data(yr):
 
 # update_races(yr)
 
-# print(update_data(yr))
+print(update_data(yr))
