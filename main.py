@@ -204,15 +204,25 @@ def command(user_id, input_list, comm, datetime):
             fixed_inputs.append(sn)
         
         if (comm == "laps" or comm == "time" or comm == "distance" or comm == "racetrace"):
+            driver_list = []
             if (comm == "racetrace"):
-                driver_list = input_list[2]
+                # driver_list = input_list[2]
+                i = 2
             else:
-                driver_list = input_list[3]
+                # driver_list = input_list[3]
+                i = 3
                 
-            drivers = driver_list.split("/")
+            while i < len(input_list):
+                if (input_list[i].isnumeric()):
+                    break
+                else:
+                    driver_list.append(input_list[i])
+                i+=1
+                
+            drivers = driver_list
         
             fixed_inputs.append(drivers)
-        
+            
         if (comm == "gear" or comm == "speed"):
             driver = input_list[3]
             
