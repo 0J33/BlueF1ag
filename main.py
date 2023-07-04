@@ -219,7 +219,10 @@ def command(user_id, input_list, comm, datetime):
                     driver_list.append(input_list[i])
                 i+=1
                 
-            drivers = driver_list
+            if driver_list[0].__contains__("/"):
+                drivers = driver_list[0].split("/")
+            else:
+                drivers = driver_list
         
             fixed_inputs.append(drivers)
             
