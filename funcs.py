@@ -108,7 +108,6 @@ def get_sess(yr, rc, sn):
         try:
             #check if test
             if rc.lower().__contains__("preseason") or rc.lower().__contains__("pre-season") or rc.lower().__contains__("pre season") or rc.lower().__contains__("testing") or rc.lower().__contains__("test"):
-                print("\n\n\ntest\n\n\n")
                 try:
                     session = fastf1.get_testing_session(yr, 1, sn)
                 except:
