@@ -420,8 +420,8 @@ def update():
     races = ""
     data = ""
     try:
-        # os.system("python stnd.py")
-        os.system("py stnd.py")
+        os.system("python stnd.py")
+        # os.system("py stnd.py")
         stnd = "stnd success"
     except:
         stnd = "stnd fail"
