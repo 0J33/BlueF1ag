@@ -523,6 +523,7 @@ def update_data(yr):
     docs = collection.find({"year": int(yr)})
     for doc in docs:
         races_list.append(doc['races'])
+    races_list = races_list[0]
     for rc in races_list:
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
@@ -561,7 +562,7 @@ def update_data(yr):
                         "laps": laps,
                         "distance": distance
                     })
-                    res.append(yr, rc, sn)
+                    res.append([yr, rc, sn])
                 except Exception as exc:
                     print(str(exc))
                     if res == []:
