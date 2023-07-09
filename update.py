@@ -10,9 +10,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import platform
 from PIL import Image, ImageDraw, ImageFont
+from pymongo import MongoClient
 from env import *
-from git_func import *
 platform.system()
+
+client = MongoClient(connection_string)
+db = client[db_name]
 
 
 # get parth of file
@@ -497,35 +500,38 @@ def get_distance(yr, rc, sn):
 
 ### updates gist with races of a given year ###
 def update_races(yr):
-    old = read_gist(GH_GIST_ID_RACES, "races")
-    if str(yr) not in old:
+    collection_name = "races"
+    collection = db[collection_name]
+    # if doc exists with yr not exists, create doc
+    if collection.count_documents({"year": int(yr)}) == 0:
         schedule = ff1.get_event_schedule(yr)
         df = schedule[['EventName']]
         df = df.values
         df = df.tolist()
-        df = str(df).replace("[","").replace("]","").replace("'","")
-        content = (str(yr) + ":" + df + "\n")
-        update_gist(old + content, GH_GIST_ID_RACES, "races")
+        races = []
+        for i in df:
+            races.append(i[0])
+        collection.insert_one({"year": yr, 'races': races})
 
 ### updates gist with data of all sessions of a given year and returns a list of all updated sessions ###
 def update_data(yr):
     res = []
     msg = "Err"
     races_list = []
-    races = read_gist(GH_GIST_ID_RACES, "races")
-    old = read_gist(GH_GIST_ID_DATA, "data")
-    data = races.split("\n")
-    for i in range(1, len(data)):
-        if str(yr) in data[i]:
-            races_list = data[i][5:].split(",")
-            break
+    collection_name = "races"
+    collection = db[collection_name]
+    docs = collection.find({"year": int(yr)})
+    for doc in docs:
+        races_list.append(doc['races'])
     for rc in races_list:
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
             if sn == "Sprint Shootout":
                 sn = "Sprint"
-            if old.__contains__("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + 'Session:' + str(sn)):
+            collection_name = "data"
+            collection = db[collection_name]
+            if collection.count_documents({"year": int(yr), "race": rc, "session": sn}) > 0:
                 pass
             elif "testing" in rc.lower():
                 pass
@@ -547,8 +553,14 @@ def update_data(yr):
                         distance = 0
                         if rc.lower().__contains__("austria"):
                             distance = 4300
-                    content = ("Year:" + str(yr) + "," + "Race:" + str(rc) + "," + "Session:" + str(sn) + "," + "Drivers:" + str(drivers).replace(",","/") + "," + "Laps:" + str(laps) + "," + "Distance:" + str(distance) + "\n")
-                    update_gist(old + content, GH_GIST_ID_DATA, "data")
+                    collection.insert_one({
+                        "year": int(yr),
+                        "race": rc,
+                        "session": sn,
+                        "drivers": drivers,
+                        "laps": laps,
+                        "distance": distance
+                    })
                     res.append(yr, rc, sn)
                 except Exception as exc:
                     print(str(exc))

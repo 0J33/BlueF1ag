@@ -36,9 +36,9 @@ from matplotlib import dates
 from email.message import EmailMessage
 import ssl
 import smtplib
+from pymongo import MongoClient
 from env import *
 from funcs import *
-from git_func import *
 import warnings
 import platform
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -65,29 +65,43 @@ def delete_all():
 
 # method that logs data from slash commands
 def log(user_id, message, exc, flag, datetime):  
-    datetime = datetime.replace("-", " ").replace(".", ":") 
-    file = ""
-    gist_id = None
+    datetime = datetime.replace("-", " ").replace(".", ":")
+    
     id_flg = False
     for i in IDS:
         if i in user_id:
             id_flg = True
             break
     if (not id_flg and not flag):
-        file = "logs"
-        gist_id = GH_GIST_ID_LOGS
+        collection_name = "logs"
     elif (not id_flg and flag):
-        file = "exc"
-        gist_id = GH_GIST_ID_EXC
+        collection_name = "exc"
     elif (user_id in IDS and not flag):
-        file = "devlogs"
-        gist_id = GH_GIST_ID_DEVLOGS
+        collection_name = "devlogs"
     elif (user_id in IDS and flag):
-        file = "devexc"
-        gist_id = GH_GIST_ID_DEVEXC
-    content = (str(user_id) + "\n" + str(message) + "\n" + str(exc) + str(datetime) + "\n\n")
-    old = read_gist(gist_id, file)
-    update_gist(old + content, gist_id, file)
+        collection_name = "devexc"
+        
+    client = MongoClient(connection_string)
+    db = client[db_name]
+    collection = db[collection_name]
+        
+    inputs = message.split(" ")[-1]
+    comm = message.replace(inputs, "").strip()
+    
+    if not exc:
+        collection.insert_one({
+            "user_id": user_id, 
+            "command": comm,
+            "inputs": inputs,
+            "datetime": datetime})
+    else:
+        collection.insert_one({
+            "user_id": user_id, 
+            "command": comm,
+            "exception": exc,
+            "inputs": inputs,
+            "datetime": datetime,
+        })
 
 # fix exception string
 def fix_exc(exc, fixed_inputs, comm):
