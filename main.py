@@ -98,8 +98,8 @@ def log(user_id, message, exc, flag, datetime):
         collection.insert_one({
             "user_id": user_id, 
             "command": comm,
-            "exception": exc,
             "inputs": inputs,
+            "exception": exc,
             "datetime": datetime,
         })
 
