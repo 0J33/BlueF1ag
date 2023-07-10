@@ -90,13 +90,13 @@ def log(user_id, message, exc, flag, datetime):
     
     if not exc:
         collection.insert_one({
-            "user_id": user_id, 
+            "name": user_id, 
             "command": comm,
             "inputs": inputs,
             "datetime": datetime})
     else:
         collection.insert_one({
-            "user_id": user_id, 
+            "name": user_id, 
             "command": comm,
             "inputs": inputs,
             "exception": exc,
