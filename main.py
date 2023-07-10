@@ -85,8 +85,8 @@ def log(user_id, message, exc, flag, datetime):
     db = client[db_name]
     collection = db[collection_name]
         
-    inputs = message.split(" ")[-1]
-    comm = message.replace(inputs, "").strip()
+    comm = message.split(" ")[0]
+    inputs = message.replace(comm, "").strip()
     
     if not exc:
         collection.insert_one({
