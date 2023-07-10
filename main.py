@@ -420,8 +420,8 @@ def update():
     races = ""
     data = ""
     try:
-        os.system("python stnd.py")
-        # os.system("py stnd.py")
+        # PY is string like "py stnd.py" or "python stnd.py", etc.
+        os.system(PY)
         stnd = "stnd success"
     except:
         stnd = "stnd fail"
