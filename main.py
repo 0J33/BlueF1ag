@@ -84,9 +84,17 @@ def log(user_id, message, exc, flag, datetime):
     client = MongoClient(connection_string)
     db = client[db_name]
     collection = db[collection_name]
+    
+    print(message)
         
-    comm = message.split(" ")[0]
-    inputs = message.replace(comm, "").strip()
+    comm = ""
+    inputs = ""
+    if "\n" in message:
+        comm = message.split("\n")[0]
+        inputs = message.replace(comm, "").strip().replace("[", "").replace("]", "").replace("'", "").replace(", ", " ")
+    else:
+        comm = message.split(" ")[0]
+        inputs = message.replace(comm, "").strip()
     
     if not exc:
         collection.insert_one({
