@@ -439,7 +439,7 @@ def update():
     except:
         races = "races fail"
     try:
-        data = update_data(yr)
+        data = str(update_data(yr))
     except:
         data = "data fail"
     return stnd + "<br />" + races + "<br />" + data
