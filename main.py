@@ -427,6 +427,7 @@ def update():
     stnd = ""
     races = ""
     data = ""
+    gd = ""
     try:
         # PY is string like "py stnd.py" or "python stnd.py", etc.
         os.system(PY)
@@ -442,7 +443,12 @@ def update():
         data = str(update_data(yr))
     except:
         data = "data fail"
-    return stnd + "<br />" + races + "<br />" + data
+    try:
+        update_gd(yr)
+        gd = "gd success"
+    except:
+        gd = "gd fail"
+    return stnd + "<br />" + races + "<br />" + data + "<br />" + gd
 
 # execute function when user submits form
 @app.route('/', methods=['GET', 'POST'])
