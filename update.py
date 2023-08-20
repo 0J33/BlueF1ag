@@ -4,31 +4,22 @@ import pandas as pd
 import numpy as np
 import random
 import requests
-import datetime
+import datetime as dt
 import fastf1 as ff1
 from fastf1 import plotting
 import seaborn as sns
 import matplotlib.pyplot as plt
-import platform
 from PIL import Image, ImageDraw, ImageFont
 from pymongo import MongoClient
 from env import *
-platform.system()
+import gdapi
+from utils import *
+from utils import dir_path
 
 client = MongoClient(connection_string)
 db = client[db_name]
 
 
-# get parth of file
-dir_path = r"" + str(pathlib.Path(__file__).parent.resolve())
-
-# get path for os
-def get_path():
-    if platform.system().__contains__("Win"):
-        path = "\\"
-    elif platform.system().__contains__("Lin"):
-        path = "/"
-    return path
 
 # enable cache
 try:
@@ -37,8 +28,7 @@ except:
     pass
 
 # set yr to current year
-yr = datetime.datetime.now().year
-
+yr = dt.datetime.now().year
 
 # get driver standings
 def get_drivers_standings():
@@ -427,79 +417,7 @@ def update_from(i):
             print(str(exc) + "\nFAILED UPDATE " + str(i))
         i -= 1
 
-### gets the years for which data is available for each function ###
-def get_years(func):
-    years = []
-    func = func.lower()
-    if func == "results" or func == "schedule" or func == "drivers":
-        for i in range(1950, datetime.datetime.now().year+1):
-            years.append(i)
-    elif func == "constructors":
-        for i in range(1958, datetime.datetime.now().year+1):
-            years.append(i)
-    else:
-        for i in range(2018, datetime.datetime.now().year+1):
-            years.append(i)
-    return years[::-1]
-
-### get races of a given year ###
-def get_races(yr):
-    file = open("res/data.txt", "r")
-    text = file.read()
-    file.close()
-    records = text.split("\n")
-    res = ""
-    for record in records:
-        if record.__contains__(str(yr)):
-            res = record[5:].split(",")
-    for i in range(len(res)):
-        res[i] = res[i].strip()
-    return res
-
-### gets sessions of a grand prix weekend ###
-def get_sessions(yr, rc):
-    yr = int(yr)
-    sessions = []
-    i=1
-    while True:
-        sess = 'Session' + str(i)
-        fastf1_obj = ff1.get_event(yr, rc)
-        try: 
-            sessions.append((getattr(fastf1_obj, sess)))
-        except:
-            break
-        i+=1
-    return sessions
- 
-### gets drivers of a session ###
-def get_drivers(yr, rc, sn):
-    session = ff1.get_session(yr, rc, sn)
-    session.load()
-    laps = session.laps
-    ls = set(tuple(x) for x in laps[['Driver']].values.tolist())
-    lis = [x[0] for x in ls]
-    return lis
-
-### gets laps of a session ###
-def get_laps(yr, rc, sn):
-    session = ff1.get_session(yr, rc, sn)
-    session.load()
-    laps = session.laps
-    ls = set(tuple(x) for x in laps[['LapNumber']].values.tolist())
-    lis = sorted([int(x[0]) for x in ls])
-    max = int(np.max(lis))
-    return max
-
-### gets distance of a session ###
-def get_distance(yr, rc, sn):
-    session = ff1.get_session(yr, rc, sn)
-    session.load()
-    laps = session.load_laps(with_telemetry=True)
-    car_data = laps.pick_fastest().get_car_data().add_distance()
-    maxdist = int(np.max(car_data['Distance']))
-    return maxdist
-
-### updates gist with races of a given year ###
+### updates mongo with races of a given year ###
 def update_races(yr):
     collection_name = "races"
     collection = db[collection_name]
@@ -514,7 +432,7 @@ def update_races(yr):
             races.append(i[0])
         collection.insert_one({"year": yr, 'races': races})
 
-### updates gist with data of all sessions of a given year and returns a list of all updated sessions ###
+### updates mongo with data of all sessions of a given year and returns a list of all updated sessions ###
 def update_data(yr):
     res = []
     msg = "Err"
@@ -572,6 +490,11 @@ def update_data(yr):
                     else:
                         msg = "Sessions updated:"
                         return msg + "\n" + str(res)
+
+### updates gd with lap and telemetry data of all sessions of a given year ###       
+def update_gd(yr):
+    gdapi.save(yr, "laps")
+    gdapi.save(yr, "telemetry")
    
 # update(yr)
 
@@ -580,221 +503,3 @@ def update_data(yr):
 # update_races(yr)
 
 # print(update_data(yr))
-
-
-### MONGO FUNCTIONS ###
-
-# load the session
-def get_sess(yr, rc, sn):
-    
-    #if session number
-    try:
-        rc = int(rc)
-        session = ff1.get_session(yr, rc, sn)
-    #if session not number
-    except:
-        try:
-            #check if test
-            if rc.lower().__contains__("preseason") or rc.lower().__contains__("pre-season") or rc.lower().__contains__("pre season") or rc.lower().__contains__("testing") or rc.lower().__contains__("test"):
-                try:
-                    session = ff1.get_testing_session(yr, 1, sn)
-                except:
-                    session = ff1.get_testing_session(yr, 2, sn)
-            #not test
-            else:
-                session = ff1.get_session(yr, rc, sn)
-        except:
-            session = ff1.get_session(yr, rc, sn)
-    session.load()
-    try:
-        fix = session.laps.pick_fastest()
-    except:
-        pass
-    return session
-
-def save_laps(yr, rc, sn):
-    
-    collection = db['laps']
-    
-    try:
-        
-        if "test" in rc.lower():
-            raise Exception("Test session")
-        
-        if collection.count_documents({'yr': yr, 'rc': rc, 'sn': sn}) == 0:
-
-            session = get_sess(yr, rc, sn)
-            laps = session.load_laps(with_telemetry=True)
-            
-            new_laps = []
-            
-            for i in range(len(laps)):
-                lap = laps.iloc[i].to_dict()
-                for key in lap:
-                    try:
-                        json.dumps(lap[key])
-                    except:
-                        lap[key] = str(lap[key])
-                print(yr, rc, sn, i+1, "/", len(laps))
-                new_laps.append(lap)
-                    
-            record = {
-                'yr': yr,
-                'rc': rc,
-                'sn': sn,
-                'laps': new_laps
-            }
-            
-            collection.insert_one(record)
-            
-    except:
-        
-        collection.insert_one({
-            'yr': yr,
-            'rc': rc,
-            'sn': sn,
-            'laps': []
-        })
-
-def save_telemetry(yr, rc, sn):
-    
-    collection = db['telemetry']
-    
-    try:
-        
-        if "test" in rc.lower():
-            raise Exception("Test session")
-
-        session = get_sess(yr, rc, sn)
-        laps = session.load_laps(with_telemetry=True)
-        
-        # drivers = laps['Driver'].unique()
-        drivers = ['VER', 'ALO']
-        
-        all_telemetry = []
-        
-        for driver in drivers:
-        
-            lap = 1
-            # while lap <= 100:
-            while lap <= 2:
-                try:
-                    driver_laps = session.laps.pick_driver(driver)
-                    fast = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
-                    telemetry = fast.get_car_data().add_distance()
-                    
-                    pos_data = fast.get_pos_data(pad=1, pad_side='both')
-                    car_data = fast.get_car_data(pad=1, pad_side='both')
-                    drv_ahead = car_data.iloc[1:-1].add_driver_ahead() \
-                        .loc[:, ('DriverAhead', 'DistanceToDriverAhead',
-                                'Date', 'Time', 'SessionTime')]
-                    car_data = car_data.add_distance().add_relative_distance()
-                    car_data = car_data.merge_channels(drv_ahead)
-                    merged = pos_data.merge_channels(car_data)
-                    new_merged = merged.slice_by_lap(fast, interpolate_edges=True)
-                    telemetry = telemetry.merge_channels(new_merged)
-                    
-                    all_telemetry.append([driver, lap, telemetry])
-                except:
-                    pass
-                lap += 1
-
-        for driver, lap, tel in all_telemetry:
-            data_list = []
-            
-            for _, row in tel.iterrows():
-                temp = row.to_dict()
-                for key in temp:
-                    try:
-                        json.dumps(temp[key])
-                    except:
-                        temp[key] = str(temp[key])
-                data_list.append(temp)
-        
-            record = {
-                'yr': yr,
-                'rc': rc,
-                'sn': sn,
-                'driver': driver,
-                'lap': lap,
-                'telemetry': data_list
-            }
-            
-            if collection.count_documents({'yr': yr, 'rc': rc, 'sn': sn, 'driver': driver, 'lap': lap}) == 0:
-                collection.insert_one(record)
-
-    except Exception as exc:
-        
-        print("error", str(exc)) 
-
-def get_laps(yr, rc, sn):
-    
-    collection_name = "laps" ### CHANGE COLLECTION NAME HERE ###
-    collection = db[collection_name]
-    
-    if collection.count_documents({'yr': yr, 'rc': rc, 'sn': sn}) == 1:
-        doc = collection.find_one({'yr': yr, 'rc': rc, 'sn': sn})
-        laps = doc['laps']
-        laps = pd.DataFrame(laps)
-        
-        for col in laps.columns:
-            if col.lower().__contains__("time"):
-                laps[col] = pd.to_timedelta(laps[col])
-
-        return laps
-    
-    else:
-        
-        return None
-
-def get_telemetry(yr, rc, sn, driver, lap):
-    
-    collection_name = "telemetry" ### CHANGE COLLECTION NAME HERE ###
-    collection = db[collection_name]
-    
-    if collection.count_documents({'yr': yr, 'rc': rc, 'sn': sn, 'driver': driver, 'lap': int(lap)}) == 1:
-        doc = collection.find_one({'yr': yr, 'rc': rc, 'sn': sn, 'driver': driver, 'lap': int(lap)})
-        telemetry = doc['telemetry']
-        telemetry = pd.DataFrame(telemetry)
-        
-        for col in telemetry.columns:
-            if col.lower().__contains__("time"):
-                telemetry[col] = pd.to_timedelta(telemetry[col])
-
-        return telemetry
-    
-    else:
-        
-        return None
-    
-### END OF MONGO FUNCTIONS ###
-
-
-### TEMP FUNCTIONS ###
-
-# yrs = [2018, 2019, 2020, 2021, 2022, 2023]
-
-# for yr in yrs:
-#     races_list = []
-#     collection_name = "races"
-#     collection = db[collection_name]
-#     docs = collection.find({"year": int(yr)})
-#     for doc in docs:
-#         races_list.append(doc['races'])
-#     races_list = races_list[0]
-#     for rc in races_list:
-#         rc = rc.strip()
-#         sessions = get_sessions(yr, rc)
-#         for sn in sessions:
-            
-#             # collection_name = "laps"
-#             # collection = db[collection_name]
-#             # save_laps(yr, rc, sn)
-#             # print("laps", yr, rc, sn)
-                
-#             collection_name = "telemetry"
-#             collection = db[collection_name]
-#             save_telemetry(yr, rc, sn)
-#             print("telemetry", yr, rc, sn)
-            
-### END OF TEMP FUNCTIONS ###

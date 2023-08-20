@@ -36,8 +36,10 @@ from matplotlib import dates
 from PIL import Image, ImageDraw, ImageFont
 import warnings
 import platform
-from update import *
-from utils import * ###
+# from update import *
+import gdapi
+from gdapi import *
+from utils import *
 warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()
 mpl.use('Agg')
@@ -67,35 +69,6 @@ def wait_for_turn(datetime):
     else:
         tm.sleep(1)
         wait_for_turn(datetime)
-
-# get_datetime helper
-def get_time():
-    return ctime(time())
-
-# get current time
-def get_datetime():
-    datetime = get_time()
-    datetime = datetime.replace(" ", "-")
-    datetime = datetime.replace(":", ".")
-    return datetime
-
-# set mpl font
-def set_font():
-    # set font
-    fe = fm.FontEntry(
-        fname=dir_path + get_path() + "fonts" + get_path() +
-        "Formula1-Regular_web.ttf",
-        name='Formula1 Display Regular')
-    fm.fontManager.ttflist.insert(0, fe)  # or append is fine
-    mpl.rcParams['font.family'] = fe.name  # = 'your custom ttf font name'
-
-# get path for os
-def get_path():
-    if platform.system().__contains__("Win"):
-        path = "\\"
-    elif platform.system().__contains__("Lin"):
-        path = "/"
-    return path
 
 # reset mpl
 def rstall(plt):
@@ -141,7 +114,38 @@ def make_img(datetime, text):
     img.save(dir_path + get_path() + "res" + get_path() + "output" + get_path() + datetime + ".png", "PNG")
 
 # set mpl font
+def set_font():
+    # set font
+    fe = fm.FontEntry(
+        fname=dir_path + get_path() + "fonts" + get_path() +
+        "Formula1-Regular_web.ttf",
+        name='Formula1 Display Regular')
+    fm.fontManager.ttflist.insert(0, fe)  # or append is fine
+    mpl.rcParams['font.family'] = fe.name  # = 'your custom ttf font name'
+    
+# set mpl font
 set_font()
+
+def delta_time_updated(yr, rc, sn, driver1, lap1, driver2, lap2):
+    
+    # ref = reference_lap.get_car_data(interpolate_edges=True).add_distance()
+    # comp = compare_lap.get_car_data(interpolate_edges=True).add_distance()
+    ref = get_telemetry(yr, rc, sn, driver1, lap1)
+    comp = get_telemetry(yr, rc, sn, driver2, lap2)
+
+    def mini_pro(stream):
+        # Ensure that all samples are interpolated
+        dstream_start = stream[1] - stream[0]
+        dstream_end = stream[-1] - stream[-2]
+        return np.concatenate([[stream[0] - dstream_start], stream, [stream[-1] + dstream_end]])
+
+    ltime = mini_pro(comp['Time'].dt.total_seconds().to_numpy())
+    ldistance = mini_pro(comp['Distance'].to_numpy())
+    lap_time = np.interp(ref['Distance'], ldistance, ltime)
+
+    delta = lap_time - ref['Time'].dt.total_seconds()
+
+    return delta, ref, comp
 
 ### END OF GENERAL FUNCTIONS ###
 
@@ -156,7 +160,7 @@ def fastest_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
 
@@ -310,7 +314,7 @@ def laps_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -368,7 +372,7 @@ def time_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -443,7 +447,7 @@ def distance_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -518,7 +522,7 @@ def delta_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -602,7 +606,7 @@ def gear_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -686,7 +690,7 @@ def speed_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -787,14 +791,15 @@ def tel_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
-
+    
+    laps = gdapi.get_laps(yr, rc, sn)
+    
     queue.append(datetime)
     
     wait_for_turn(datetime)
 
     # weekend = session.event
-    # laps = session.load_laps(with_telemetry=True)
+    # laps = session.load()
     drv1 = d1
     drv2 = d2
 
@@ -978,14 +983,14 @@ def cornering_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
     wait_for_turn(datetime)
 
     # Get the laps
-    # laps = session.load_laps(with_telemetry=True)
+    # laps = session.load()
 
     # Setting parameters
     driver_1, driver_2 = d1, d2
@@ -1217,7 +1222,7 @@ def tires_func(input_list, datetime): # very slow
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
 
@@ -1229,7 +1234,7 @@ def tires_func(input_list, datetime): # very slow
     plt.rcParams["figure.autolayout"] = True
 
     # Get the laps
-    # laps = session.load_laps(with_telemetry=True)
+    # laps = session.load()
 
     # Calculate RaceLapNumber (LapNumber minus 1 since the warmup lap is included in LapNumber)
     laps['RaceLapNumber'] = laps['LapNumber'] - 1
@@ -1363,7 +1368,8 @@ def strategy_func(input_list, datetime):
 
     # Load the session data
     race = fastf1.get_session(yr, rc, 'R')
-    laps = race.load_laps(with_telemetry=True)
+    race.load()
+    laps = race.laps
 
     queue.append(datetime)
     
@@ -1448,7 +1454,7 @@ def sectors_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = get_laps(yr, rc, sn)
+    laps = gdapi.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -1616,7 +1622,7 @@ def rt_func(input_list, datetime):
 
     # session = fastf1.get_session(yr, rc, 'Race')
     # session.load()
-    laps = get_laps(yr, rc, 'Race')
+    laps = gdapi.get_laps(yr, rc, 'Race')
 
     queue.append(datetime)
     
