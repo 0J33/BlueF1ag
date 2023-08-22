@@ -31,14 +31,52 @@ drive_service = build('drive', 'v3', credentials=credentials)
 
 ### GOOGLE DRIVE API FUNCTIONS ###
 
-# Upload JSON file to a specific folder
-def upload_file_to_folder(file_name, folder_id):
+# Delete folder
+def delete_folder(folder_name):
+    results = drive_service.files().list(q=f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder'", fields="files(id)").execute()
+    items = results.get('files', [])
+    for item in items:
+        delete_file_from_drive(item['id'])
+
+# Check if folder exists
+def check_if_folder_exists(folder_name):
+    results = drive_service.files().list(q=f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder'", fields="files(id)").execute()
+    items = results.get('files', [])
+    if items:
+        return True
+    else:
+        return False
+
+# Check if file exists in folder
+def check_file_in_folder(file_name, folder_name):
+    folder_id = get_folder_id(folder_name)
+    if folder_id is None:
+        return False
+    results = drive_service.files().list(q=f"name='{file_name}' and parents in '{folder_id}'",
+                                          fields="files(id)").execute()
+    items = results.get('files', [])
+    if items:
+        return True
+    else:
+        return False
+
+# Upload csv file to a specific folder
+def upload_file_to_folder(full_name, folder_id):
+    if full_name.__contains__("/"):
+        folder_name = full_name.split("/")[0]
+        file_name = full_name.split("/")[1]
+    else:
+        file_name = full_name
+        folder_name = "Blue F1ag"
+    if check_file_in_folder(file_name, folder_name):
+        print(f"File '{file_name}' already exists in folder '{folder_name}'.")
+        return
     file_metadata = {'name': file_name, 'parents': [folder_id]}
-    media = MediaFileUpload("record_dump/" + file_name, mimetype='application/json')
+    media = MediaFileUpload("record_dump/" + full_name, mimetype='application/json')
     uploaded_file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
     print('File ID: %s' % uploaded_file.get('id'))
 
-# Get the ID of the "Blue F1ag Storage" folder
+# Get the ID of the "Blue F1ag" folder
 def get_folder_id(folder_name):
     results = drive_service.files().list(q=f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder'",
                                           fields="files(id)").execute()
@@ -49,7 +87,18 @@ def get_folder_id(folder_name):
         print(f"Folder '{folder_name}' not found.")
         return None
 
-# Download JSON file
+# Get folder name using ID
+def get_folder_name(folder_id):
+    results = drive_service.files().list(q=f"id='{folder_id}' and mimeType='application/vnd.google-apps.folder'",
+                                          fields="files(name)").execute()
+    items = results.get('files', [])
+    if items:
+        return items[0]['name']
+    else:
+        print(f"Folder '{folder_id}' not found.")
+        return None
+
+# Download csv file
 def download_file(file_id, file_name):
     request = drive_service.files().get_media(fileId=file_id)
     fh = open("record_dump/" + file_name, 'wb')
@@ -61,23 +110,22 @@ def download_file(file_id, file_name):
     fh.close()
         
 # Save record as file
-def save_record_as_file(record, file_name):
-    if type(record) is not list:
-        with open("record_dump/" + file_name, 'w') as f:
-            json.dump(record, f, indent=4)
-    else:
-        with open("record_dump/" + file_name, 'w') as f:
-            json.dump({"records": record}, f, indent=4)
+def save_record_as_file(csv, file_name):
+    with open("record_dump/" + file_name, 'w') as f:
+        for i in csv:
+            for j in i:
+                f.write(str(j) + ",")
+            f.write("\n")
         
 # Read record from file
 def read_record_from_file(file_name):
     with open("record_dump/" + file_name, 'r') as f:
-        record = json.load(f)
-    return record
+        csv = f.read()
+    return csv
 
 # Get file ID
-def get_file_id(file_name):
-    results = drive_service.files().list(q=f"name='{file_name}' and parents in '{get_folder_id('Blue F1ag Storage')}'",
+def get_file_id(file_name, folder_name):
+    results = drive_service.files().list(q=f"name='{file_name}' and parents in '{get_folder_id(folder_name)}'",
                                           fields="files(id)").execute()
     items = results.get('files', [])
     if items:
@@ -95,15 +143,35 @@ def delete_file_from_drive(file_id):
     drive_service.files().delete(fileId=file_id).execute()
     print(f"File '{file_id}' deleted.")
 
+# Create folder
+def create_folder(parent_folder_name, subfolder_name):
+    parent_folder_id = get_folder_id(parent_folder_name)  # You need to implement get_folder_id function
+    if parent_folder_id is None:
+        print(f"Parent folder '{get_folder_id(parent_folder_name)}' not found.")
+        return
+
+    file_metadata = {
+        'name': subfolder_name,
+        'mimeType': 'application/vnd.google-apps.folder',
+        'parents': [parent_folder_id]
+    }
+
+    try:
+        folder = drive_service.files().create(body=file_metadata, fields='id').execute()
+        print(f"Subfolder '{subfolder_name}' created with ID: {folder.get('id')}")
+        return folder.get('id')
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 ###
 
 def save_laps(yr, rc, sn):
     
-    file_name = f"{yr}_{rc}_{sn}_laps.json"
+    file_name = f"{yr}_{rc}_{sn}_laps.csv"
     
     try:
         
-        if get_file_id(file_name) is not None:
+        if get_file_id(file_name, 'Blue F1ag') is not None:
             raise Exception("File already exists")
         
         if "test" in rc.lower() or "pre-season" in rc.lower():
@@ -112,48 +180,49 @@ def save_laps(yr, rc, sn):
         if rc == "Sprint Shootout":
             raise Exception("Sprint Shootout")
         
-        if get_file_id(file_name) is None:
+        if get_file_id(file_name, "Blue F1ag") is None:
 
             session = get_sess(yr, rc, sn)
             session.load()
             laps = session.laps
             
+            titles = []
+            for i in laps.columns:
+                if i not in titles:
+                    titles.append(i)
+                    
             new_laps = []
+            new_laps.append(titles)
             
             for i in range(len(laps)):
-                lap = laps.iloc[i].to_dict()
-                for key in lap:
-                    try:
-                        json.dumps(lap[key])
-                    except:
-                        lap[key] = str(lap[key])
-                print(yr, rc, sn, i+1, "/", len(laps))
-                new_laps.append(lap)
-                    
+                lap = laps.iloc[i]
+                new_lap = []
+                for j in titles:
+                    new_lap.append(lap[j])
+                new_laps.append(new_lap)
+            
             if new_laps == []:
                 raise Exception("No laps found")
-                    
-            record = {
-                'laps': new_laps
-            }
             
-            save_record_as_file(record, file_name)
-            blue_f1ag_folder_id = get_folder_id('Blue F1ag Storage')
+            save_record_as_file(new_laps, file_name)
+            blue_f1ag_folder_id = get_folder_id('Blue F1ag')
             upload_file_to_folder(file_name, blue_f1ag_folder_id)
             delete_file(file_name)
             
     except Exception as exc:
-        
+    
+        import traceback
+        print(traceback.format_exc())
         print("error", str(exc)) 
 
 def save_telemetry(yr, rc, sn):
     
-    file_name = f"{yr}_{rc}_{sn}_telemetry.json"
+    file_name = f"{yr}_{rc}_{sn}_summary.csv"
+    folder_name = f"{yr}_{rc}_{sn}"
     
     try:
-        
-        if get_file_id(file_name) is not None:
-            raise Exception("File already exists")
+        if check_if_folder_exists(folder_name):
+            raise Exception("Folder already exists")
         
         if "test" in rc.lower() or "pre-season" in rc.lower():
             raise Exception("Test session")
@@ -165,115 +234,74 @@ def save_telemetry(yr, rc, sn):
         session.load()
         laps = session.laps
         
-        drivers = laps['Driver'].unique()
-        # drivers = ['VER', 'ALO']
+        try:
+            os.mkdir("record_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn))
+        except:
+            pass
         
-        all_telemetry = []
+        blue_flag_folder_id = get_folder_id(str(yr) + "_" + str(rc) + "_" + str(sn))     
+        print(blue_flag_folder_id)
+        if blue_flag_folder_id is None:
+            blue_flag_folder_id = create_folder('Blue F1ag', str(yr) + "_" + str(rc) + "_" + str(sn))
+            print(blue_flag_folder_id)
+            
+        drivers = laps['Driver'].unique()
         
         for driver in drivers:
-        
             lap = 1
-            while lap <= 100:
-            # while lap <= 2:
+            while lap <= int(laps[laps['Driver'] == driver]['LapNumber'].max()) + 1:
                 try:
                     driver_laps = session.laps.pick_driver(driver)
                     fast = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
                     telemetry = fast.get_car_data().add_distance()
                     
-                    pos_data = fast.get_pos_data(pad=1, pad_side='both')
-                    car_data = fast.get_car_data(pad=1, pad_side='both')
-                    drv_ahead = car_data.iloc[1:-1].add_driver_ahead() \
-                        .loc[:, ('DriverAhead', 'DistanceToDriverAhead',
-                                'Date', 'Time', 'SessionTime')]
-                    car_data = car_data.add_distance().add_relative_distance()
-                    car_data = car_data.merge_channels(drv_ahead)
-                    merged = pos_data.merge_channels(car_data)
-                    new_merged = merged.slice_by_lap(fast, interpolate_edges=True)
-                    telemetry = telemetry.merge_channels(new_merged)
+                    csv_file_name = f"{yr}_{rc}_{sn}_{driver}_{lap}_telemetry.csv"
+                    telemetry.to_csv("record_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn) + "/" + csv_file_name, index=False)
                     
-                    all_telemetry.append([driver, lap, telemetry])
                 except:
                     pass
                 lap += 1
-                
-        all_records = []
-        for driver, lap, tel in all_telemetry:
-            data_list = []
-            
-            for _, row in tel.iterrows():
-                temp = row.to_dict()
-                for key in temp:
-                    try:
-                        json.dumps(temp[key])
-                    except:
-                        temp[key] = str(temp[key])
-                data_list.append(temp)
         
-            record = {
-                'driver': driver,
-                'lap': lap,
-                'telemetry': data_list
-            }
-
-            all_records.append(record)
-            
-        laps = []
-            
+        summary_data = []
         for driver in drivers:
-            
-            file_name_drv = f"{yr}_{rc}_{sn}_{driver}_telemetry.json"
-            
-            if get_file_id(file_name_drv) is not None:
-                raise Exception("File already exists")
-            
-            driver_records = []
-            for record in all_records:
-                if record['driver'] == driver:
-                    driver_records.append(record)
-                    
-            laps.append(driver_records[-1]['lap'])
-            
-            save_record_as_file(driver_records, file_name_drv)
-            blue_f1ag_folder_id = get_folder_id('Blue F1ag Storage')
-            upload_file_to_folder(f"{yr}_{rc}_{sn}_{driver}_telemetry.json", blue_f1ag_folder_id)
-            delete_file(f"{yr}_{rc}_{sn}_{driver}_telemetry.json")
+            # find max numver of laps for driver and loop through
+            for lap in range(1, int(laps[laps['Driver'] == driver]['LapNumber'].max()) + 1):
+                summary_data.append({'driver': driver, 'lap': lap})
+        summary_df = pd.DataFrame(summary_data)
+        summary_file_name = f"{yr}_{rc}_{sn}_summary.csv"
+        summary_df.to_csv("record_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn) + "/" + summary_file_name, index=False)
         
-        all_records_drv = []
-        i=0
-        while i < len(drivers):
-            try:
-                record_temp = {
-                    'driver': drivers[i],
-                    'lap': laps[i]
-                }
-            except:
-                record_temp = {
-                    'driver': drivers[i],
-                    'lap': None
-                }
-            all_records_drv.append(record_temp)
-            i += 1
+        for driver in drivers:
+            max_lap = int(laps[laps['Driver'] == driver]['LapNumber'].max())
+            for lap in range(1, max_lap + 1):
+                try:
+                    csv_file_name = f"{yr}_{rc}_{sn}_{driver}_{lap}_telemetry.csv"
+                    upload_file_to_folder(str(yr) + "_" + str(rc) + "_" + str(sn) + "/" + csv_file_name, blue_flag_folder_id)
+                    print("Uploaded", csv_file_name)
+                    delete_file(str(yr) + "_" + str(rc) + "_" + str(sn) + "/" + csv_file_name)
+                except:
+                    pass
         
-        save_record_as_file(all_records_drv, file_name)
-        blue_f1ag_folder_id = get_folder_id('Blue F1ag Storage')
-        upload_file_to_folder(file_name, blue_f1ag_folder_id)
-        delete_file(file_name)
+        upload_file_to_folder(str(yr) + "_" + str(rc) + "_" + str(sn) + "/" + summary_file_name, blue_flag_folder_id)
+        delete_file(str(yr) + "_" + str(rc) + "_" + str(sn) + "/" +summary_file_name)
+        
+        os.rmdir("record_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn))
 
     except Exception as exc:
-        
-        print("error", str(exc)) 
+        import traceback
+        print(traceback.format_exc())
+        print("Error:", str(exc))
 
 def get_laps(yr, rc, sn):
     
     try:
     
-        file_name = f"{yr}_{rc}_{sn}_laps.json"
-        download_file(get_file_id(file_name), file_name)
-        laps = read_record_from_file(file_name)
+        file_name = f"{yr}_{rc}_{sn}_laps.csv"
+        download_file(get_file_id(file_name, "Blue F1ag"), file_name)
+        # laps = read_record_from_file(file_name)
+        laps = pd.read_csv("record_dump/" + file_name)
         delete_file(file_name)
-
-        laps = laps['laps']
-        laps = pd.DataFrame(laps)
+        
         
         for col in laps.columns:
             if col.lower().__contains__("time"):
@@ -282,28 +310,22 @@ def get_laps(yr, rc, sn):
         return laps
     
     except:
-    
+        
         return None
 
 def get_telemetry(yr, rc, sn, driver, lap):
     
     try:
         
-        file_name = f"{yr}_{rc}_{sn}_{driver}_telemetry.json"
-        download_file(get_file_id(file_name), file_name)
-        records = read_record_from_file(file_name)
-
-        records = records['records']
+        file_name = f"{yr}_{rc}_{sn}_{driver}_{lap}_telemetry.csv"
+        folder_name = f"{yr}_{rc}_{sn}"
         
-        record = None
-        for doc in records:
-            if doc['driver'] == driver and doc['lap'] == lap:
-                record = doc
-                break
+        download_file(get_file_id(file_name, folder_name), file_name)
+        # telemetry = read_record_from_file(file_name)
+        
+        telemetry = pd.read_csv("record_dump/" + file_name)
+        
         delete_file(file_name)
-        
-        telemetry = record['telemetry']
-        telemetry = pd.DataFrame(telemetry)
         
         for col in telemetry.columns:
             if col.lower().__contains__("time"):
@@ -335,11 +357,11 @@ def save(yr, flag):
             
             if flag == "laps":
                 save_laps(yr, rc, sn)
-                print(f"{yr}_{rc}_{sn}.json saved")
+                print(str(yr), str(rc), str(sn), "done")
                 
             if flag == "telemetry":
                 save_telemetry(yr, rc, sn)
-                print(f"{yr}_{rc}_{sn}_telemetry.json saved")
+                print(str(yr), str(rc), str(sn), "done")
 
 def save_from(yr, flag):
     for yr in range(yr, dt.datetime.now().year + 1):
@@ -350,27 +372,28 @@ def save_from(yr, flag):
 
 #### FOR TESTING ###
 
-# record = {'VER': 1, 'ALO': 2, 'PER': 3}
-# file_name = 'VER,ALO,PER.json'
-# save_record_as_file(record, file_name)
-# blue_f1ag_storage_folder_id = get_folder_id('Blue F1ag Storage')
-# upload_file_to_folder(file_name, blue_f1ag_storage_folder_id)
-# delete_file(file_name)
+import traceback
 
-# file_name = 'VER,ALO,PER.json'
-# download_file(get_file_id(file_name), file_name)
-# record = read_record_from_file(file_name)
-# delete_file(file_name)
-# print(record)
-
-# done = False
-# while(not done):
-#     try:
-#         save_from(2018, "telemetry")
-#         done = True
-#     except:
-#         done = False
-
-save_telemetry(2023, "Bahrain Grand Prix", "Qualifying")
+try:
+    
+    done = False
+    while(not done):
+        try:
+            # save_from(2018, "laps")
+            save_from(2018, "telemetry")
+            done = True
+        except:
+            done = False
+        
+    # save_laps(2023, "Bahrain Grand Prix", "Qualifying")
+    # print(get_laps(2023, "Bahrain Grand Prix", "Qualifying"))
+    # save_telemetry(2023, "Bahrain Grand Prix", "Qualifying")
+    # print(get_telemetry(2023, "Bahrain Grand Prix", "Qualifying", "VER", 1))
+    
+    ...
+    
+except Exception as exc:
+    
+    print(traceback.format_exc())
 
 ### END OF TESTING ###
