@@ -368,32 +368,3 @@ def save_from(yr, flag):
         save(yr, flag)
                                         
 ### END OF TEMP FUNCTIONS ###
-
-
-#### FOR TESTING ###
-
-import traceback
-
-try:
-    
-    done = False
-    while(not done):
-        try:
-            # save_from(2018, "laps")
-            save_from(2018, "telemetry")
-            done = True
-        except:
-            done = False
-        
-    # save_laps(2023, "Bahrain Grand Prix", "Qualifying")
-    # print(get_laps(2023, "Bahrain Grand Prix", "Qualifying"))
-    # save_telemetry(2023, "Bahrain Grand Prix", "Qualifying")
-    # print(get_telemetry(2023, "Bahrain Grand Prix", "Qualifying", "VER", 1))
-    
-    ...
-    
-except Exception as exc:
-    
-    print(traceback.format_exc())
-
-### END OF TESTING ###
