@@ -36,10 +36,7 @@ from matplotlib import dates
 from PIL import Image, ImageDraw, ImageFont
 import warnings
 import platform
-# from update import *
-import odapi
-from odapi import *
-from utils import *
+from update import *
 warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()
 mpl.use('Agg')
@@ -69,6 +66,63 @@ def wait_for_turn(datetime):
     else:
         tm.sleep(1)
         wait_for_turn(datetime)
+
+# get_datetime helper
+def get_time():
+    return ctime(time())
+
+# get current time
+def get_datetime():
+    datetime = get_time()
+    datetime = datetime.replace(" ", "-")
+    datetime = datetime.replace(":", ".")
+    return datetime
+
+# set mpl font
+def set_font():
+    # set font
+    fe = fm.FontEntry(
+        fname=dir_path + get_path() + "fonts" + get_path() +
+        "Formula1-Regular_web.ttf",
+        name='Formula1 Display Regular')
+    fm.fontManager.ttflist.insert(0, fe)  # or append is fine
+    mpl.rcParams['font.family'] = fe.name  # = 'your custom ttf font name'
+
+# get path for os
+def get_path():
+    if platform.system().__contains__("Win"):
+        path = "\\"
+    elif platform.system().__contains__("Lin"):
+        path = "/"
+    return path
+
+# load the session
+def get_sess(yr, rc, sn):
+    
+    #if session number
+    try:
+        rc = int(rc)
+        session = fastf1.get_session(yr, rc, sn)
+    #if session not number
+    except:
+        try:
+            #check if test
+            if rc.lower().__contains__("preseason") or rc.lower().__contains__("pre-season") or rc.lower().__contains__("pre season") or rc.lower().__contains__("testing") or rc.lower().__contains__("test"):
+                try:
+                    session = fastf1.get_testing_session(yr, 1, sn)
+                except:
+                    session = fastf1.get_testing_session(yr, 2, sn)
+            #not test
+            else:
+                session = fastf1.get_session(yr, rc, sn)
+        except:
+            session = fastf1.get_session(yr, rc, sn)
+    session.load()
+    try:
+        fix = session.laps.pick_fastest()
+    except:
+        pass
+    return session
 
 # reset mpl
 def rstall(plt):
@@ -114,38 +168,7 @@ def make_img(datetime, text):
     img.save(dir_path + get_path() + "res" + get_path() + "output" + get_path() + datetime + ".png", "PNG")
 
 # set mpl font
-def set_font():
-    # set font
-    fe = fm.FontEntry(
-        fname=dir_path + get_path() + "fonts" + get_path() +
-        "Formula1-Regular_web.ttf",
-        name='Formula1 Display Regular')
-    fm.fontManager.ttflist.insert(0, fe)  # or append is fine
-    mpl.rcParams['font.family'] = fe.name  # = 'your custom ttf font name'
-    
-# set mpl font
 set_font()
-
-def delta_time_updated(yr, rc, sn, driver1, lap1, driver2, lap2):
-    
-    # ref = reference_lap.get_car_data(interpolate_edges=True).add_distance()
-    # comp = compare_lap.get_car_data(interpolate_edges=True).add_distance()
-    ref = get_telemetry(yr, rc, sn, driver1, lap1)
-    comp = get_telemetry(yr, rc, sn, driver2, lap2)
-
-    def mini_pro(stream):
-        # Ensure that all samples are interpolated
-        dstream_start = stream[1] - stream[0]
-        dstream_end = stream[-1] - stream[-2]
-        return np.concatenate([[stream[0] - dstream_start], stream, [stream[-1] + dstream_end]])
-
-    ltime = mini_pro(comp['Time'].dt.total_seconds().to_numpy())
-    ldistance = mini_pro(comp['Distance'].to_numpy())
-    lap_time = np.interp(ref['Distance'], ldistance, ltime)
-
-    delta = lap_time - ref['Time'].dt.total_seconds()
-
-    return delta, ref, comp
 
 ### END OF GENERAL FUNCTIONS ###
 
@@ -158,9 +181,8 @@ def fastest_func(input_list, datetime):
     rc = input_list[1]
     sn = input_list[2]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
 
@@ -172,19 +194,16 @@ def fastest_func(input_list, datetime):
     plt.rcParams["figure.figsize"] = [7, 5]
     plt.rcParams["figure.autolayout"] = True
 
-    # drivers = pd.unique(session.laps['Driver'])
-    drivers = pd.unique(laps['Driver'])
+    drivers = pd.unique(session.laps['Driver'])
 
     list_fastest_laps = list()
     for drv in drivers:
-        drvs_fastest_lap = laps[laps['Driver'] == drv].sort_values(
-            by='LapTime').reset_index(drop=True).loc[0]
+        drvs_fastest_lap = session.laps.pick_driver(drv).pick_fastest()
         list_fastest_laps.append(drvs_fastest_lap)
     fastest_laps = Laps(list_fastest_laps).sort_values(
         by='LapTime').reset_index(drop=True)
 
-    # pole_lap = fastest_laps.pick_fastest()
-    pole_lap = fastest_laps.loc[0]
+    pole_lap = fastest_laps.pick_fastest()
     fastest_laps['LapTimeDelta'] = fastest_laps['LapTime'] - \
         pole_lap['LapTime']
 
@@ -211,10 +230,9 @@ def fastest_func(input_list, datetime):
 
     lap_time_string = strftimedelta(pole_lap['LapTime'], '%m:%s.%ms')
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
     plt.suptitle(
-        # f"{session.event.year} {session.event['EventName']} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")")
-        f"{yr} {rc} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")")
+        f"{session.event.year} {session.event['EventName']} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")")
     plt.setp(ax.get_xticklabels(), fontsize=7)
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
@@ -312,9 +330,8 @@ def laps_func(input_list, datetime):
     sn = input_list[2]
     drivers = input_list[3]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
     
@@ -333,8 +350,7 @@ def laps_func(input_list, datetime):
     title = ""
     title = title + str(drivers[0])
     while (i < len(drivers)):
-        # temp = session.laps.pick_driver(drivers[i])
-        temp = laps[laps['Driver'] == drivers[i]]
+        temp = session.laps.pick_driver(drivers[i])
         try:
             ax.plot(temp['LapNumber'], temp['LapTime'], color=fastf1.plotting.driver_color(
                 drivers[i]), label=str(drivers[i]))
@@ -345,10 +361,9 @@ def laps_func(input_list, datetime):
             title = title + " vs " + str(drivers[i+1])
         i += 1
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
     plt.suptitle(
-        # f"Laps Comparison\n{session.event.year} {session.event['EventName']} {sn}\n" + title)
-        f"Laps Comparison\n{yr} {rc} {sn}\n" + title)
+        f"Laps Comparison\n{session.event.year} {session.event['EventName']} {sn}\n" + title)
 
     def yformat(x, pos): return dates.DateFormatter('%M:%S.%f')(x)[:-5]
     ax.yaxis.set_major_formatter(plt.FuncFormatter(yformat))
@@ -370,9 +385,8 @@ def time_func(input_list, datetime):
     drivers = input_list[3]
     lap = input_list[4]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
     
@@ -392,14 +406,11 @@ def time_func(input_list, datetime):
     i = 0
     while (i < len(drivers)):
         if lap == None:
-            # fast = session.laps.pick_driver(drivers[i]).pick_fastest()
-            fast = laps[laps['Driver'] == drivers[i]].iloc[0]
+            fast = session.laps.pick_driver(drivers[i]).pick_fastest()
         else:
-            # driver_laps = session.laps.pick_driver(drivers[i])
-            driver_laps = laps[laps['Driver'] == drivers[i]]
+            driver_laps = session.laps.pick_driver(drivers[i])
             fast = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
-        # car_data = fast.get_car_data()
-        car_data = get_telemetry(yr, rc, sn, fast['Driver'], fast['LapNumber'])
+        car_data = fast.get_car_data()
         t = car_data['Time']
         vCar = car_data['Speed']
         try:
@@ -417,14 +428,14 @@ def time_func(input_list, datetime):
             title = title + " vs " + str(drivers[i+1])
         i += 1
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
 
     if lap == None:
-        # plt.suptitle("Fastest Lap Comparison\n" + f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
-        plt.suptitle("Fastest Lap Comparison\n" + f"{yr} {rc} {sn}\n" + title)
+        plt.suptitle("Fastest Lap Comparison\n" +
+                     f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
     else:
-        # plt.suptitle("Lap " + str(lap) + " Comparison " + f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
-        plt.suptitle("Lap " + str(lap) + " Comparison " + f"{yr} {rc} {sn}\n" + title)
+        plt.suptitle("Lap " + str(lap) + " Comparison " +
+                     f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
 
     plt.setp(ax.get_xticklabels(), fontsize=7)
 
@@ -445,9 +456,8 @@ def distance_func(input_list, datetime):
     drivers = input_list[3]
     lap = input_list[4]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
     
@@ -467,14 +477,11 @@ def distance_func(input_list, datetime):
     i = 0
     while (i < len(drivers)):
         if lap == None:
-            #fast = session.laps.pick_driver(drivers[i]).pick_fastest()
-            fast = laps[laps['Driver'] == drivers[i]].iloc[0]
+            fast = session.laps.pick_driver(drivers[i]).pick_fastest()
         else:
-            #driver_laps = session.laps.pick_driver(drivers[i])
-            driver_laps = laps[laps['Driver'] == drivers[i]]
+            driver_laps = session.laps.pick_driver(drivers[i])
             fast = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
-        # car_data = fast.get_car_data().add_distance()
-        car_data = get_telemetry(yr, rc, sn, fast['Driver'], fast['LapNumber'])
+        car_data = fast.get_car_data().add_distance()
         t = car_data['Distance']
         vCar = car_data['Speed']
         try:
@@ -492,14 +499,14 @@ def distance_func(input_list, datetime):
             title = title + " vs " + str(drivers[i+1])
         i += 1
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
 
     if lap == None:
-        # plt.suptitle("Fastest Lap Comparison\n" + f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
-        plt.suptitle("Fastest Lap Comparison\n" + f"{yr} {rc} {sn}\n" + title)
+        plt.suptitle("Fastest Lap Comparison\n" +
+                     f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
     else:
-        # plt.suptitle("Lap " + str(lap) + " Comparison " + f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
-        plt.suptitle("Lap " + str(lap) + " Comparison " + f"{yr} {rc} {sn}\n" + title)
+        plt.suptitle("Lap " + str(lap) + " Comparison " +
+                     f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
 
     ax.set_xlabel('Distance in m')
     ax.set_ylabel('Speed km/h')
@@ -520,31 +527,26 @@ def delta_func(input_list, datetime):
     lap1 = input_list[5]
     lap2 = input_list[6]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
     
     wait_for_turn(datetime)
 
     if lap1 == None:
-        # dd1 = session.laps.pick_driver(d1).pick_fastest()
-        dd1 = laps[laps['Driver'] == d1].iloc[0]
+        dd1 = session.laps.pick_driver(d1).pick_fastest()
     else:
-        # driver_laps = session.laps.pick_driver(d1)
-        driver_laps = laps[laps['Driver'] == d1]
+        driver_laps = session.laps.pick_driver(d1)
         dd1 = driver_laps[driver_laps['LapNumber'] == int(lap1)].iloc[0]
 
     if lap2 == None:
-        # dd2 = session.laps.pick_driver(d2).pick_fastest()
-        dd2 = laps[laps['Driver'] == d2].iloc[0]
+        dd2 = session.laps.pick_driver(d2).pick_fastest()
     else:
-        # driver_laps = session.laps.pick_driver(d2)
-        driver_laps = laps[laps['Driver'] == d2]
+        driver_laps = session.laps.pick_driver(d2)
         dd2 = driver_laps[driver_laps['LapNumber'] == int(lap2)].iloc[0]
 
-    delta_time, ref_tel, compare_tel = delta_time_updated(yr, rc, sn, dd1['Driver'], dd1['LapNumber'], dd2['Driver'], dd2['LapNumber'])
+    delta_time, ref_tel, compare_tel = utils.delta_time(dd1, dd2)
 
     plotting.setup_mpl()
     fig, ax = plt.subplots()
@@ -585,10 +587,10 @@ def delta_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
 
-    # plt.suptitle("Lap Comparison\n" + f"{session.event.year} {session.event['EventName']} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")")
-    plt.suptitle("Lap Comparison\n" + f"{yr} {rc} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")")
+    plt.suptitle("Lap Comparison\n" +
+                 f"{session.event.year} {session.event['EventName']} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")")
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
@@ -604,9 +606,8 @@ def gear_func(input_list, datetime):
     driver = input_list[3]
     lap = input_list[4]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
     
@@ -619,26 +620,20 @@ def gear_func(input_list, datetime):
 
     if lap == None and driver == None:
         # get fastest lap of the session
-        # d_lap = session.laps.pick_fastest()
-        d_lap = laps.iloc[0]
+        d_lap = session.laps.pick_fastest()
     elif lap == None and driver != None:
         # get fastest lap of driver
-        # d_lap = session.laps.pick_driver(driver).pick_fastest()
-        d_lap = laps[laps['Driver'] == driver].iloc[0]
+        d_lap = session.laps.pick_driver(driver).pick_fastest()
     elif lap != None and driver != None:
         # get specific lap of driver
-        # driver_laps = session.laps.pick_driver(driver)
-        driver_laps = laps[laps['Driver'] == driver]
+        driver_laps = session.laps.pick_driver(driver)
         d_lap = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
     elif lap != None and driver == None:
-        # temp_lap = session.laps.pick_fastest()
-        temp_lap = laps.iloc[0]
-        # driver_laps = session.laps.pick_driver(str(f"{temp_lap['Driver']}"))
-        driver_laps = laps[laps['Driver'] == str(f"{temp_lap['Driver']}")]
+        temp_lap = session.laps.pick_fastest()
+        driver_laps = session.laps.pick_driver(str(f"{temp_lap['Driver']}"))
         d_lap = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
     # get telemetry data
-    # tel = d_lap.get_telemetry()
-    tel = get_telemetry(yr, rc, sn, d_lap['Driver'], d_lap['LapNumber'])
+    tel = d_lap.get_telemetry()
 
     x = np.array(tel['X'].values)
     y = np.array(tel['Y'].values)
@@ -658,14 +653,14 @@ def gear_func(input_list, datetime):
     plt.tick_params(labelleft=False, left=False,
                     labelbottom=False, bottom=False)
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
 
     if lap == None:
-        # plt.suptitle(f"Fastest Lap Gear Shift Visualization - " + f"{d_lap['Driver']}\n" + f"{session.event.year} {session.event['EventName']} {sn}\n")
-        plt.suptitle(f"Fastest Lap Gear Shift Visualization - " + f"{d_lap['Driver']}\n" + f"{yr} {rc} {sn}\n")
+        plt.suptitle(
+            f"Fastest Lap Gear Shift Visualization - " + f"{d_lap['Driver']}\n" + f"{session.event.year} {session.event['EventName']} {sn}\n")
     else:
-        # plt.suptitle(f"Lap {lap} Gear Shift Visualization - " + f"{d_lap['Driver']}\n" + f"{session.event.year} {session.event['EventName']} {sn}\n")
-        plt.suptitle(f"Lap {lap} Gear Shift Visualization - " + f"{d_lap['Driver']}\n" + f"{yr} {rc} {sn}\n")
+        plt.suptitle(f"Lap {lap} Gear Shift Visualization - " +
+                     f"{d_lap['Driver']}\n" + f"{session.event.year} {session.event['EventName']} {sn}\n")
 
     cbar = plt.colorbar(mappable=lc_comp, label="Gear",
                         boundaries=np.arange(1, 10))
@@ -688,9 +683,8 @@ def speed_func(input_list, datetime):
 
     colormap = mpl.cm.plasma
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
     
@@ -700,31 +694,23 @@ def speed_func(input_list, datetime):
 
     if lap == None and driver == None:
         # get fastest lap of the session
-        # d_lap = session.laps.pick_fastest()
-        d_lap = laps.iloc[0]
+        d_lap = session.laps.pick_fastest()
     elif lap == None and driver != None:
         # get fastest lap of driver
-        # d_lap = session.laps.pick_driver(driver).pick_fastest()
-        d_lap = laps[laps['Driver'] == driver].iloc[0]
+        d_lap = session.laps.pick_driver(driver).pick_fastest()
     elif lap != None and driver != None:
         # get specific lap of driver
-        # driver_laps = session.laps.pick_driver(driver)
-        driver_laps = laps[laps['Driver'] == driver]
+        driver_laps = session.laps.pick_driver(driver)
         d_lap = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
     elif lap != None and driver == None:
-        # temp_lap = session.laps.pick_fastest()
-        temp_lap = laps.iloc[0]
-        # driver_laps = session.laps.pick_driver(str(f"{temp_lap['Driver']}"))
-        driver_laps = laps[laps['Driver'] == str(f"{temp_lap['Driver']}")]
+        temp_lap = session.laps.pick_fastest()
+        driver_laps = session.laps.pick_driver(str(f"{temp_lap['Driver']}"))
         d_lap = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
 
     # Get telemetry data
-    # x = d_lap.telemetry['X']              # values for x-axis
-    # y = d_lap.telemetry['Y']              # values for y-axis
-    # color = d_lap.telemetry['Speed']      # value to base color gradient on
-    x = get_telemetry(yr, rc, sn, d_lap['Driver'], d_lap['LapNumber'])['X'].values
-    y = get_telemetry(yr, rc, sn, d_lap['Driver'], d_lap['LapNumber'])['Y'].values
-    color = get_telemetry(yr, rc, sn, d_lap['Driver'], d_lap['LapNumber'])['Speed'].values
+    x = d_lap.telemetry['X']              # values for x-axis
+    y = d_lap.telemetry['Y']              # values for y-axis
+    color = d_lap.telemetry['Speed']      # value to base color gradient on
 
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
@@ -736,14 +722,14 @@ def speed_func(input_list, datetime):
     plt.rcParams["figure.figsize"] = [7, 5]
     plt.rcParams["figure.autolayout"] = True
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
 
     if lap == None:
-        # fig.suptitle("Fastest Lap Speed Visualization - " + f"{d_lap['Driver']}" + "\n" + f"{session.event.year} {session.event['EventName']} {sn}\n", size=20, y=0.97)
-        fig.suptitle("Fastest Lap Speed Visualization - " + f"{d_lap['Driver']}" + "\n" + f"{yr} {rc} {sn}\n", size=20, y=0.97)
+        fig.suptitle("Fastest Lap Speed Visualization - " +
+                     f"{d_lap['Driver']}" + "\n" + f"{session.event.year} {session.event['EventName']} {sn}\n", size=20, y=0.97)
     else:
-        # fig.suptitle("Lap " + str(lap) + " Speed Visualization - " + f"{d_lap['Driver']}" + "\n" + f"{session.event.year} {session.event['EventName']} {sn}\n", size=20, y=0.97)
-        fig.suptitle("Lap " + str(lap) + " Speed Visualization - " + f"{d_lap['Driver']}" + "\n" + f"{yr} {rc} {sn}\n", size=20, y=0.97)
+        fig.suptitle("Lap " + str(lap) + " Speed Visualization - " +
+                     f"{d_lap['Driver']}" + "\n" + f"{session.event.year} {session.event['EventName']} {sn}\n", size=20, y=0.97)
 
     # Adjust margins and turn of axis
     plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.12)
@@ -751,9 +737,7 @@ def speed_func(input_list, datetime):
 
     # After this, we plot the data itself.
     # Create background track line
-    # ax.plot(d_lap.telemetry['X'], d_lap.telemetry['Y'],
-    #         color='black', linestyle='-', linewidth=16, zorder=0)
-    ax.plot(get_telemetry(yr, rc, sn, d_lap['Driver'], d_lap['LapNumber'])['X'].values, get_telemetry(yr, rc, sn, d_lap['Driver'], d_lap['LapNumber'])['Y'].values,
+    ax.plot(d_lap.telemetry['X'], d_lap.telemetry['Y'],
             color='black', linestyle='-', linewidth=16, zorder=0)
 
     # Create a continuous norm to map from data points to colors
@@ -789,33 +773,28 @@ def tel_func(input_list, datetime):
     lap1 = input_list[5]
     lap2 = input_list[6]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    
-    laps = gdapi.get_laps(yr, rc, sn)
-    
+    session = get_sess(yr, rc, sn)
+    session.load()
+
     queue.append(datetime)
     
     wait_for_turn(datetime)
 
-    # weekend = session.event
-    # laps = session.load()
+    weekend = session.event
+    laps = session.load_laps(with_telemetry=True)
     drv1 = d1
     drv2 = d2
 
-    # first_driver = laps.pick_driver(drv1)
-    first_driver = laps[laps['Driver'] == drv1].iloc[0]
-    # first_driver_info = session.get_driver(drv1)
-    
+    first_driver = laps.pick_driver(drv1)
+    first_driver_info = session.get_driver(drv1)
 
     try:
         first_color = fastf1.plotting.driver_color(d1)
     except:
         first_color = 'grey'
 
-    # second_driver = laps.pick_driver(drv2)
-    second_driver = laps[laps['Driver'] == drv2].iloc[0]
-    # second_driver_info = session.get_driver(drv2)
+    second_driver = laps.pick_driver(drv2)
+    second_driver_info = session.get_driver(drv2)
 
     try:
         if (d1 != d2):
@@ -826,25 +805,21 @@ def tel_func(input_list, datetime):
         second_color = 'grey'
 
     if lap1 == None:
-        # first_driver = laps.pick_driver(drv1).pick_fastest()
-        first_driver = laps[laps['Driver'] == drv1].iloc[0]
+        first_driver = laps.pick_driver(drv1).pick_fastest()
     else:
-        # driver_laps = session.laps.pick_driver(drv1)
-        driver_laps = laps[laps['Driver'] == drv1]
-        first_driver = driver_laps[driver_laps['LapNumber'] == int(lap1)].iloc[0]
+        driver_laps = session.laps.pick_driver(drv1)
+        first_driver = driver_laps[driver_laps['LapNumber'] == int(
+            lap1)].iloc[0]
 
     if lap2 == None:
-        # second_driver = laps.pick_driver(drv2).pick_fastest()
-        second_driver = laps[laps['Driver'] == drv2].iloc[0]
+        second_driver = laps.pick_driver(drv2).pick_fastest()
     else:
-        # driver_laps = session.laps.pick_driver(drv2)
-        driver_laps = laps[laps['Driver'] == drv2]
-        second_driver = driver_laps[driver_laps['LapNumber'] == int(lap2)].iloc[0]
+        driver_laps = session.laps.pick_driver(drv2)
+        second_driver = driver_laps[driver_laps['LapNumber'] == int(
+            lap2)].iloc[0]
 
-    # first_car = first_driver.get_car_data().add_distance()
-    # second_car = second_driver.get_car_data().add_distance()
-    first_car = get_telemetry(yr, rc, sn, drv1, int(first_driver['LapNumber']))
-    second_car = get_telemetry(yr, rc, sn, drv2, int(second_driver['LapNumber']))
+    first_car = first_driver.get_car_data().add_distance()
+    second_car = second_driver.get_car_data().add_distance()
 
     plotting.setup_mpl()
     fig, ax = plt.subplots(7, 1, figsize=(10, 10), gridspec_kw={
@@ -859,10 +834,12 @@ def tel_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
 
-    # fig.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" + drv1 + " (" + lap1 + ") vs " + drv2 + " (" + lap2 + ")", size=15)
-    fig.suptitle(f"{yr} {rc} {sn}\n" + drv1 + " (" + lap1 + ") vs " + drv2 + " (" + lap2 + ")", size=15)
+    sn = session.event.get_session_name(sn)
+
+    fig.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" +
+                 drv1 + " (" + lap1 + ") vs " + drv2 + " (" + lap2 + ")", size=15)
 
     drs_1 = first_car['DRS']
     drs_2 = second_car['DRS']
@@ -901,10 +878,8 @@ def tel_func(input_list, datetime):
         while (b < len(second_car['Distance'])):
             brake_2.extend([0])
             b += 1
-    # delta_time, ref_tel, compare_tel = utils.delta_time(
-    #     first_driver, second_driver)
-    delta_time, ref_tel, compare_tel = delta_time_updated(
-        yr, rc, sn, drv1, int(first_driver['LapNumber']), drv2, int(second_driver['LapNumber']))
+    delta_time, ref_tel, compare_tel = utils.delta_time(
+        first_driver, second_driver)
 
     delta = []
 
@@ -979,30 +954,23 @@ def cornering_func(input_list, datetime):
     lap1 = input_list[7]
     lap2 = input_list[8]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
     
     wait_for_turn(datetime)
 
     # Get the laps
-    # laps = session.load()
+    laps = session.load_laps(with_telemetry=True)
 
     # Setting parameters
     driver_1, driver_2 = d1, d2
 
-    # car_data = laps.pick_driver(
-    #     driver_1).pick_fastest().get_car_data().add_distance()
-    car_data = get_telemetry(yr, rc, sn, driver_1, lap1)
+    car_data = laps.pick_driver(
+        driver_1).pick_fastest().get_car_data().add_distance()
     dist = car_data['Distance']
     maxdist = dist[len(dist)-1]
-
-    if (dist1 == None):
-        dist1 = 0
-    if (dist2 == None):
-        dist2 = 0
 
     if (dist2 == 0):
         distance = maxdist
@@ -1012,28 +980,22 @@ def cornering_func(input_list, datetime):
     distance_min, distance_max = dist1, distance
 
     # Extracting the laps
-    # laps_driver_1 = laps.pick_driver(driver_1)
-    # laps_driver_2 = laps.pick_driver(driver_2)
-    laps_driver_1 = laps[laps['Driver'] == driver_1]
-    laps_driver_2 = laps[laps['Driver'] == driver_2]
+    laps_driver_1 = laps.pick_driver(driver_1)
+    laps_driver_2 = laps.pick_driver(driver_2)
 
     if lap1 == None:
-        # telemetry_driver_1 = laps_driver_1.pick_fastest().get_car_data().add_distance()
-        telemetry_driver_1 = get_telemetry(yr, rc, sn, driver_1, lap1)
+        telemetry_driver_1 = laps_driver_1.pick_fastest().get_car_data().add_distance()
     else:
         temp_laps1 = laps_driver_1[laps_driver_1['LapNumber'] == int(
             lap1)].iloc[0]
-        # telemetry_driver_1 = temp_laps1.get_car_data().add_distance()
-        telemetry_driver_1 = get_telemetry(yr, rc, sn, driver_1, lap1)
+        telemetry_driver_1 = temp_laps1.get_car_data().add_distance()
 
     if lap2 == None:
-        # telemetry_driver_2 = laps_driver_2.pick_fastest().get_car_data().add_distance()
-        telemetry_driver_2 = get_telemetry(yr, rc, sn, driver_2, lap2)
+        telemetry_driver_2 = laps_driver_2.pick_fastest().get_car_data().add_distance()
     else:
         temp_laps2 = laps_driver_2[laps_driver_2['LapNumber'] == int(
             lap2)].iloc[0]
-        # telemetry_driver_2 = temp_laps2.get_car_data().add_distance()
-        telemetry_driver_2 = get_telemetry(yr, rc, sn, driver_2, lap2)
+        telemetry_driver_2 = temp_laps2.get_car_data().add_distance()
 
     # Identifying the team for coloring later on
     team_driver_1 = laps_driver_1.reset_index().loc[0, 'Team']
@@ -1200,10 +1162,10 @@ def cornering_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
 
-    # plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=20)
-    plt.suptitle(f"{yr} {rc} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=20)
+    plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" +
+                 d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=20)
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
@@ -1218,9 +1180,8 @@ def tires_func(input_list, datetime): # very slow
     sn = input_list[2]
     sl = input_list[3]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
 
@@ -1232,7 +1193,7 @@ def tires_func(input_list, datetime): # very slow
     plt.rcParams["figure.autolayout"] = True
 
     # Get the laps
-    # laps = session.load()
+    laps = session.load_laps(with_telemetry=True)
 
     # Calculate RaceLapNumber (LapNumber minus 1 since the warmup lap is included in LapNumber)
     laps['RaceLapNumber'] = laps['LapNumber'] - 1
@@ -1247,22 +1208,16 @@ def tires_func(input_list, datetime): # very slow
 
     # Telemetry can only be retrieved driver-by-driver
     for driver in drivers:
-        # driver_laps = laps.pick_driver(driver)
-        driver_laps = laps.loc[laps['Driver'] == driver]
+        driver_laps = laps.pick_driver(driver)
 
         # Since we want to compare distances, we need to collect telemetry lap-by-lap to reset the distance
-        # for lap in driver_laps.iterlaps():
-        for lap in driver_laps.iterrows():
-            try:
-                # driver_telemetry = lap[1].get_telemetry().add_distance()
-                driver_telemetry = get_telemetry(yr, rc, sn, driver, lap[1]['LapNumber'])
-                driver_telemetry['Driver'] = driver
-                driver_telemetry['Lap'] = lap[1]['RaceLapNumber']
-                driver_telemetry['Compound'] = lap[1]['Compound']
+        for lap in driver_laps.iterlaps():
+            driver_telemetry = lap[1].get_telemetry().add_distance()
+            driver_telemetry['Driver'] = driver
+            driver_telemetry['Lap'] = lap[1]['RaceLapNumber']
+            driver_telemetry['Compound'] = lap[1]['Compound']
 
-                telemetry = telemetry.append(driver_telemetry)
-            except:
-                pass
+            telemetry = telemetry.append(driver_telemetry)
 
     # Only keep required columns
     telemetry = telemetry[['Lap', 'Distance', 'Compound', 'Speed', 'X', 'Y']]
@@ -1347,10 +1302,10 @@ def tires_func(input_list, datetime): # very slow
         cbar.set_ticks(np.arange(1.5, 4.5))
         cbar.set_ticklabels(['Inters', 'Wets', 'Slicks'])
 
-        # sn = session.event.get_session_name(sn)
+        sn = session.event.get_session_name(sn)
 
-        # plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n Lap {sl} - Tire Comparison")
-        plt.suptitle(f"{yr} {rc} {sn}\n Lap {sl} - Tire Comparison")
+        plt.suptitle(
+            f"{session.event.year} {session.event['EventName']} {sn}\n Lap {sl} - Tire Comparison")
 
     generate_minisector_plot(sl, sn)
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
@@ -1366,8 +1321,7 @@ def strategy_func(input_list, datetime):
 
     # Load the session data
     race = fastf1.get_session(yr, rc, 'R')
-    race.load()
-    laps = race.laps
+    laps = race.load_laps(with_telemetry=True)
 
     queue.append(datetime)
     
@@ -1450,9 +1404,8 @@ def sectors_func(input_list, datetime):
     lap1 = input_list[5]
     lap2 = input_list[6]
 
-    # session = get_sess(yr, rc, sn)
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
+    session.load()
 
     queue.append(datetime)
     
@@ -1461,7 +1414,7 @@ def sectors_func(input_list, datetime):
     plotting.setup_mpl()
 
     # Explore the lap data
-    # session.laps
+    session.laps
 
     driver_1 = d1
     driver_2 = d2
@@ -1480,37 +1433,27 @@ def sectors_func(input_list, datetime):
         color_2 = 'grey'
 
     # Find the laps
-    # laps_driver_1 = session.laps.pick_driver(driver_1)
-    # laps_driver_2 = session.laps.pick_driver(driver_2)
-    laps_driver_1 = laps[laps['Driver'] == driver_1]
-    laps_driver_2 = laps[laps['Driver'] == driver_2]
+    laps_driver_1 = session.laps.pick_driver(driver_1)
+    laps_driver_2 = session.laps.pick_driver(driver_2)
 
     if lap1 == None:
-        # fastest_driver_1 = laps_driver_1.pick_fastest()
-        fastest_driver_1 = laps_driver_1.iloc[0]
+        fastest_driver_1 = laps_driver_1.pick_fastest()
     else:
-        # fastest_driver_1 = laps_driver_1[laps_driver_1['LapNumber'] == int(
-            # lap1)].iloc[0]
-        fastest_driver_1 = laps_driver_1.iloc[int(lap1)]
+        fastest_driver_1 = laps_driver_1[laps_driver_1['LapNumber'] == int(
+            lap1)].iloc[0]
 
     if lap2 == None:
-        # fastest_driver_2 = laps_driver_2.pick_fastest()
-        fastest_driver_2 = laps_driver_2.iloc[0]
+        fastest_driver_2 = laps_driver_2.pick_fastest()
     else:
-        # fastest_driver_2 = laps_driver_2[laps_driver_2['LapNumber'] == int(
-            # lap2)].iloc[0]
-        fastest_driver_2 = laps_driver_2.iloc[int(lap2)]
+        fastest_driver_2 = laps_driver_2[laps_driver_2['LapNumber'] == int(
+            lap2)].iloc[0]
 
-    # telemetry_driver_1 = fastest_driver_1.get_telemetry()
-    # telemetry_driver_2 = fastest_driver_2.get_telemetry()
-    telemetry_driver_1 = get_telemetry(yr, rc, sn, driver_1, fastest_driver_1['LapNumber'])
-    telemetry_driver_2 = get_telemetry(yr, rc, sn, driver_2, fastest_driver_2['LapNumber'])
+    telemetry_driver_1 = fastest_driver_1.get_telemetry()
+    telemetry_driver_2 = fastest_driver_2.get_telemetry()
 
     # Get the gap (delta time) between driver 1 and driver 2
-    # delta_time, ref_tel, compare_tel = fastf1.utils.delta_time(
-        # fastest_driver_1, fastest_driver_2)
-    delta_time, ref_tel, compare_tel = delta_time_updated(
-        yr, rc, sn, driver_1, fastest_driver_1['LapNumber'], driver_2, fastest_driver_2['LapNumber'])
+    delta_time, ref_tel, compare_tel = fastf1.utils.delta_time(
+        fastest_driver_1, fastest_driver_2)
 
     # Identify team colors
     team_driver_1 = laps_driver_1['Team'].iloc[0]
@@ -1601,10 +1544,10 @@ def sectors_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    # sn = session.event.get_session_name(sn)
+    sn = session.event.get_session_name(sn)
 
-    # plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn} - Fastest Sectors\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=25)
-    plt.suptitle(f"{yr} {rc} {sn} - Fastest Sectors\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=25)
+    plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn} - Fastest Sectors\n" +
+                 d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=25)
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
@@ -1618,9 +1561,8 @@ def rt_func(input_list, datetime):
     rc = input_list[1]
     drivers = input_list[2]
 
-    # session = fastf1.get_session(yr, rc, 'Race')
-    # session.load()
-    laps = gdapi.get_laps(yr, rc, 'Race')
+    session = fastf1.get_session(yr, rc, 'Race')
+    session.load()
 
     queue.append(datetime)
     
@@ -1639,8 +1581,7 @@ def rt_func(input_list, datetime):
     title = ""
     title = title + str(drivers[0])
     while (i < len(drivers)):
-        # temp = session.laps.pick_driver(drivers[i])
-        temp = laps.loc[laps['DriverNumber'] == drivers[i]]
+        temp = session.laps.pick_driver(drivers[i])
         if (i+1 < len(drivers)):
             title = title + " vs " + str(drivers[i+1])
         i += 1
@@ -1649,7 +1590,7 @@ def rt_func(input_list, datetime):
     # suppress errors as dont really matter for this
     pd.options.mode.chained_assignment = None
 
-    # laps = session.laps
+    laps = session.laps
     # laps = laps.loc[laps['PitOutTime'].isna() & laps['PitInTime'].isna() & laps['LapTime'].notna()]
     laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
 
@@ -1675,8 +1616,8 @@ def rt_func(input_list, datetime):
 
     ax.set_xlabel('Lap Number')
     ax.set_ylabel('Race Trace (relative to imaginary driver)')
-    # ax.set_title("Race Trace - " + f"{session.event.year} {session.event['EventName']}\n" + title)
-    ax.set_title(f"{yr} {rc} Race Trace\n" + title)
+    ax.set_title("Race Trace - " +
+                 f"{session.event.year} {session.event['EventName']}\n" + title)
 
     ax.legend()
 
