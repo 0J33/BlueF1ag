@@ -37,8 +37,8 @@ from PIL import Image, ImageDraw, ImageFont
 import warnings
 import platform
 # from update import *
-import odapi
-from odapi import *
+import gdapi
+from gdapi import *
 from utils import *
 warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()

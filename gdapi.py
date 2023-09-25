@@ -368,3 +368,24 @@ def save_from(yr, flag):
         save(yr, flag)
                                         
 ### END OF TEMP FUNCTIONS ###
+
+
+#### FOR TESTING ###
+
+import traceback
+
+try:
+    
+    done = False
+    while(not done):
+        try:
+            save_from(2022, "telemetry")
+            done = True
+        except:
+            done = False
+
+except Exception as exc:
+    
+    print(traceback.format_exc())
+
+### END OF TESTING ###
