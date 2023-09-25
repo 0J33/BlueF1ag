@@ -38,7 +38,7 @@ import ssl
 import smtplib
 from pymongo import MongoClient
 from env import *
-from funcs import *
+from funcs_cache import *
 import warnings
 import platform
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -443,11 +443,11 @@ def update():
         data = str(update_data(yr))
     except:
         data = "data fail"
-    try:
-        update_gd(yr)
-        gd = "gd success"
-    except:
-        gd = "gd fail"
+    # try:
+    #     update_gd(yr)
+    #     gd = "gd success"
+    # except:
+    #     gd = "gd fail"
     return stnd + "<br />" + races + "<br />" + data + "<br />" + gd
 
 # execute function when user submits form

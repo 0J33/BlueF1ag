@@ -36,7 +36,7 @@ from matplotlib import dates
 from PIL import Image, ImageDraw, ImageFont
 import warnings
 import platform
-from update import *
+from update_old import *
 warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()
 mpl.use('Agg')

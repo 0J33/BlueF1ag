@@ -16,7 +16,4 @@ record_dump/
 creds.json
 creds_sc.json
 
-funcs(old).py
-update(old).py
-
 gui.py
