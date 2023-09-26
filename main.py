@@ -72,7 +72,7 @@ def delete_all():
         os.remove(file_path)
 
 # method that logs data from slash commands
-def log(user_id, message, exc, flag, datetime):  
+def log(user_id, message, exc, flag, datetime): # TODO fix log
     datetime = datetime.replace("-", " ").replace(".", ":")
     
     id_flg = False
@@ -432,7 +432,7 @@ def command(user_id, input_list, comm, datetime):
 app = Flask('', static_folder='res')
 
 # update data
-@app.route('/update', methods=['GET', 'POST'])
+@app.route('/update', methods=['GET', 'POST']) # TODO fix update
 def update():
     yr = dt.now().year
     stnd = ""
