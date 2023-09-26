@@ -75,6 +75,9 @@ def delete_all():
 def log(user_id, message, exc, flag, datetime):  
     datetime = datetime.replace("-", " ").replace(".", ":")
     
+    if type(IDS) == str:
+        IDS = IDS.split(", ")
+    
     id_flg = False
     for i in IDS:
         if i in user_id:
