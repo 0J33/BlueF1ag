@@ -422,7 +422,10 @@ def command(user_id, input_list, comm, datetime):
         
         raise Exception(exc)
 
-    log(user_id, message, exc, flag, datetime)
+    try:
+        log(user_id, message, exc, flag, datetime)
+    except:
+        pass
     return datetime
 
 # flask server
@@ -478,10 +481,16 @@ def home():
             else:
                 try:
                     result = "/res/stnd/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
-                    log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
+                    try:
+                        log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
+                    except:
+                        pass
                 except Exception as exc:
                     print(str(exc))
-                    log(user_id, str(func_name) + "\n" + str(input_list), str(exc), True, datetime)
+                    try:
+                        log(user_id, str(func_name) + "\n" + str(input_list), str(exc), True, datetime)
+                    except:
+                        pass
             return jsonify({'result': result}), 200    
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
