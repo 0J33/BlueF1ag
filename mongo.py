@@ -4,7 +4,12 @@ import json
 import pandas as pd
 import datetime
 from datetime import datetime, timedelta
-from env import *
+import os
+try:
+    from env import *
+except:
+    connection_string = os.getenv("connection_string")
+    db_name = os.getenv("db_name")
 from utils import *
 
 client = MongoClient(connection_string)

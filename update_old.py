@@ -12,7 +12,12 @@ import matplotlib.pyplot as plt
 import platform
 from PIL import Image, ImageDraw, ImageFont
 from pymongo import MongoClient
-from env import *
+import os
+try:
+    from env import *
+except:
+    connection_string = os.getenv("connection_string")
+    db_name = os.getenv("db_name")
 platform.system()
 
 client = MongoClient(connection_string)

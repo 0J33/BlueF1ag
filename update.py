@@ -11,7 +11,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 from pymongo import MongoClient
-from env import *
+import os
+try:
+    from env import *
+except:
+    connection_string = os.getenv("connection_string")
+    db_name = os.getenv("db_name")
 import gdapi
 from utils import *
 from utils import dir_path

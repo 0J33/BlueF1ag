@@ -37,10 +37,18 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 from pymongo import MongoClient
-from env import *
 from funcs_cache import *
 import warnings
 import platform
+try:
+    from env import *
+except:
+    IDS = os.getenv("IDS")
+    PY = os.getenv("PY")
+    connection_string = os.getenv("connection_string")
+    db_name = os.getenv("db_name")
+    
+    
 warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()
 mpl.use('Agg')
