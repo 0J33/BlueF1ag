@@ -57,7 +57,7 @@ pd.set_option('display.max_rows', None)
 # set mpl font
 set_font()
 
-# enable cache
+# enable cache # TODO fix storage
 if os.path.exists(dir_path + get_path() + "doc_cache"):
     fastf1.Cache.enable_cache(dir_path + get_path() + "doc_cache")
 
