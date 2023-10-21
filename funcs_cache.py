@@ -781,7 +781,7 @@ def tel_func(input_list, datetime):
     wait_for_turn(datetime)
 
     weekend = session.event
-    laps = session.load_laps(with_telemetry=True)
+    laps = session.laps
     drv1 = d1
     drv2 = d2
 
@@ -962,7 +962,7 @@ def cornering_func(input_list, datetime):
     wait_for_turn(datetime)
 
     # Get the laps
-    laps = session.load_laps(with_telemetry=True)
+    laps = session.laps
 
     # Setting parameters
     driver_1, driver_2 = d1, d2
@@ -1173,7 +1173,7 @@ def cornering_func(input_list, datetime):
     queue.remove(datetime)
     return "success"
 
-def tires_func(input_list, datetime): # very slow
+def tires_func(input_list, datetime): # very slow # not working (lap/tel problem)
 
     yr = input_list[0]
     rc = input_list[1]
@@ -1193,7 +1193,7 @@ def tires_func(input_list, datetime): # very slow
     plt.rcParams["figure.autolayout"] = True
 
     # Get the laps
-    laps = session.load_laps(with_telemetry=True)
+    laps = session.laps
 
     # Calculate RaceLapNumber (LapNumber minus 1 since the warmup lap is included in LapNumber)
     laps['RaceLapNumber'] = laps['LapNumber'] - 1
@@ -1321,7 +1321,7 @@ def strategy_func(input_list, datetime):
 
     # Load the session data
     race = fastf1.get_session(yr, rc, 'R')
-    laps = race.load_laps(with_telemetry=True)
+    laps = race.laps
 
     queue.append(datetime)
     
