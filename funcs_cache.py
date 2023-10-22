@@ -1173,7 +1173,7 @@ def cornering_func(input_list, datetime):
     queue.remove(datetime)
     return "success"
 
-def tires_func(input_list, datetime): # very slow # not working (lap/tel problem)
+def tires_func(input_list, datetime): # very slow
 
     yr = input_list[0]
     rc = input_list[1]
@@ -1321,6 +1321,7 @@ def strategy_func(input_list, datetime):
 
     # Load the session data
     race = fastf1.get_session(yr, rc, 'R')
+    race.load()
     laps = race.laps
 
     queue.append(datetime)
