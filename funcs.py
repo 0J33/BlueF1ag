@@ -37,8 +37,8 @@ from PIL import Image, ImageDraw, ImageFont
 import warnings
 import platform
 # from update import *
-import odapi
-from odapi import *
+import aws_api
+from aws_api import *
 from utils import *
 warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()
@@ -54,8 +54,6 @@ if not os.path.exists(dir_path + get_path() + "res"):
     os.mkdir(dir_path + get_path() + "res")
 if not os.path.exists(dir_path + get_path() + "res" + get_path() + "output"):
     os.mkdir(dir_path + get_path() + "res" + get_path() + "output")
-if not os.path.exists(dir_path + get_path() + "res" + get_path() + "stnd"):
-    os.mkdir(dir_path + get_path() + "res" + get_path() + "stnd")
 
 queue = []
 
@@ -160,7 +158,7 @@ def fastest_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
 
@@ -314,7 +312,7 @@ def laps_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -372,7 +370,7 @@ def time_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -447,7 +445,7 @@ def distance_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -522,7 +520,7 @@ def delta_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -606,7 +604,7 @@ def gear_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -690,7 +688,7 @@ def speed_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -792,7 +790,7 @@ def tel_func(input_list, datetime):
     # session = get_sess(yr, rc, sn)
     # session.load()
     
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
     
     queue.append(datetime)
     
@@ -981,7 +979,7 @@ def cornering_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -1220,7 +1218,7 @@ def tires_func(input_list, datetime): # very slow
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
 
@@ -1452,7 +1450,7 @@ def sectors_func(input_list, datetime):
 
     # session = get_sess(yr, rc, sn)
     # session.load()
-    laps = gdapi.get_laps(yr, rc, sn)
+    laps = aws_api.get_laps(yr, rc, sn)
 
     queue.append(datetime)
     
@@ -1620,7 +1618,7 @@ def rt_func(input_list, datetime):
 
     # session = fastf1.get_session(yr, rc, 'Race')
     # session.load()
-    laps = gdapi.get_laps(yr, rc, 'Race')
+    laps = aws_api.get_laps(yr, rc, 'Race')
 
     queue.append(datetime)
     

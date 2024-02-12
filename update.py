@@ -12,14 +12,15 @@ import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 from pymongo import MongoClient
 import os
-try:
-    from env import *
-except:
-    connection_string = os.getenv("connection_string")
-    db_name = os.getenv("db_name")
-import gdapi
+from dotenv import load_dotenv
+import aws_api
 from utils import *
 from utils import dir_path
+
+load_dotenv()
+
+connection_string = os.getenv("connection_string")
+db_name = os.getenv("db_name")
 
 client = MongoClient(connection_string)
 db = client[db_name]
@@ -214,7 +215,10 @@ def driver_func(yr):
 
     # Save the plot
     #plt.show()
-    plt.savefig(dir_path + "\\res\\stnd\\" + str(yr) + "_DRIVERS_STANDINGS" + '.png')
+    file = str(yr) + "_DRIVERS_STANDINGS" + '.png'
+    plt.savefig("data_dump/" + file)
+    aws_api.upload_file("data_dump/" + file, file, "standings/")
+    aws_api.delete_file_local(file)
 
 # get constructorss standings
 def get_constructors_standings():
@@ -389,7 +393,10 @@ def const_func(yr):
 
     # Save the plot
     #plt.show()
-    plt.savefig(dir_path + "\\res\\stnd\\" + str(yr) + "_CONSTRUCTORS_STANDINGS" + '.png')
+    file = str(yr) + "_CONSTRUCTORS_STANDINGS" + '.png'
+    plt.savefig("data_dump/" + file)
+    aws_api.upload_file("data_dump/" + file, file, "standings/")
+    aws_api.delete_file_local(file)
 
 ### updates standings for both drivers and constructors ###
 def update(yr):
@@ -497,9 +504,9 @@ def update_data(yr):
                         return msg + "\n" + str(res)
 
 ### updates gd with lap and telemetry data of all sessions of a given year ###       
-def update_gd(yr):
-    gdapi.save(yr, "laps")
-    gdapi.save(yr, "telemetry")
+def update_aws(yr):
+    aws_api.save(yr, "laps")
+    aws_api.save(yr, "telemetry")
    
 # update(yr)
 

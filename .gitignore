@@ -1,19 +1,10 @@
 __pycache__/
 
 doc_cache/
-res/output/
-res/stnd/
+res/
 
-env.py
 backup.py
-count.py
-update_check.py
 
 kart/
 
-record_dump/
-
-creds.json
-creds_sc.json
-
-gui.py
+data_dump/

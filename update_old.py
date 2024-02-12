@@ -13,11 +13,12 @@ import platform
 from PIL import Image, ImageDraw, ImageFont
 from pymongo import MongoClient
 import os
-try:
-    from env import *
-except:
-    connection_string = os.getenv("connection_string")
-    db_name = os.getenv("db_name")
+from dotenv import load_dotenv
+
+load_dotenv()
+
+connection_string = os.getenv("connection_string")
+db_name = os.getenv("db_name")
 platform.system()
 
 client = MongoClient(connection_string)

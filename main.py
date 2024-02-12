@@ -3,6 +3,7 @@ from flask import Flask
 from threading import Thread
 import asyncio
 import os
+from dotenv import load_dotenv
 import pathlib
 import sys
 import tracemalloc
@@ -37,17 +38,18 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 from pymongo import MongoClient
-from funcs_cache import *
+from funcs_aws_api import *
+import update
 import warnings
 import platform
-try:
-    from env import *
-except:
-    IDS = os.getenv("IDS")
-    PY = os.getenv("PY")
-    connection_string = os.getenv("connection_string")
-    db_name = os.getenv("db_name")
-    
+
+load_dotenv()
+
+aws_url = os.getenv("aws_url")
+IDS = os.getenv("IDS")
+PY = os.getenv("PY")
+connection_string = os.getenv("connection_string")
+db_name = os.getenv("db_name")
     
 warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()
@@ -57,7 +59,7 @@ pd.set_option('display.max_rows', None)
 # set mpl font
 set_font()
 
-# enable cache # TODO fix storage
+# enable cache
 if os.path.exists(dir_path + get_path() + "doc_cache"):
     fastf1.Cache.enable_cache(dir_path + get_path() + "doc_cache")
 
@@ -446,19 +448,19 @@ def update():
     except:
         stnd = "stnd fail"
     try:
-        update_races(yr)
+        update.update_races(yr)
         races = "race success"
     except:
         races = "races fail"
     try:
-        data = str(update_data(yr))
+        data = str(update.update_data(yr))
     except:
         data = "data fail"
-    # try:
-    #     update_gd(yr)
-    #     gd = "gd success"
-    # except:
-    #     gd = "gd fail"
+    try:
+        update.update_aws(yr)
+        aws = "aws success"
+    except:
+        aws = "aws fail"
     return stnd + "<br />" + races + "<br />" + data + "<br />" + gd
 
 # execute function when user submits form
@@ -477,10 +479,10 @@ def home():
                 if input_list[i] == "None":
                     input_list[i] = None
             if not (func_name.lower() == "drivers" or func_name.lower() == "constructors"):
-                result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png"
+                result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png" # TODO send bytes
             else:
                 try:
-                    result = "/res/stnd/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
+                    result = aws_url + "/standings/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
                     try:
                         log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
                     except:

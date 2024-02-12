@@ -2,10 +2,10 @@
 
 Blue F1ag provides F1 data through graphs for fans to analyze.
 
-[Add Blue F1ag to your discord server](https://ojee.net/bluef1ag-inv)  
-[Blue F1ag Support Server](https://ojee.net/bluef1ag-support)  
-[Blue F1ag ToS](https://ojee.net/bluef1ag-tos)  
-[Blue F1ag Privacy Policy](https://ojee.net/bluef1ag-priv)  
+[Add Blue F1ag to your discord server](https://discord.com/oauth2/authorize?client_id=892359806898303036&permissions=534723947584&scope=bot)  
+[Blue F1ag Support Server](https://discord.com/invite/uXY5Va4Jbb)  
+[Blue F1ag ToS](https://bluef1ag.ojee.net/tos)  
+[Blue F1ag Privacy Policy](https://bluef1ag.ojee.net/priv)  
 
 # Requirements
 
