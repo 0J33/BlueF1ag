@@ -233,12 +233,11 @@ def save_telemetry(yr, rc, sn):
                     csv_file_name = f"{yr}_{rc}_{sn}_{driver}_{lap}_telemetry.csv"
                     upload_file("data_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn) + "/" + csv_file_name, csv_file_name, f"telemetry/{folder_name}/")
                     print("Uploaded", csv_file_name)
-                    delete_file_local(csv_file_name)
                 except:
                     pass
         
         upload_file("data_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn) + "/" + summary_file_name, summary_file_name, f"telemetry/{folder_name}/")
-        delete_file(str(yr) + "_" + str(rc) + "_" + str(sn) + "/" +summary_file_name)
+        delete_file_local(str(yr) + "_" + str(rc) + "_" + str(sn))
         
         os.rmdir("data_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn))
 
