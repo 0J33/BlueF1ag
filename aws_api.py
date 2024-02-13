@@ -237,8 +237,8 @@ def save_telemetry(yr, rc, sn):
                     pass
         
         upload_file("data_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn) + "/" + summary_file_name, summary_file_name, f"telemetry/{folder_name}/")
-        delete_file_local(str(yr) + "_" + str(rc) + "_" + str(sn))
-        
+        for file in os.listdir("data_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn)):
+            delete_file_local(str(yr) + "_" + str(rc) + "_" + str(sn) + "/" + file)
         os.rmdir("data_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn))
 
     except Exception as exc:
