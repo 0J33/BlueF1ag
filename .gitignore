@@ -3,8 +3,6 @@ __pycache__/
 doc_cache/
 res/
 
-backup.py
-
 kart/
 
 data_dump/
