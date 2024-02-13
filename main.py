@@ -461,7 +461,7 @@ def update():
         aws = "aws success"
     except:
         aws = "aws fail"
-    return stnd + "<br />" + races + "<br />" + data + "<br />" + gd
+    return stnd + "<br />" + races + "<br />" + data + "<br />" + aws
 
 # execute function when user submits form
 @app.route('/', methods=['GET', 'POST'])
