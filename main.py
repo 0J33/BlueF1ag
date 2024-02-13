@@ -74,7 +74,7 @@ def delete_all():
         os.remove(file_path)
 
 # method that logs data from slash commands
-def log(user_id, message, exc, flag, datetime): # TODO fix log
+def log(user_id, func, message, exc, flag, datetime): # TODO fix log
     datetime = datetime.replace("-", " ").replace(".", ":")
     
     id_flg = False
@@ -97,14 +97,8 @@ def log(user_id, message, exc, flag, datetime): # TODO fix log
     
     print(message)
         
-    comm = ""
-    inputs = ""
-    if "\n" in message:
-        comm = message.split("\n")[0]
-        inputs = message.replace(comm, "").strip().replace("[", "").replace("]", "").replace("'", "").replace(", ", " ")
-    else:
-        comm = message.split(" ")[0]
-        inputs = message.replace(comm, "").strip()
+    comm = func
+    inputs = message
     
     if not exc:
         collection.insert_one({
@@ -440,7 +434,7 @@ def update():
     stnd = ""
     races = ""
     data = ""
-    gd = ""
+    aws = ""
     try:
         # PY is string like "py stnd.py" or "python stnd.py", etc.
         os.system(PY)
@@ -474,23 +468,24 @@ def home():
             datetime = request.form.get('datetime')
             input_list = request.form.get('input_list')
             user_id = request.form.get('id')
-            input_list = input_list.replace("[", "").replace("]", "").replace("'", "").split(', ')
-            for i in range(len(input_list)):
-                if input_list[i] == "None":
-                    input_list[i] = None
             if not (func_name.lower() == "drivers" or func_name.lower() == "constructors"):
-                result = "/res/output/" + command(user_id, input_list, func_name.lower(), datetime) + ".png" # TODO send bytes
+                res = command(user_id, input_list, func_name.lower(), datetime)
+                with open("/res/output" + res + ".png", "rb") as image:
+                    f = image.read()
+                    b = bytearray(f)
+                result = b
+                os.remove("/res/output" + res + ".png")
             else:
                 try:
-                    result = aws_url + "/standings/" + str(input_list[0]) + "_" + str(func_name).upper() + "_STANDINGS.png"
+                    result = aws_url + "/standings/" + str(input_list["year"]) + "_" + str(func_name).upper() + "_STANDINGS.png"
                     try:
-                        log(user_id, str(func_name) + "\n" + str(input_list), "", False, datetime)
+                        log(user_id, func_name, input_list, "", False, datetime)
                     except:
                         pass
                 except Exception as exc:
                     print(str(exc))
                     try:
-                        log(user_id, str(func_name) + "\n" + str(input_list), str(exc), True, datetime)
+                        log(user_id, func_name, input_list, str(exc), True, datetime)
                     except:
                         pass
             return jsonify({'result': result}), 200    

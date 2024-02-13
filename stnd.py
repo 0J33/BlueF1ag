@@ -1,5 +1,5 @@
 import datetime
-from update_old import *
+from update import *
 
 yr = datetime.datetime.now().year
 update(yr)
