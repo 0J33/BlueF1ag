@@ -10,7 +10,7 @@ import matplotlib as mpl
 from datetime import datetime as dt
 import datetime
 from pymongo import MongoClient
-import update
+from update import *
 import warnings
 import platform
 from funcs import *
@@ -400,9 +400,9 @@ def command(user_id, input_list, comm, datetime):
 app = Flask('', static_folder='res')
 
 # update data
-@app.route('/update', methods=['GET', 'POST']) # TODO fix update
+@app.route('/update', methods=['GET', 'POST'])
 def update():
-    yr = dt.now().year
+    yr = dt.datetime.now().year
     stnd = ""
     races = ""
     data = ""
@@ -414,16 +414,16 @@ def update():
     except:
         stnd = "stnd fail"
     try:
-        update.update_races(yr)
+        update_races(yr)
         races = "race success"
     except:
         races = "races fail"
     try:
-        data = str(update.update_data(yr))
+        data = str(update_data(yr))
     except:
         data = "data fail"
     try:
-        update.update_aws(yr)
+        update_aws(yr)
         aws = "aws success"
     except:
         aws = "aws fail"
