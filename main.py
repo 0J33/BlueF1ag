@@ -46,7 +46,7 @@ def delete_all():
         os.remove(file_path)
 
 # method that logs data from slash commands
-def log(user_id, func, message, exc, flag, datetime): # TODO fix log
+def log(user_id, func, message, exc, flag, datetime):
     datetime = datetime.replace("-", " ").replace(".", ":")
     
     id_flg = False
