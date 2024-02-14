@@ -14,6 +14,7 @@ from pymongo import MongoClient
 from update import *
 import warnings
 import platform
+import traceback
 from funcs import *
 
 load_dotenv()
@@ -28,6 +29,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()
 mpl.use('Agg')
 pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
 
 # set mpl font
 set_font()
@@ -227,7 +229,8 @@ def command(user_id, input_list, comm, datetime):
         exc = str(exc)
         flag = True
         
-        print("FAILED " + message + " " + datetime + " " + exc)
+        print("FAILED " + message + " " + datetime + " ")
+        print(traceback.format_exc())
             
         exc = fix_exc(exc, input_list, comm)
         
