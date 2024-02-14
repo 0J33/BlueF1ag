@@ -1,21 +1,14 @@
-import json
-import pathlib
 import pandas as pd
-import numpy as np
-import random
 import requests
 import datetime as dt
 import fastf1 as ff1
-from fastf1 import plotting
 import seaborn as sns
 import matplotlib.pyplot as plt
-from PIL import Image, ImageDraw, ImageFont
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
 import aws_api
 from utils import *
-from utils import dir_path
 
 load_dotenv()
 

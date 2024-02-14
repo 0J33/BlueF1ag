@@ -1,15 +1,5 @@
-import asyncio
 import os
 import pathlib
-import sys
-import tracemalloc
-import discord
-from discord import app_commands
-from discord.ext import commands
-import random
-import requests
-import json
-import seaborn as sns
 import fastf1
 from fastf1 import plotting
 from fastf1 import utils
@@ -24,19 +14,17 @@ from matplotlib.colors import ListedColormap
 from matplotlib.collections import LineCollection
 from matplotlib import cm
 import numpy as np
-from scipy.interpolate import make_interp_spline, BSpline
 import matplotlib as mpl
 from matplotlib.ticker import MaxNLocator
 import matplotlib.font_manager as fm
 from time import time, ctime
 import time as tm
-from datetime import datetime
-import datetime
 from matplotlib import dates
 from PIL import Image, ImageDraw, ImageFont
 import warnings
 import platform
-from update_old import *
+from update import *
+
 warnings.filterwarnings("ignore", category=FutureWarning)
 platform.system()
 mpl.use('Agg')

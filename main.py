@@ -1,47 +1,19 @@
-import aiohttp
 from flask import Flask
 from threading import Thread
-import asyncio
 import os
 from dotenv import load_dotenv
-import pathlib
-import sys
-import tracemalloc
-import random
-from flask import Blueprint, jsonify, request
-import requests
-import json
-import seaborn as sns
+from flask import jsonify, request
 import fastf1
-from fastf1 import plotting
-from fastf1 import utils
 import fastf1.plotting
-from fastf1.core import Laps
-from matplotlib import pyplot as plt
-import matplotlib.pyplot as plt
 import pandas as pd
-from timple.timedelta import strftimedelta
-from matplotlib.colors import ListedColormap
-from matplotlib.collections import LineCollection
-from matplotlib import cm
-import numpy as np
-from scipy.interpolate import make_interp_spline, BSpline
 import matplotlib as mpl
-from matplotlib.ticker import MaxNLocator
-import matplotlib.font_manager as fm
-from time import time, ctime
-import time as tm
 from datetime import datetime as dt
 import datetime
-from matplotlib import dates
-from email.message import EmailMessage
-import ssl
-import smtplib
 from pymongo import MongoClient
-from funcs_aws_api import *
 import update
 import warnings
 import platform
+from funcs import *
 
 load_dotenv()
 

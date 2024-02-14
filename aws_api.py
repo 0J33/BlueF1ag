@@ -1,9 +1,6 @@
 import boto3
-import json
 import os
 from dotenv import load_dotenv
-import fastf1 as ff1
-from fastf1 import plotting
 import datetime as dt
 import pandas as pd
 from pymongo import MongoClient
