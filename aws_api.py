@@ -23,6 +23,9 @@ aws_region = os.getenv("aws_region")
 # Create an S3 client
 s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, region_name=aws_region)
 
+if not os.path.exists(dir_path + get_path() + "data_dump"):
+    os.mkdir(dir_path + get_path() + "data_dump")
+
 ### NOTES ###
 
 # bucket_name = 'your_bucket_name'
