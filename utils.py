@@ -1,10 +1,8 @@
-from functools import reduce
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
 from time import time
 from time import ctime
 import fastf1 as ff1
-from fastf1 import utils
 import pathlib
 import platform
 platform.system()
