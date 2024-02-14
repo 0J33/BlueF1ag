@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from threading import Thread
 import os
 from dotenv import load_dotenv
@@ -226,8 +227,7 @@ def command(user_id, input_list, comm, datetime):
         exc = str(exc)
         flag = True
         
-        if os.path.exists(dir_path + get_path() + "logs" + get_path() + "logs.txt"): 
-            print(exc)
+        print("FAILED " + message + " " + datetime + " " + exc)
             
         exc = fix_exc(exc, input_list, comm)
         
@@ -241,6 +241,7 @@ def command(user_id, input_list, comm, datetime):
 
 # flask server
 app = Flask('', static_folder='res')
+CORS(app)
 
 # update data
 @app.route('/update', methods=['GET', 'POST'])

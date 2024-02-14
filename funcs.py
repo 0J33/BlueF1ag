@@ -160,9 +160,12 @@ def fastest_func(input_list, datetime):
 
     list_fastest_laps = list()
     for drv in drivers:
-        drvs_fastest_lap = laps[laps['Driver'] == drv].sort_values(
-            by='LapTime').reset_index(drop=True).loc[0]
-        list_fastest_laps.append(drvs_fastest_lap)
+        try:
+            drvs_fastest_lap = laps[laps['Driver'] == drv].sort_values(
+                by='LapTime').reset_index(drop=True).loc[0]
+            list_fastest_laps.append(drvs_fastest_lap)
+        except:
+            pass
     fastest_laps = Laps(list_fastest_laps).sort_values(
         by='LapTime').reset_index(drop=True)
 
@@ -204,6 +207,7 @@ def fastest_func(input_list, datetime):
     
     rstall(plt)
     queue.remove(datetime)
+    
     return "success"
 
 def results_func(input_list, datetime):

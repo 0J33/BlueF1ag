@@ -86,7 +86,12 @@ def read_file(file_path):
     try:
         response = s3.get_object(Bucket=bucket_name, Key=file_path)
         file_content = response['Body'].read().decode('utf-8')
-        return file_content
+        data = file_content.split("\n")
+        data = [i.split(",") for i in data]
+        data = pd.DataFrame(data)
+        data.columns = data.iloc[0]
+        data = data[1:]
+        return data
     except Exception as e:
         print(f'An error occurred: {e}')
         return e
