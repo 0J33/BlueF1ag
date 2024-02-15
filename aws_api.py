@@ -240,8 +240,7 @@ def save_results(yr, rc, sn):
         print("error", str(exc)) 
         
 def save_telemetry(yr, rc, sn):
-    
-    file_name = f"{yr}_{rc}_{sn}_summary.csv"
+
     folder_name = f"{yr}_{rc}_{sn}"
         
     try:
