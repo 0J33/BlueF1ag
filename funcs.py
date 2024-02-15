@@ -622,7 +622,7 @@ def delta_func(input_list, datetime):
     queue.remove(datetime)
     return "success"
 
-def gear_func(input_list, datetime): # TODO: no X, Y / fix data
+def gear_func(input_list, datetime): # TODO: no X, Y data / fix data
 
     yr = input_list["year"]
     rc = input_list["race"]
@@ -705,7 +705,7 @@ def gear_func(input_list, datetime): # TODO: no X, Y / fix data
     queue.remove(datetime)
     return "success"
 
-def speed_func(input_list, datetime): # TODO: no X, Y / fix data
+def speed_func(input_list, datetime): # TODO: no X, Y data / fix data
 
     yr = input_list["year"]
     rc = input_list["race"]
@@ -1567,7 +1567,7 @@ def strategy_func(input_list, datetime):
     queue.remove(datetime)
     return "success"
 
-def sectors_func(input_list, datetime): # TODO: no X, Y, Minisector / fix data
+def sectors_func(input_list, datetime): # TODO: no X, Y, Minisector data / fix data
 
     yr = input_list["year"]
     rc = input_list["race"]
