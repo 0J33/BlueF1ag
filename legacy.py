@@ -6,7 +6,7 @@ import fastf1 as ff1
 import aws_api
 
 #quali battles
-def battles_func(yr):
+def battles_func(yr):  # TODO: optimize this function
 
     def ergast_retrieve(api_endpoint: str):
         url = f'https://ergast.com/api/f1/{api_endpoint}.json'
