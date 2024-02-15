@@ -218,43 +218,55 @@ def fastest_func(input_list, datetime):
     
     return "success"
 
-def results_func(input_list, datetime): # TODO: fix data
+def results_func(input_list, datetime):
 
     yr = input_list["year"]
     rc = input_list["race"]
     sn = input_list["session"]
 
-    session = get_sess(yr, rc, sn)
-    session.load()
-
-    msg = session.results
-    if session.event.get_session_name(sn).lower() == "qualifying" or session.event.get_session_name(sn).lower() == "sprint shootout":
-        msg2 = msg[['Position', 'BroadcastName', 'TeamName', 'Q1', 'Q2', 'Q3']] 
-    elif session.event.get_session_name(sn).lower() == "race" or session.event.get_session_name(sn).lower() == "sprint":
-        msg2 = msg[['Position', 'BroadcastName', 'TeamName', 'Points', 'Status']] 
+    # session = get_sess(yr, rc, sn)
+    # session.load()
+    # msg = session.results
+    results = aws_api.get_results(yr, rc, sn)
+    
+    results = results.replace({r'\r': ''}, regex=True)
+    results.columns = results.columns.str.replace(r'\r', '')
+    
+    # delete last row
+    results = results[:-1]
+    
+    # if session.event.get_session_name(sn).lower() == "qualifying" or session.event.get_session_name(sn).lower() == "sprint shootout":
+    if sn.lower() == "qualifying" or sn.lower() == "sprint shootout":
+        results_text = results[['Position', 'BroadcastName', 'TeamName', 'Q1', 'Q2', 'Q3']] 
+    # elif session.event.get_session_name(sn).lower() == "race" or session.event.get_session_name(sn).lower() == "sprint":
+    elif sn.lower() == "race" or sn.lower() == "sprint":
+        results_text = results[['Position', 'BroadcastName', 'TeamName', 'Points', 'Status']] 
     else:
-        msg2 = msg[['BroadcastName', 'TeamName']]
-    sn = session.event.get_session_name(sn)
-    text = f"{session.event.year} {session.event['EventName']} {sn}"
+        results_text = results[['BroadcastName', 'TeamName']]
+    # sn = session.event.get_session_name(sn)
+    # text = f"{session.event.year} {session.event['EventName']} {sn}"
+    text = f"{yr} {rc} {sn}"
 
     text = tabulate.tabulate([[text]], tablefmt='fancy_grid')
     
-    msg2 = tabulate.tabulate(msg2.values, headers=msg2.columns, tablefmt='fancy_grid')
+    results_text = tabulate.tabulate(results_text.values, headers=results_text.columns, tablefmt='fancy_grid')
     
-    msg2 = msg2.replace("BroadcastName", "Driver       ").replace("TeamName", "Team    ")
+    results_text = results_text.replace("BroadcastName", "Driver       ").replace("TeamName", "Team    ")
     
-    if session.event.get_session_name(sn).lower() == "qualifying" or session.event.get_session_name(sn).lower() == "sprint shootout":
-        msg2 = msg2.replace(".0 0 days", "   0 days").replace(".0                    NaT", "                      NaT").replace("0 days 00:", "").replace("                    Q", "       Q").replace("                   NaT", "      NaT").replace("000 ", " ").replace("000\n", "\n").replace("NaT", "   ")
-        msg2 = msg2.replace("Q1                    ", "Q1       ").replace("Q2                    ", "Q2       ").replace("Q3                    ", "Q3       ")
-        msg2 = msg2.replace("═══════════════════════╤════════════════════════╤════════════════════════╕", "══════════╤═══════════╤═══════════╕")
-        msg2 = msg2.replace("═══════════════════════╧════════════════════════╧════════════════════════╛", "══════════╧═══════════╧═══════════╛")
-        msg2 = msg2.replace("───────────────────────┼────────────────────────┼────────────────────────┤", "──────────┼───────────┼───────────┤")
-        msg2 = msg2.replace("═══════════════════════╪════════════════════════╪════════════════════════╡", "══════════╪═══════════╪═══════════╡")
-        msg2 = msg2.replace("                        │", "           │")
-    elif session.event.get_session_name(sn).lower() == "race" or session.event.get_session_name(sn).lower() == "sprint":
-        msg2 = msg2.replace(".0", "  ")
+    # if session.event.get_session_name(sn).lower() == "qualifying" or session.event.get_session_name(sn).lower() == "sprint shootout":
+    if sn.lower() == "qualifying" or sn.lower() == "sprint shootout":
+        results_text = results_text.replace(".0 0 days", "   0 days").replace(".0                    NaT", "                      NaT").replace("0 days 00:", "").replace("                    Q", "       Q").replace("                   NaT", "      NaT").replace("000 ", " ").replace("000\n", "\n").replace("NaT", "   ")
+        results_text = results_text.replace("Q1                    ", "Q1       ").replace("Q2                    ", "Q2       ").replace("Q3                    ", "Q3       ")
+        results_text = results_text.replace("═══════════════════════╤════════════════════════╤════════════════════════╕", "══════════╤═══════════╤═══════════╕")
+        results_text = results_text.replace("═══════════════════════╧════════════════════════╧════════════════════════╛", "══════════╧═══════════╧═══════════╛")
+        results_text = results_text.replace("───────────────────────┼────────────────────────┼────────────────────────┤", "──────────┼───────────┼───────────┤")
+        results_text = results_text.replace("═══════════════════════╪════════════════════════╪════════════════════════╡", "══════════╪═══════════╪═══════════╡")
+        results_text = results_text.replace("                        │", "           │")
+    # elif session.event.get_session_name(sn).lower() == "race" or session.event.get_session_name(sn).lower() == "sprint":
+    elif sn.lower() == "race" or sn.lower() == "sprint":
+        results_text = results_text.replace(".0", "  ")
 
-    make_img(datetime, text + "\n" + msg2)
+    make_img(datetime, text + "\n" + results_text)
     return "success"
 
 def schedule_func(input_list, datetime):
@@ -1456,15 +1468,17 @@ def tires_func(input_list, datetime): # very slow # TODO: no X, Y data / fix dat
     queue.remove(datetime)
     return "success"
 
-def strategy_func(input_list, datetime): # TODO: fix data
+def strategy_func(input_list, datetime):
 
     yr = input_list["year"]
     rc = input_list["race"]
 
     # Load the session data
-    race = fastf1.get_session(yr, rc, 'R')
-    race.load()
-    laps = race.laps
+    # race = fastf1.get_session(yr, rc, 'R')
+    # race.load()
+    # laps = race.laps
+    laps = aws_api.get_laps(yr, rc, 'Race')
+    results = aws_api.get_results(yr, rc, 'Race')
 
     queue.append(datetime)
     
@@ -1510,7 +1524,8 @@ def strategy_func(input_list, datetime): # TODO: fix data
     plotting.setup_mpl()
     fig, ax = plt.subplots()
 
-    for driver in race.results['Abbreviation']:
+    # for driver in race.results['Abbreviation']:
+    for driver in results['Abbreviation']:
         stints = driver_stints.loc[driver_stints['Driver'] == driver]
 
         previous_stint_end = 0
@@ -1526,7 +1541,8 @@ def strategy_func(input_list, datetime): # TODO: fix data
             previous_stint_end = previous_stint_end + stint['StintLength']
 
     # Set title
-    plt.title(f"Race strategy - {race.event.year} {race.event['EventName']}\n")
+    # plt.title(f"Race strategy - {race.event.year} {race.event['EventName']}\n")
+    plt.title(f"Race strategy - {yr} {rc}\n")
 
     # Set x-label
     plt.xlabel('Lap')
@@ -1819,4 +1835,4 @@ def rt_func(input_list, datetime):
 
 ### If you want to run a function make sure to provide the correct input_list and datetime ###
 
-# results_func([2021, 'Abu Dhabi Grand Prix', 'Race'], get_datetime())
+# results_func({"year": 2021, "race": "Abu Dhabi Grand Prix", "session": "Race"}, get_datetime())

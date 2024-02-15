@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import datetime as dt
 import pandas as pd
 from pymongo import MongoClient
+import unicodedata
 from utils import *
 import traceback
 
@@ -25,6 +26,9 @@ s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_k
 
 if not os.path.exists(dir_path + get_path() + "data_dump"):
     os.mkdir(dir_path + get_path() + "data_dump")
+
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
 
 ### NOTES ###
 
@@ -115,11 +119,9 @@ def delete_folder(folder_path):
         return False
 
 def save_data_as_file(data, file_name):
-    with open("data_dump/" + file_name, 'w') as f:
-        for i in data:
-            for j in i:
-                f.write(str(j) + ",")
-            f.write("\n")
+    with open("data_dump/" + file_name, 'w', encoding='utf-8') as f:
+        for row in data:
+            f.write(','.join(map(str, row)) + '\n')
         
 def read_data_from_file(file_name):
     with open("data_dump/" + file_name, 'r') as f:
@@ -129,7 +131,7 @@ def read_data_from_file(file_name):
 def delete_file_local(file_name):
     os.remove("data_dump/" + file_name)
     
-###
+### # TODO: fix testing sessions
 
 def save_laps(yr, rc, sn):
     
@@ -172,6 +174,64 @@ def save_laps(yr, rc, sn):
             
             save_data_as_file(new_laps, file_name)
             upload_file("data_dump/" + file_name, file_name, "laps/")
+            delete_file_local(file_name)
+            
+    except Exception as exc:
+    
+        print(traceback.format_exc())
+        print("error", str(exc)) 
+        
+def save_results(yr, rc, sn):
+    
+    file_name = f"{yr}_{rc}_{sn}_results.csv"
+    
+    try:
+        
+        if check_file_exists(f"results/{file_name}"):
+            raise Exception("File already exists")
+        
+        if "test" in rc.lower() or "pre-season" in rc.lower():
+            raise Exception("Test session")
+        
+        if rc == "Sprint Shootout":
+            raise Exception("Sprint Shootout")
+        
+        if not check_folder_exists(f"results/{file_name}"):
+            
+            session = get_sess(yr, rc, sn)
+            session.load()
+            results = session.results
+            
+            titles = []
+            for i in results.columns:
+                if i not in titles:
+                    titles.append(i)
+                    
+            new_results = []
+            new_results.append(titles)
+            
+            for i in range(len(results)):
+                result = results.iloc[i]
+                new_result = []
+                for j in titles:
+                    new_result.append(result[j])
+                new_results.append(new_result)
+                
+            if new_results == []:
+                raise Exception("No results found")
+            
+            normalized_results = []
+            for row in new_results:
+                normalized_row = []
+                for j, item in enumerate(row):
+                    if titles[j] == 'FullName':
+                        normalized_row.append(unicodedata.normalize('NFKD', str(item)) if isinstance(item, str) else item)
+                    else:
+                        normalized_row.append(item)
+                normalized_results.append(normalized_row)
+            
+            save_data_as_file(normalized_results, file_name)
+            upload_file("data_dump/" + file_name, file_name, "results/")
             delete_file_local(file_name)
             
     except Exception as exc:
@@ -267,6 +327,27 @@ def get_laps(yr, rc, sn):
     except:
         
         return None
+
+def get_results(yr, rc, sn):
+    
+    try:
+    
+        file_name = f"{yr}_{rc}_{sn}_results.csv"
+        results = read_file("results/" + file_name)
+                
+        for col in results.columns:
+            if col.lower().__contains__("time"):
+                for i in range(len(results)):
+                    try:
+                        results[col][i] = pd.to_timedelta(results[col][i])
+                    except:
+                        pass
+
+        return results
+    
+    except:
+        
+        return None
     
 def get_telemetry(yr, rc, sn, driver, lap):
     
@@ -308,6 +389,10 @@ def save(yr, flag):
                 save_laps(yr, rc, sn)
                 print(str(yr), str(rc), str(sn), "done")
                 
+            if flag == "results":
+                save_results(yr, rc, sn)
+                print(str(yr), str(rc), str(sn), "done")
+                
             if flag == "telemetry":
                 save_telemetry(yr, rc, sn)
                 print(str(yr), str(rc), str(sn), "done")
@@ -326,11 +411,12 @@ try:
     while(not done):
         try:
             # save_from(2018, "laps")
+            # save_from(2018, "results")
             # save_from(2018, "telemetry")
             done = True
         except:
             done = False
-
+        
 except Exception as exc:
     
     print(traceback.format_exc())
