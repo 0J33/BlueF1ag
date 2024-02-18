@@ -499,6 +499,8 @@ def update_data(yr):
 ### updates gd with lap and telemetry data of all sessions of a given year ###       
 def update_aws(yr):
     aws_api.save(yr, "laps")
+    aws_api.save(yr, "results")
+    aws_api.save(yr, "car_data")
     aws_api.save(yr, "telemetry")
    
 # update(yr)
