@@ -14,8 +14,15 @@ Run `pip install -r requirements.txt` to install dependencies.
 # Running
 
 - To enable cache make a folder named `doc_cache` in the main directory.
-- All the plotting functions are in the `funcs.py` file.
-- You can update standings and other data using the functions in the `update.py` file.
+- To run the server, run `main.py`.
+- To generate graphs you can either, send a `POST` request to `/` with the proper inputs.
+- Alternatively, you can use the functions directly in the `funcs.py` / `funcs_cache.py`.
+- To update data, send an empty `POST` request to `/update`.
+- Alternatively, you can update data using the functions in the `update.py`.
+- All the plotting functions are in `funcs.py` / `funcs_cache.py`.
+- `funcs.py` uses aws for storage rather than the built in cache in the fasft1 library.
+- `funcs_cahce.py` uses the built in cache in the fastf1 library
+- `aws_api.py` contains functions for using aws s3.
 
 # Data
 
