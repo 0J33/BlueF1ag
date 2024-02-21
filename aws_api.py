@@ -283,7 +283,6 @@ def save_car_data(yr, rc, sn):
         
         summary_data = []
         for driver in drivers:
-            # find max numver of laps for driver and loop through
             for lap in range(1, int(laps[laps['Driver'] == driver]['LapNumber'].max()) + 1):
                 summary_data.append({'driver': driver, 'lap': lap})
         summary_df = pd.DataFrame(summary_data)
@@ -354,7 +353,6 @@ def save_telemetry(yr, rc, sn):
         
         summary_data = []
         for driver in drivers:
-            # find max numver of laps for driver and loop through
             for lap in range(1, int(laps[laps['Driver'] == driver]['LapNumber'].max()) + 1):
                 summary_data.append({'driver': driver, 'lap': lap})
         summary_df = pd.DataFrame(summary_data)
