@@ -27,4 +27,4 @@ Run `pip install -r requirements.txt` to install dependencies.
 
 # Data
 
-Data is from the [FastF1](https://github.com/theOehrly/Fast-F1) api.
+Data is from the [FastF1](https://github.com/theOehrly/Fast-F1) and [Ergast](https://ergast.com/mrd/).
