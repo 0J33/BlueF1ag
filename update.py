@@ -462,6 +462,9 @@ def update_data(yr):
                 pass
             else:
                 try:
+                    drivers = []
+                    laps = []
+                    distance = 0
                     print(yr, rc, sn)
                     try:
                         drivers = get_drivers(yr, rc, sn)
@@ -486,7 +489,18 @@ def update_data(yr):
                         "laps": laps,
                         "distance": distance
                     })
+                    if drivers == [] and laps == [] and distance == 0:
+                        if res == []:
+                            msg = "No sessions updated."
+                            return msg
+                        else:
+                            msg = "Sessions updated:"
+                            return msg + "\n" + str(res)
                     res.append([yr, rc, sn])
+                    aws_api.save_laps(yr, rc, sn)
+                    aws_api.save_results(yr, rc, sn)
+                    aws_api.save_car_data(yr, rc, sn)
+                    aws_api.save_telemetry(yr, rc, sn)
                 except Exception as exc:
                     print(str(exc))
                     if res == []:

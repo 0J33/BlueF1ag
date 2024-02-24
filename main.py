@@ -267,15 +267,10 @@ def update():
     except:
         races = "races fail"
     try:
-        data = str(update_data(yr))
+        data = str(update_data(yr)) + "\naws success"
     except:
         data = "data fail"
-    try:
-        update_aws(yr)
-        aws = "aws success"
-    except:
-        aws = "aws fail"
-    return stnd + "<br />" + races + "<br />" + data + "<br />" + aws
+    return stnd + "<br />" + races + "<br />" + data
 
 # execute function when user submits form
 @app.route('/', methods=['GET', 'POST'])
