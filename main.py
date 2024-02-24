@@ -363,7 +363,7 @@ def inputs():
                     
             return jsonify({'result': res}), 200
         
-        except:
+        except Exception as exc:
             return jsonify({'error': str(exc)}), 400
 
 # run the server
