@@ -16,6 +16,7 @@ import warnings
 import platform
 import traceback
 from funcs import *
+from utils import *
 
 load_dotenv()
 
@@ -285,9 +286,9 @@ def home():
         try:
             data = request.get_json()
             func_name = data.get('func_name')
-            datetime = data.get('datetime')
             input_list = data.get('input_list')
             user_id = data.get('user_id')
+            datetime = get_datetime()
             if not (func_name.lower() == "drivers" or func_name.lower() == "constructors"):
                 res = command(user_id, input_list, func_name.lower(), datetime)
                 with open("res/output/" + res + ".png", "rb") as image:
@@ -297,7 +298,10 @@ def home():
                 os.remove("res/output/" + res + ".png")
             else:
                 try:
-                    result = aws_url + "/standings/" + str(input_list["year"]) + "_" + str(func_name).upper() + "_STANDINGS.png"
+                    result = read_file("standings/" + str(input_list["year"]) + "_" + str(func_name).upper() + "_STANDINGS.png")
+                    temp = bytearray(result)
+                    result = list(temp)
+                    print(result)
                     try:
                         log(user_id, func_name, input_list, "", False, datetime)
                     except:
@@ -314,6 +318,53 @@ def home():
         
     else:
         return "Backend is running."
+
+# get inputs
+@app.route('/inputs', methods=['GET', 'POST'])
+def inputs():
+
+    if request.method == 'POST':
+        
+        try:
+            data = request.get_json()
+            input_type = data.get('input')
+            input_data = data.get('data')
+            
+            if input_type == "years":
+                try:
+                    res = get_years(input_data["func"])
+                except:
+                    res = []
+            elif input_type == "races":
+                try:
+                    res = get_races(input_data["year"])
+                except:
+                    res = []
+            elif input_type == "sessions":
+                try:
+                    res = get_sessions(input_data["year"], input_data["race"])
+                except:
+                    res = []
+            elif input_type == "drivers":
+                try:
+                    res = get_drivers(input_data["year"], input_data["race"], input_data["session"])
+                except:
+                    res = []
+            elif input_type == "laps":
+                try:
+                    res = get_laps(input_data["year"], input_data["race"], input_data["session"])
+                except:
+                    res = []
+            elif input_type == "distance":
+                try:
+                    res = get_distance(input_data["year"], input_data["race"], input_data["session"])
+                except:
+                    res = []
+                    
+            return jsonify({'result': res}), 200
+        
+        except:
+            return jsonify({'error': str(exc)}), 400
 
 # run the server
 def run():

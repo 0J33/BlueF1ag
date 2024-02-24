@@ -1,11 +1,22 @@
 import numpy as np
-from datetime import datetime
+import datetime as dt
 from time import time
 from time import ctime
 import fastf1 as ff1
 import pathlib
 import platform
+from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 platform.system()
+
+load_dotenv()
+
+connection_string = os.getenv("connection_string")
+db_name = os.getenv("db_name")
+
+client = MongoClient(connection_string)
+db = client[db_name]
 
 ### UTIL FUNCTIONS ###
 
@@ -72,29 +83,22 @@ def get_years(func):
     years = []
     func = func.lower()
     if func == "results" or func == "schedule" or func == "drivers":
-        for i in range(1950, datetime.datetime.now().year+1):
+        for i in range(1950, dt.datetime.now().year+1):
             years.append(i)
     elif func == "constructors":
-        for i in range(1958, datetime.datetime.now().year+1):
+        for i in range(1958, dt.datetime.now().year+1):
             years.append(i)
     else:
-        for i in range(2018, datetime.datetime.now().year+1):
+        for i in range(2018, dt.datetime.now().year+1):
             years.append(i)
     return years[::-1]
 
 ### get races of a given year ###
 def get_races(yr):
-    file = open("res/data.txt", "r")
-    text = file.read()
-    file.close()
-    records = text.split("\n")
-    res = ""
-    for record in records:
-        if record.__contains__(str(yr)):
-            res = record[5:].split(",")
-    for i in range(len(res)):
-        res[i] = res[i].strip()
-    return res
+    collection_name = "races"
+    collection = db[collection_name]
+    doc = collection.find_one({"year": int(yr)})
+    return doc["races"]
 
 ### gets sessions of a grand prix weekend ###
 def get_sessions(yr, rc):

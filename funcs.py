@@ -115,8 +115,8 @@ def delta_time_updated(yr, rc, sn, driver1, lap1, driver2, lap2):
     
     # ref = reference_lap.get_car_data(interpolate_edges=True).add_distance()
     # comp = compare_lap.get_car_data(interpolate_edges=True).add_distance()
-    ref = get_telemetry(yr, rc, sn, driver1, lap1)
-    comp = get_telemetry(yr, rc, sn, driver2, lap2)
+    ref = get_car_data(yr, rc, sn, driver1, lap1)
+    comp = get_car_data(yr, rc, sn, driver2, lap2)
     
     ref = ref.replace({r'\r': ''}, regex=True)
     comp = comp.replace({r'\r': ''}, regex=True)
@@ -409,7 +409,7 @@ def time_func(input_list, datetime):
             driver_laps = laps[laps['Driver'] == drivers[i]]
             fast = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
         # car_data = fast.get_car_data()
-        car_data = get_telemetry(yr, rc, sn, fast['Driver'], int(float(fast['LapNumber'])))
+        car_data = get_car_data(yr, rc, sn, fast['Driver'], int(float(fast['LapNumber'])))
         t = car_data['Time']
         car_data['Speed'] = car_data['Speed'].astype(float)
         vCar = car_data['Speed']
@@ -488,7 +488,7 @@ def distance_func(input_list, datetime):
             driver_laps = laps[laps['Driver'] == drivers[i]]
             fast = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
         # car_data = fast.get_car_data().add_distance()
-        car_data = get_telemetry(yr, rc, sn, fast['Driver'], int(float(fast['LapNumber'])))
+        car_data = get_car_data(yr, rc, sn, fast['Driver'], int(float(fast['LapNumber'])))
         car_data = car_data.replace({r'\r': ''}, regex=True)
         car_data.columns = car_data.columns.str.replace(r'\r', '')
         car_data['Distance'] = car_data['Distance'].astype(float)
@@ -890,8 +890,8 @@ def tel_func(input_list, datetime):
 
     # first_car = first_driver.get_car_data().add_distance()
     # second_car = second_driver.get_car_data().add_distance()
-    first_car = get_telemetry(yr, rc, sn, drv1, int(float(first_driver['LapNumber'])))
-    second_car = get_telemetry(yr, rc, sn, drv2, int(float(second_driver['LapNumber'])))
+    first_car = get_car_data(yr, rc, sn, drv1, int(float(first_driver['LapNumber'])))
+    second_car = get_car_data(yr, rc, sn, drv2, int(float(second_driver['LapNumber'])))
     
     first_car = first_car.replace({r'\r': ''}, regex=True)
     second_car = second_car.replace({r'\r': ''}, regex=True)
@@ -1096,7 +1096,7 @@ def cornering_func(input_list, datetime):
 
     # car_data = laps.pick_driver(
     #     driver_1).pick_fastest().get_car_data().add_distance()
-    car_data = get_telemetry(yr, rc, sn, driver_1, lap1)
+    car_data = get_car_data(yr, rc, sn, driver_1, lap1)
     dist = car_data['Distance']
     maxdist = dist[len(dist)-1]
 
@@ -1120,21 +1120,21 @@ def cornering_func(input_list, datetime):
 
     if lap1 == None:
         # telemetry_driver_1 = laps_driver_1.pick_fastest().get_car_data().add_distance()
-        telemetry_driver_1 = get_telemetry(yr, rc, sn, driver_1, lap1)
+        telemetry_driver_1 = get_car_data(yr, rc, sn, driver_1, lap1)
     else:
         temp_laps1 = laps_driver_1[laps_driver_1['LapNumber'] == int(
             lap1)].iloc[0]
         # telemetry_driver_1 = temp_laps1.get_car_data().add_distance()
-        telemetry_driver_1 = get_telemetry(yr, rc, sn, driver_1, lap1)
+        telemetry_driver_1 = get_car_data(yr, rc, sn, driver_1, lap1)
 
     if lap2 == None:
         # telemetry_driver_2 = laps_driver_2.pick_fastest().get_car_data().add_distance()
-        telemetry_driver_2 = get_telemetry(yr, rc, sn, driver_2, lap2)
+        telemetry_driver_2 = get_car_data(yr, rc, sn, driver_2, lap2)
     else:
         temp_laps2 = laps_driver_2[laps_driver_2['LapNumber'] == int(
             lap2)].iloc[0]
         # telemetry_driver_2 = temp_laps2.get_car_data().add_distance()
-        telemetry_driver_2 = get_telemetry(yr, rc, sn, driver_2, lap2)
+        telemetry_driver_2 = get_car_data(yr, rc, sn, driver_2, lap2)
 
     # Identifying the team for coloring later on
     team_driver_1 = laps_driver_1.reset_index().loc[0, 'Team']
