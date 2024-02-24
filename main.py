@@ -367,7 +367,7 @@ def run():
         delete_all()
     except:
         pass
-    app.run(host='0.0.0.0',port=2222)
+    app.run(ssl_context='adhoc', host='0.0.0.0',port=5000)
 
 # keep the server running
 def keep_alive():
