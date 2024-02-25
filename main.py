@@ -298,7 +298,6 @@ def home():
                     result = read_file("standings/" + str(input_list["year"]) + "_" + str(func_name).upper() + "_STANDINGS.png")
                     temp = bytearray(result)
                     result = list(temp)
-                    print(result)
                     try:
                         log(user_id, func_name, input_list, "", False, datetime)
                     except:
