@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_sslify import SSLify
 from threading import Thread
 import os
 from dotenv import load_dotenv
@@ -246,6 +247,7 @@ def command(user_id, input_list, comm, datetime):
 # flask server
 app = Flask('', static_folder='res')
 CORS(app)
+sslify = SSLify(app)
 
 # update data
 @app.route('/update', methods=['GET', 'POST'])
@@ -367,7 +369,7 @@ def run():
         delete_all()
     except:
         pass
-    app.run(ssl_context='adhoc', host='0.0.0.0',port=5000)
+    app.run(ssl_context=('cert/fullchain.pem', 'cert/privkey.pem'), host='0.0.0.0',port=5000)
 
 # keep the server running
 def keep_alive():
