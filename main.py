@@ -16,10 +16,16 @@ from update import *
 import warnings
 import platform
 import traceback
-from funcs import *
 from utils import *
 
 load_dotenv()
+
+FUNCS = os.getenv("FUNCS")
+
+if FUNCS == "aws":
+    from funcs import *
+elif FUNCS == "cache":
+    from funcs_cache import *
 
 aws_url = os.getenv("aws_url")
 IDS = os.getenv("IDS")
