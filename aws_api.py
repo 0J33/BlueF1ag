@@ -89,7 +89,7 @@ def check_file_exists(file_path):
 def read_file(file_path):
     try:
         response = s3.get_object(Bucket=bucket_name, Key=file_path)
-        if response['ContentType'] == 'text/csv':
+        if file_path.split(".")[1] == "csv":
             file_content = response['Body'].read().decode('utf-8')
             data = file_content.split("\n")
             data = [i.split(",") for i in data]
@@ -97,7 +97,7 @@ def read_file(file_path):
             data.columns = data.iloc[0]
             data = data[1:]
             return data
-        else:
+        elif file_path.split(".")[1] == "png":
             file_content = response['Body'].read()
             return file_content
             
@@ -418,7 +418,8 @@ def get_results(yr, rc, sn):
 
         return results
     
-    except:
+    except Exception as exc:
+        print(traceback.format_exc())
         
         return None
     
