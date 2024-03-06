@@ -80,7 +80,7 @@ def make_img(datetime, text):
 
     # Define the fonts to use (change to fonts installed on your system)
     interval_font = ImageFont.truetype(dir_path + get_path() + "fonts" + get_path() + "Interval Bold.otf", 60)
-    consola_font = ImageFont.truetype("consola.ttf", 70)
+    consola_font = ImageFont.truetype(dir_path + get_path() + "fonts" + get_path() + "consola.ttf", 70)
 
     # Draw the text on the image
     y = 10
