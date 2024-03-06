@@ -165,9 +165,9 @@ set_font()
 
 def fastest_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -231,9 +231,9 @@ def fastest_func(input_list, datetime):
 
 def results_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -270,7 +270,7 @@ def results_func(input_list, datetime):
 
 def schedule_func(input_list, datetime):
     
-    yr = input_list[0]
+    yr = input_list["year"]
 
     schedule = fastf1.get_event_schedule(yr)
     msg = schedule[['EventName', 'EventDate', 'EventFormat']]
@@ -284,8 +284,8 @@ def schedule_func(input_list, datetime):
 
 def event_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
+    yr = input_list["year"]
+    rc = input_list["race"]
 
     msg = fastf1.get_event(yr, rc)
     lines = str(msg).splitlines()
@@ -313,10 +313,10 @@ def event_func(input_list, datetime):
 
 def laps_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    drivers = input_list[3]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    drivers = input_list["drivers"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -367,11 +367,11 @@ def laps_func(input_list, datetime):
 
 def time_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    drivers = input_list[3]
-    lap = input_list[4]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    drivers = input_list["drivers"]
+    lap = input_list["lap"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -438,11 +438,11 @@ def time_func(input_list, datetime):
 
 def distance_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    drivers = input_list[3]
-    lap = input_list[4]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    drivers = input_list["drivers"]
+    lap = input_list["lap"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -507,13 +507,13 @@ def distance_func(input_list, datetime):
 
 def delta_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    d1 = input_list[3]
-    d2 = input_list[4]
-    lap1 = input_list[5]
-    lap2 = input_list[6]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    d1 = input_list["driver1"]
+    d2 = input_list["driver2"]
+    lap1 = input_list["lap1"]
+    lap2 = input_list["lap2"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -588,11 +588,11 @@ def delta_func(input_list, datetime):
 
 def gear_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    driver = input_list[3]
-    lap = input_list[4]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    driver = input_list["driver"]
+    lap = input_list["lap"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -663,11 +663,11 @@ def gear_func(input_list, datetime):
 
 def speed_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    driver = input_list[3]
-    lap = input_list[4]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    driver = input_list["driver"]
+    lap = input_list["lap"]
 
     colormap = mpl.cm.plasma
 
@@ -753,13 +753,13 @@ def speed_func(input_list, datetime):
 
 def tel_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    d1 = input_list[3]
-    d2 = input_list[4]
-    lap1 = input_list[5]
-    lap2 = input_list[6]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    d1 = input_list["driver1"]
+    d2 = input_list["driver2"]
+    lap1 = input_list["lap1"]
+    lap2 = input_list["lap2"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -932,15 +932,15 @@ def tel_func(input_list, datetime):
 
 def cornering_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    d1 = input_list[3]
-    d2 = input_list[4]
-    dist1 = input_list[5]
-    dist2 = input_list[6]
-    lap1 = input_list[7]
-    lap2 = input_list[8]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    d1 = input_list["driver1"]
+    d2 = input_list["driver2"]
+    dist1 = input_list["dist1"]
+    dist2 = input_list["dist2"]
+    lap1 = input_list["lap1"]
+    lap2 = input_list["lap2"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -1163,10 +1163,10 @@ def cornering_func(input_list, datetime):
 
 def tires_func(input_list, datetime): # very slow
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    sl = input_list[3]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    sl = input_list["lap"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -1304,8 +1304,8 @@ def tires_func(input_list, datetime): # very slow
 
 def strategy_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
+    yr = input_list["year"]
+    rc = input_list["race"]
 
     # Load the session data
     race = fastf1.get_session(yr, rc, 'R')
@@ -1385,13 +1385,13 @@ def strategy_func(input_list, datetime):
 
 def sectors_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    sn = input_list[2]
-    d1 = input_list[3]
-    d2 = input_list[4]
-    lap1 = input_list[5]
-    lap2 = input_list[6]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+    d1 = input_list["driver1"]
+    d2 = input_list["driver2"]
+    lap1 = input_list["lap1"]
+    lap2 = input_list["lap2"]
 
     session = get_sess(yr, rc, sn)
     session.load()
@@ -1546,9 +1546,9 @@ def sectors_func(input_list, datetime):
 
 def rt_func(input_list, datetime):
 
-    yr = input_list[0]
-    rc = input_list[1]
-    drivers = input_list[2]
+    yr = input_list["year"]
+    rc = input_list["race"]
+    drivers = input_list["drivers"]
 
     session = fastf1.get_session(yr, rc, 'Race')
     session.load()
