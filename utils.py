@@ -132,13 +132,20 @@ def get_laps(yr, rc, sn):
     ls = set(tuple(x) for x in laps[['LapNumber']].values.tolist())
     lis = sorted([int(x[0]) for x in ls])
     max = int(np.max(lis))
-    return max
+    res = []
+    for i in range(1, max+1):
+        res.append(i)
+    return res
 
 ### gets distance of a session ###
 def get_distance(yr, rc, sn):
     session = ff1.get_session(yr, rc, sn)
     session.load()
-    laps = session.load()
+    laps = session.laps
     car_data = laps.pick_fastest().get_car_data().add_distance()
     maxdist = int(np.max(car_data['Distance']))
-    return maxdist
+    res = []
+    for i in range(0, maxdist+1, 100):
+        res.append(i)
+    res.append(maxdist)
+    return res

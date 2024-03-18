@@ -350,20 +350,14 @@ def inputs():
                     res = get_sessions(input_data["year"], input_data["race"])
                 except:
                     res = []
-            elif input_type == "drivers":
+            elif input_type == "all":
                 try:
-                    res = get_drivers(input_data["year"], input_data["race"], input_data["session"])
+                    res = [[], "", ""]
+                    res[0] = get_drivers(input_data["year"], input_data["race"], input_data["session"])
+                    res[1] = get_laps(input_data["year"], input_data["race"], input_data["session"])
+                    res[2] = get_distance(input_data["year"], input_data["race"], input_data["session"])
                 except:
-                    res = []
-            elif input_type == "laps":
-                try:
-                    res = get_laps(input_data["year"], input_data["race"], input_data["session"])
-                except:
-                    res = []
-            elif input_type == "distance":
-                try:
-                    res = get_distance(input_data["year"], input_data["race"], input_data["session"])
-                except:
+                    print(traceback.format_exc())
                     res = []
                     
             return jsonify({'result': res}), 200
