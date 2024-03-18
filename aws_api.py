@@ -460,6 +460,23 @@ def get_telemetry(yr, rc, sn, driver, lap):
     except:
         
         return None
+    
+def get_standings(type, yr):
+    
+    try:
+        
+        file_name = f"{yr}_{type.upper()}_STANDINGS.png"
+        
+        standings = read_file("standings/" + file_name)
+        
+        with open("res/output/" + file_name, 'wb') as f:
+            f.write(standings)
+        
+        return file_name
+        
+    except:
+            
+        return None
 
 ### END OF AWS API FUNCTIONS ###
 

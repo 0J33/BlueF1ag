@@ -193,38 +193,42 @@ def command(user_id, input_list, comm, datetime):
         
         print("STARTED " + message + " " + datetime)
 
-        if comm == "fastest":
-            res = fastest_func(input_list, datetime)
-        elif comm == "results":
-            res = results_func(input_list, datetime)
-        elif comm == "schedule":
-            res = schedule_func(input_list, datetime)
-        elif comm == "event":
-            res = event_func(input_list, datetime)
-        elif comm == "laps":
-            res = laps_func(input_list, datetime)
-        elif comm == "time":
-            res = time_func(input_list, datetime)
-        elif comm == "distance":
-            res = distance_func(input_list, datetime)
-        elif comm == "delta":
-            res = delta_func(input_list, datetime)
-        elif comm == "gear":
-            res = gear_func(input_list, datetime)
-        elif comm == "speed":
-            res = speed_func(input_list, datetime)
-        elif comm == "telemetry":
-            res = tel_func(input_list, datetime)
-        elif comm == "cornering":
-            res = cornering_func(input_list, datetime)
-        elif comm == "tires":
-            res = tires_func(input_list, datetime)
-        elif comm == "strategy":
-            res = strategy_func(input_list, datetime)
-        elif comm == "sectors":
-            res = sectors_func(input_list, datetime)
-        elif comm == "racetrace":
-            res = rt_func(input_list, datetime)
+        if comm == "drivers" or comm == "constructors":
+            res = aws_api.get_standings(comm, input_list["year"])
+            return res
+        else:
+            if comm == "fastest":
+                res = fastest_func(input_list, datetime)
+            elif comm == "results":
+                res = results_func(input_list, datetime)
+            elif comm == "schedule":
+                res = schedule_func(input_list, datetime)
+            elif comm == "event":
+                res = event_func(input_list, datetime)
+            elif comm == "laps":
+                res = laps_func(input_list, datetime)
+            elif comm == "time":
+                res = time_func(input_list, datetime)
+            elif comm == "distance":
+                res = distance_func(input_list, datetime)
+            elif comm == "delta":
+                res = delta_func(input_list, datetime)
+            elif comm == "gear":
+                res = gear_func(input_list, datetime)
+            elif comm == "speed":
+                res = speed_func(input_list, datetime)
+            elif comm == "telemetry":
+                res = tel_func(input_list, datetime)
+            elif comm == "cornering":
+                res = cornering_func(input_list, datetime)
+            elif comm == "tires":
+                res = tires_func(input_list, datetime)
+            elif comm == "strategy":
+                res = strategy_func(input_list, datetime)
+            elif comm == "sectors":
+                res = sectors_func(input_list, datetime)
+            elif comm == "racetrace":
+                res = rt_func(input_list, datetime)
             
         if res !="success" or res == None:
             raise Exception("Internal Server Error. Please try again.")
@@ -303,20 +307,16 @@ def home():
                 result = list(b)
                 os.remove("res/output/" + res + ".png")
             else:
-                try:
-                    result = read_file("standings/" + str(input_list["year"]) + "_" + str(func_name).upper() + "_STANDINGS.png")
-                    temp = bytearray(result)
-                    result = list(temp)
-                    try:
-                        log(user_id, func_name, input_list, "", False, datetime)
-                    except:
-                        pass
-                except Exception as exc:
-                    print(str(exc))
-                    try:
-                        log(user_id, func_name, input_list, str(exc), True, datetime)
-                    except:
-                        pass
+                res = command(user_id, input_list, func_name.lower(), datetime)
+                with open("res/output/" + res, "rb") as image:
+                    f = image.read()
+                    b = bytearray(f)
+                result = list(b)
+                os.remove("res/output/" + res)
+            try:
+                log(user_id, func_name, input_list, "", False, datetime)
+            except:
+                pass
             return jsonify({'result': result}), 200    
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400

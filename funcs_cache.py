@@ -1091,7 +1091,10 @@ def cornering_func(input_list, datetime):
                    telemetry_driver_2['Speed'], label=driver_2, color='grey')
 
     # Speed difference
-    ax[0].text(distance_min + 15, 200, speed_text, fontsize=15)
+    if distance_min == None:
+        ax[0].text(0, 200, speed_text, fontsize=15)
+    else:
+        ax[0].text(distance_min + 15, 200, speed_text, fontsize=15)
 
     ax[0].set(ylabel='Speed')
     ax[0].legend(loc="lower right")

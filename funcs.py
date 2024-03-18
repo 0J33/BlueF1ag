@@ -1094,9 +1094,12 @@ def cornering_func(input_list, datetime):
     # Setting parameters
     driver_1, driver_2 = d1, d2
 
-    # car_data = laps.pick_driver(
-    #     driver_1).pick_fastest().get_car_data().add_distance()
-    car_data = get_car_data(yr, rc, sn, driver_1, lap1)
+    if lap1 == None:
+        car_data = get_car_data(yr, rc, sn, driver_1, laps.iloc[0]['LapNumber'])
+    else:
+        # car_data = laps.pick_driver(
+        #     driver_1).pick_fastest().get_car_data().add_distance()
+        car_data = get_car_data(yr, rc, sn, driver_1, lap1)
     dist = car_data['Distance']
     maxdist = dist[len(dist)-1]
 
