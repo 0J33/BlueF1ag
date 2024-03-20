@@ -160,6 +160,11 @@ set_font()
 
 ### END OF GENERAL FUNCTIONS ###
 
+# TODO: fix int/string
+# TODO: funcs not finishing
+# TODO: fix none/not none for all funcs
+# TODO: test all funcs
+# TODO: fix testing sessions
 
 ### PLOTTING FUNCTIONS ###
 
@@ -239,6 +244,10 @@ def results_func(input_list, datetime):
     session.load()
 
     msg = session.results
+    
+    if msg.empty:
+        raise Exception("The data you are trying to access has not been loaded yet.")
+    
     if session.event.get_session_name(sn).lower() == "qualifying" or session.event.get_session_name(sn).lower() == "sprint shootout":
         msg2 = msg[['Position', 'BroadcastName', 'TeamName', 'Q1', 'Q2', 'Q3']] 
     elif session.event.get_session_name(sn).lower() == "race" or session.event.get_session_name(sn).lower() == "sprint":
@@ -273,6 +282,10 @@ def schedule_func(input_list, datetime):
     yr = input_list["year"]
 
     schedule = fastf1.get_event_schedule(yr)
+
+    if schedule.empty:
+        raise Exception("The data you are trying to access has not been loaded yet.")
+
     msg = schedule[['EventName', 'EventDate', 'EventFormat']]
     msg = tabulate.tabulate(msg.values, headers=msg.columns, tablefmt='fancy_grid')
     msg = msg.replace("EventDate", "Date     ").replace("EventName", "Name     ").replace("EventFormat", "Format     ")
@@ -288,6 +301,10 @@ def event_func(input_list, datetime):
     rc = input_list["race"]
 
     msg = fastf1.get_event(yr, rc)
+    
+    if msg.empty:
+        raise Exception("The data you are trying to access has not been loaded yet.")
+    
     lines = str(msg).splitlines()
     l1 = []
     l2 = []

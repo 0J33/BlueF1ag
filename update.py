@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
+import traceback
 import aws_api
 from utils import *
 
@@ -207,7 +208,7 @@ def driver_func(yr):
         )
 
     # Save the plot
-    #plt.show()
+    # plt.show()
     file = str(yr) + "_DRIVERS_STANDINGS" + '.png'
     plt.savefig("data_dump/" + file)
     aws_api.upload_file("data_dump/" + file, file, "standings/")
@@ -407,7 +408,7 @@ def update(yr):
 
     except Exception as exc:
         
-        print(str(exc) + "\nNO STANDINGS DATA FROM THIS YEAR")
+        print(traceback.format_exc() + "\nFAILED UPDATE " + str(yr))
         stnd = False
         
     return stnd
@@ -481,14 +482,15 @@ def update_data(yr):
                         distance = 0
                         if rc.lower().__contains__("austria"):
                             distance = 4300
-                    collection.insert_one({
-                        "year": int(yr),
-                        "race": rc,
-                        "session": sn,
-                        "drivers": drivers,
-                        "laps": laps,
-                        "distance": distance
-                    })
+                    if not (drivers == [] and laps == [] and distance == 0):
+                        collection.insert_one({
+                            "year": int(yr),
+                            "race": rc,
+                            "session": sn,
+                            "drivers": drivers,
+                            "laps": laps,
+                            "distance": distance
+                        })
                     if drivers == [] and laps == [] and distance == 0:
                         if res == []:
                             msg = "No sessions updated."

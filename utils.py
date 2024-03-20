@@ -149,3 +149,37 @@ def get_distance(yr, rc, sn):
         res.append(i)
     res.append(maxdist)
     return res
+
+### db ###
+
+def get_drivers_from_db(yr, rc, sn):
+    collection_name = "data"
+    collection = db[collection_name]
+    sn = sn.capitalize()
+    doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
+    drivers = doc["drivers"]
+    drivers = sorted(drivers)
+    return drivers
+
+def get_laps_from_db(yr, rc, sn):
+    collection_name = "data"
+    collection = db[collection_name]
+    sn = sn.capitalize()
+    doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
+    max_lap = doc["laps"]
+    laps = []
+    for i in range(1, max_lap+1):
+        laps.append(i)
+    return laps
+
+def get_distance_from_db(yr, rc, sn):
+    collection_name = "data"
+    collection = db[collection_name]
+    sn = sn.capitalize()
+    doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
+    max_dist = doc["distance"]
+    dist = []
+    for i in range(0, max_dist+1, 100):
+        dist.append(i)
+    dist.append(max_dist)
+    return dist

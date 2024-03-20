@@ -243,6 +243,9 @@ def command(user_id, input_list, comm, datetime):
         exc = str(exc)
         flag = True
         
+        if datetime in queue:
+            queue.remove(datetime)
+        
         print("FAILED " + message + " " + datetime + " ")
         print(traceback.format_exc())
             
@@ -353,9 +356,9 @@ def inputs():
             elif input_type == "all":
                 try:
                     res = [[], "", ""]
-                    res[0] = get_drivers(input_data["year"], input_data["race"], input_data["session"])
-                    res[1] = get_laps(input_data["year"], input_data["race"], input_data["session"])
-                    res[2] = get_distance(input_data["year"], input_data["race"], input_data["session"])
+                    res[0] = get_drivers_from_db(input_data["year"], input_data["race"], input_data["session"])
+                    res[1] = get_laps_from_db(input_data["year"], input_data["race"], input_data["session"])
+                    res[2] = get_distance_from_db(input_data["year"], input_data["race"], input_data["session"])
                 except:
                     print(traceback.format_exc())
                     res = []
