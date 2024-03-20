@@ -160,8 +160,9 @@ set_font()
 
 ### END OF GENERAL FUNCTIONS ###
 
-# TODO: fix int/string
-# TODO: fix none/not none for all funcs
+# TODO: fix none driver to fastest driver
+# TODO: fix none lap to fastest lap
+# TODO: fix none distance to full distance
 # TODO: test all funcs
 # TODO: fix testing sessions
 

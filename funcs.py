@@ -140,10 +140,11 @@ def delta_time_updated(yr, rc, sn, driver1, lap1, driver2, lap2):
 
 ### END OF GENERAL FUNCTIONS ###
 
-# TODO: fix aws
-# TODO: fix int/string
+# TODO: fix aws not working
 # TODO: funcs not finishing
-# TODO: fix none/not none for all funcs
+# TODO: fix none driver to fastest driver
+# TODO: fix none lap to fastest lap
+# TODO: fix none distance to full distance
 # TODO: test all funcs
 
 ### PLOTTING FUNCTIONS ###
