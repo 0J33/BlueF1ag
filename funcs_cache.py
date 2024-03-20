@@ -161,7 +161,6 @@ set_font()
 ### END OF GENERAL FUNCTIONS ###
 
 # TODO: fix int/string
-# TODO: funcs not finishing
 # TODO: fix none/not none for all funcs
 # TODO: test all funcs
 # TODO: fix testing sessions
@@ -190,6 +189,7 @@ def fastest_func(input_list, datetime):
     drivers = pd.unique(session.laps['Driver'])
 
     list_fastest_laps = list()
+    
     for drv in drivers:
         drvs_fastest_lap = session.laps.pick_driver(drv).pick_fastest()
         list_fastest_laps.append(drvs_fastest_lap)
@@ -1344,17 +1344,29 @@ def strategy_func(input_list, datetime):
 
     driver_stints = driver_stints.sort_values(by=['Stint'])
 
-    compound_colors = {
-        'HYPERSOFT': '#FAADFF',
-        'ULTRASOFT': '#B030FF',
-        'SUPERSOFT': '#FF6666',
-        'SOFT': '#FF3333',
-        'MEDIUM': '#FFF200',
-        'HARD': '#EBEBEB',
-        'SUPERHARD': '#CC6600',
-        'INTERMEDIATE': '#39B54A',
-        'WET': '#00AEEF'
-    }
+    if yr <= 2018:
+
+        compound_colors = {
+            'HYPERSOFT': '#FFAACC',
+            'ULTRASOFT': '#772277',
+            'SUPERSOFT': '#FF3333',
+            'SOFT': '#FFF200',
+            'MEDIUM': '#EBEBEB',
+            'HARD': '#07A6F5',
+            'SUPERHARD': '#CC6600',
+            'INTERMEDIATE': '#39B54A',
+            'WET': '#0033EE'
+        }
+        
+    else:
+        
+        compound_colors = {
+            'SOFT': '#FF3333',
+            'MEDIUM': '#FFF200',
+            'HARD': '#EBEBEB',
+            'INTERMEDIATE': '#39B54A',
+            'WET': '#0033EE'
+        }
 
     plt.rcParams["figure.figsize"] = [15, 10]
     plt.rcParams["figure.autolayout"] = True
