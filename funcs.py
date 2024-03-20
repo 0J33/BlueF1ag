@@ -142,9 +142,6 @@ def delta_time_updated(yr, rc, sn, driver1, lap1, driver2, lap2):
 
 # TODO: fix aws not working
 # TODO: funcs not finishing
-# TODO: fix none driver to fastest driver
-# TODO: fix none lap to fastest lap
-# TODO: fix none distance to full distance
 # TODO: test all funcs
 
 ### PLOTTING FUNCTIONS ###
@@ -407,7 +404,7 @@ def time_func(input_list, datetime):
 
     i = 0
     while (i < len(drivers)):
-        if lap == None:
+        if (lap == None or lap == ''):
             # fast = session.laps.pick_driver(drivers[i]).pick_fastest()
             fast = laps[laps['Driver'] == drivers[i]].iloc[0]
         else:
@@ -436,7 +433,7 @@ def time_func(input_list, datetime):
 
     # sn = session.event.get_session_name(sn)
 
-    if lap == None:
+    if (lap == None or lap == ''):
         # plt.suptitle("Fastest Lap Comparison\n" + f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
         plt.suptitle("Fastest Lap Comparison\n" + f"{yr} {rc} {sn}\n" + title)
     else:
@@ -486,7 +483,7 @@ def distance_func(input_list, datetime):
 
     i = 0
     while (i < len(drivers)):
-        if lap == None:
+        if (lap == None or lap == ''):
             #fast = session.laps.pick_driver(drivers[i]).pick_fastest()
             fast = laps[laps['Driver'] == drivers[i]].iloc[0]
         else:
@@ -518,7 +515,7 @@ def distance_func(input_list, datetime):
 
     # sn = session.event.get_session_name(sn)
 
-    if lap == None:
+    if (lap == None or lap == ''):
         # plt.suptitle("Fastest Lap Comparison\n" + f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
         plt.suptitle("Fastest Lap Comparison\n" + f"{yr} {rc} {sn}\n" + title)
     else:
@@ -554,8 +551,14 @@ def delta_func(input_list, datetime):
     queue.append(datetime)
     
     wait_for_turn(datetime)
+    
+    if (d1 == None or d1 == ''):
+        d1 = laps.iloc[0]['Driver']
+    
+    if (d2 == None or d2 == ''):
+        d2 = laps.iloc[0]['Driver']
 
-    if lap1 == None:
+    if (lap1 == None or lap1 == ''):
         # dd1 = session.laps.pick_driver(d1).pick_fastest()
         dd1 = laps[laps['Driver'] == d1].iloc[0]
     else:
@@ -563,7 +566,7 @@ def delta_func(input_list, datetime):
         driver_laps = laps[laps['Driver'] == d1]
         dd1 = driver_laps[driver_laps['LapNumber'] == int(lap1)].iloc[0]
 
-    if lap2 == None:
+    if (lap2 == None or lap2 == ''):
         # dd2 = session.laps.pick_driver(d2).pick_fastest()
         dd2 = laps[laps['Driver'] == d2].iloc[0]
     else:
@@ -608,11 +611,11 @@ def delta_func(input_list, datetime):
     # set labels to absolute values and with integer representation
     twin.set_yticklabels([round(abs(tick), 1) for tick in ticks])
 
-    if lap1 == None:
+    if (lap1 == None or lap1 == ''):
         lap1 = "Fastest Lap"
     else:
         lap1 = "Lap " + str(lap1)
-    if lap2 == None:
+    if (lap2 == None or lap2 == ''):
         lap2 = "Fastest Lap"
     else:
         lap2 = "Lap " + str(lap2)
@@ -650,20 +653,20 @@ def gear_func(input_list, datetime):
     plt.rcParams["figure.figsize"] = [7, 5]
     plt.rcParams["figure.autolayout"] = True
 
-    if lap == None and driver == None:
+    if (lap == None or lap == '') and (driver == None or driver ==''):
         # get fastest lap of the session
         # d_lap = session.laps.pick_fastest()
         d_lap = laps.iloc[0]
-    elif lap == None and driver != None:
+    elif (lap == None or lap == '') and (driver != None and driver != ''):
         # get fastest lap of driver
         # d_lap = session.laps.pick_driver(driver).pick_fastest()
         d_lap = laps[laps['Driver'] == driver].iloc[0]
-    elif lap != None and driver != None:
+    elif (lap != None and lap != '') and (driver != None and driver != ''):
         # get specific lap of driver
         # driver_laps = session.laps.pick_driver(driver)
         driver_laps = laps[laps['Driver'] == driver]
         d_lap = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
-    elif lap != None and driver == None:
+    elif (lap != None and lap != '') and (driver == None or driver == ''):
         # temp_lap = session.laps.pick_fastest()
         temp_lap = laps.iloc[0]
         # driver_laps = session.laps.pick_driver(str(f"{temp_lap['Driver']}"))
@@ -693,7 +696,7 @@ def gear_func(input_list, datetime):
 
     # sn = session.event.get_session_name(sn)
 
-    if lap == None:
+    if (lap == None or lap == ''):
         # plt.suptitle(f"Fastest Lap Gear Shift Visualization - " + f"{d_lap['Driver']}\n" + f"{session.event.year} {session.event['EventName']} {sn}\n")
         plt.suptitle(f"Fastest Lap Gear Shift Visualization - " + f"{d_lap['Driver']}\n" + f"{yr} {rc} {sn}\n")
     else:
@@ -732,20 +735,20 @@ def speed_func(input_list, datetime):
 
     # weekend = session.event
 
-    if lap == None and driver == None:
+    if (lap == None or lap == '') and (driver == None or driver == ''):
         # get fastest lap of the session
         # d_lap = session.laps.pick_fastest()
         d_lap = laps.iloc[0]
-    elif lap == None and driver != None:
+    elif (lap == None or lap == '') and (driver != None and driver != ''):
         # get fastest lap of driver
         # d_lap = session.laps.pick_driver(driver).pick_fastest()
         d_lap = laps[laps['Driver'] == driver].iloc[0]
-    elif lap != None and driver != None:
+    elif (lap != None and lap != '') and (driver != None and driver != ''):
         # get specific lap of driver
         # driver_laps = session.laps.pick_driver(driver)
         driver_laps = laps[laps['Driver'] == driver]
         d_lap = driver_laps[driver_laps['LapNumber'] == int(lap)].iloc[0]
-    elif lap != None and driver == None:
+    elif (lap != None and lap != '') and (driver == None or driver == ''):
         # temp_lap = session.laps.pick_fastest()
         temp_lap = laps.iloc[0]
         # driver_laps = session.laps.pick_driver(str(f"{temp_lap['Driver']}"))
@@ -776,7 +779,7 @@ def speed_func(input_list, datetime):
 
     # sn = session.event.get_session_name(sn)
 
-    if lap == None:
+    if (lap == None or lap == ''):
         # fig.suptitle("Fastest Lap Speed Visualization - " + f"{d_lap['Driver']}" + "\n" + f"{session.event.year} {session.event['EventName']} {sn}\n", size=20, y=0.97)
         fig.suptitle("Fastest Lap Speed Visualization - " + f"{d_lap['Driver']}" + "\n" + f"{yr} {rc} {sn}\n", size=20, y=0.97)
     else:
@@ -850,6 +853,12 @@ def tel_func(input_list, datetime):
     queue.append(datetime)
     
     wait_for_turn(datetime)
+    
+    if (d1 == None or d1 == ''):
+        d1 = laps.pick_fastest()['Driver']
+    
+    if (d2 == None or d2 == ''):
+        d2 = laps.pick_fastest()['Driver']
 
     # weekend = session.event
     # laps = session.load()
@@ -878,7 +887,7 @@ def tel_func(input_list, datetime):
     except:
         second_color = 'grey'
 
-    if lap1 == None:
+    if (lap1 == None or lap1 == ''):
         # first_driver = laps.pick_driver(drv1).pick_fastest()
         first_driver = laps[laps['Driver'] == drv1].iloc[0]
     else:
@@ -886,7 +895,7 @@ def tel_func(input_list, datetime):
         driver_laps = laps[laps['Driver'] == drv1]
         first_driver = driver_laps[driver_laps['LapNumber'] == int(lap1)].iloc[0]
 
-    if lap2 == None:
+    if (lap2 == None or lap2 == ''):
         # second_driver = laps.pick_driver(drv2).pick_fastest()
         second_driver = laps[laps['Driver'] == drv2].iloc[0]
     else:
@@ -908,11 +917,11 @@ def tel_func(input_list, datetime):
     fig, ax = plt.subplots(7, 1, figsize=(10, 10), gridspec_kw={
                            'height_ratios': [2, 2, 2, 2, 2, 2, 3]})
 
-    if lap1 == None:
+    if (lap1 == None or lap1 == ''):
         lap1 = "Fastest Lap"
     else:
         lap1 = "Lap " + str(lap1)
-    if lap2 == None:
+    if (lap2 == None or lap2 == ''):
         lap2 = "Fastest Lap"
     else:
         lap2 = "Lap " + str(lap2)
@@ -1096,11 +1105,17 @@ def cornering_func(input_list, datetime):
 
     # Get the laps
     # laps = session.load()
+    
+    if (d1 == None or d1 == ''):
+        d1 = laps.pick_fastest()['Driver']
+        
+    if (d2 == None or d2 == ''):
+        d2 = laps.pick_fastest()['Driver']
 
     # Setting parameters
     driver_1, driver_2 = d1, d2
 
-    if lap1 == None:
+    if (lap1 == None or lap1 == ''):
         car_data = get_car_data(yr, rc, sn, driver_1, laps.iloc[0]['LapNumber'])
     else:
         # car_data = laps.pick_driver(
@@ -1109,17 +1124,16 @@ def cornering_func(input_list, datetime):
     dist = car_data['Distance']
     maxdist = dist[len(dist)-1]
 
-    if (dist1 == None):
+    if (dist1 == None or dist1 == ''):
         dist1 = 0
-    if (dist2 == None):
-        dist2 = 0
+        
+    if (dist2 == None or dist2 == ''):
+        dist2 = maxdist
 
-    if (dist2 == 0):
-        distance = maxdist
-    else:
-        distance = dist2
+    if (dist1 > dist2):
+        dist1, dist2 = dist2, dist1
 
-    distance_min, distance_max = dist1, distance
+    distance_min, distance_max = dist1, dist1
 
     # Extracting the laps
     # laps_driver_1 = laps.pick_driver(driver_1)
@@ -1127,7 +1141,7 @@ def cornering_func(input_list, datetime):
     laps_driver_1 = laps[laps['Driver'] == driver_1]
     laps_driver_2 = laps[laps['Driver'] == driver_2]
 
-    if lap1 == None:
+    if (lap1 == None or lap1 == ''):
         # telemetry_driver_1 = laps_driver_1.pick_fastest().get_car_data().add_distance()
         telemetry_driver_1 = get_car_data(yr, rc, sn, driver_1, lap1)
     else:
@@ -1136,7 +1150,7 @@ def cornering_func(input_list, datetime):
         # telemetry_driver_1 = temp_laps1.get_car_data().add_distance()
         telemetry_driver_1 = get_car_data(yr, rc, sn, driver_1, lap1)
 
-    if lap2 == None:
+    if (lap2 == None or lap2 == ''):
         # telemetry_driver_2 = laps_driver_2.pick_fastest().get_car_data().add_distance()
         telemetry_driver_2 = get_car_data(yr, rc, sn, driver_2, lap2)
     else:
@@ -1301,11 +1315,11 @@ def cornering_func(input_list, datetime):
     ax[0].set_xlim(distance_min, distance_max)
     ax[1].set_xlim(distance_min, distance_max)
 
-    if lap1 == None:
+    if (lap1 == None or lap1 == ''):
         lap1 = "Fastest Lap"
     else:
         lap1 = "Lap " + str(lap1)
-    if lap2 == None:
+    if (lap2 == None or lap2 == ''):
         lap2 = "Fastest Lap"
     else:
         lap2 = "Lap " + str(lap2)
@@ -1623,6 +1637,12 @@ def sectors_func(input_list, datetime):
 
     # Explore the lap data
     # session.laps
+    
+    if (d1 == None or d1 == ''):
+        d1 = laps.iloc[0]['Driver']
+        
+    if (d2 == None or d2 == ''):
+        d2 = laps.iloc[0]['Driver']
 
     driver_1 = d1
     driver_2 = d2
@@ -1646,7 +1666,7 @@ def sectors_func(input_list, datetime):
     laps_driver_1 = laps[laps['Driver'] == driver_1]
     laps_driver_2 = laps[laps['Driver'] == driver_2]
 
-    if lap1 == None:
+    if (lap1 == None or lap1 == ''):
         # fastest_driver_1 = laps_driver_1.pick_fastest()
         fastest_driver_1 = laps_driver_1.iloc[0]
     else:
@@ -1654,7 +1674,7 @@ def sectors_func(input_list, datetime):
             # lap1)].iloc[0]
         fastest_driver_1 = laps_driver_1.iloc[int(float(lap1))]
 
-    if lap2 == None:
+    if (lap2 == None or lap2 == ''):
         # fastest_driver_2 = laps_driver_2.pick_fastest()
         fastest_driver_2 = laps_driver_2.iloc[0]
     else:
@@ -1768,11 +1788,11 @@ def sectors_func(input_list, datetime):
     # Add the legend to the plot
     plt.legend([line1, line2], [driver_1, driver_2])
 
-    if lap1 == None:
+    if (lap1 == None or lap1 == ''):
         lap1 = "Fastest Lap"
     else:
         lap1 = "Lap " + str(lap1)
-    if lap2 == None:
+    if (lap2 == None or lap2 == ''):
         lap2 = "Fastest Lap"
     else:
         lap2 = "Lap " + str(lap2)
