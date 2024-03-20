@@ -140,6 +140,7 @@ def delta_time_updated(yr, rc, sn, driver1, lap1, driver2, lap2):
 
 ### END OF GENERAL FUNCTIONS ###
 
+# TODO: inaccurate data
 # TODO: test all funcs
 
 ### PLOTTING FUNCTIONS ###
