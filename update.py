@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 import datetime as dt
 import fastf1 as ff1
+from fastf1 import plotting
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pymongo import MongoClient
