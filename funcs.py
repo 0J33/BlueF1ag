@@ -646,6 +646,8 @@ def gear_func(input_list, datetime):
     queue.append(datetime)
     
     wait_for_turn(datetime)
+    
+    rstall(plt)
 
     plotting.setup_mpl()
 
@@ -768,6 +770,8 @@ def speed_func(input_list, datetime):
     
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
+
+    rstall(plt)
 
     plotting.setup_mpl()
     # We create a plot with title and adjust some setting to make it look good.
@@ -1631,6 +1635,8 @@ def sectors_func(input_list, datetime):
     queue.append(datetime)
     
     wait_for_turn(datetime)
+    
+    rstall(plt)
 
     plotting.setup_mpl()
 
