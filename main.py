@@ -272,7 +272,6 @@ def update():
     stnd = ""
     races = ""
     data = ""
-    aws = ""
     try:
         # PY is string like "py stnd.py" or "python stnd.py", etc.
         os.system(PY)
