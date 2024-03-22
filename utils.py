@@ -45,24 +45,48 @@ def get_path():
 # load the session
 def get_sess(yr, rc, sn):
     
-    #if session number
     try:
         rc = int(rc)
-        session = ff1.get_session(yr, rc, sn)
-    #if session not number
     except:
-        try:
-            #check if test
-            if rc.lower().__contains__("preseason") or rc.lower().__contains__("pre-season") or rc.lower().__contains__("pre season") or rc.lower().__contains__("testing") or rc.lower().__contains__("test"):
-                try:
-                    session = ff1.get_testing_session(yr, 1, sn)
-                except:
-                    session = ff1.get_testing_session(yr, 2, sn)
-            #not test
-            else:
-                session = ff1.get_session(yr, rc, sn)
-        except:
-            session = ff1.get_session(yr, rc, sn)
+        pass
+    
+    session_type = "normal"
+
+    if yr == 2020:
+        if rc == "Pre-Season Test 1":
+            session_type = "1"
+        elif rc == "Pre-Season Test 2":
+            session_type = "2"
+    elif yr == 2021:
+        if rc == "Pre-Season Test":
+            session_type = "1"
+    elif yr == 2022:
+        if rc == "Pre-Season Track Session":
+            session_type = "1"
+        elif rc == "Pre-Season Test":
+            session_type = "2"
+    elif yr == 2023:
+        if rc == "Pre-Season Testing":
+            session_type = "1"
+    elif yr == 2024:
+        if rc == "Pre-Season Testing":
+            session_type = "1"
+            
+    if session_type == "1" or session_type == "2":
+        if sn == "Day 1":
+            sn = 1
+        elif sn == "Day 2":
+            sn = 2
+        elif sn == "Day 3":
+            sn = 3
+            
+    if session_type == "normal":
+        session = ff1.get_session(yr, rc, sn)
+    elif session_type == "1":
+        session = ff1.get_testing_session(yr, 1, sn)
+    elif session_type == "2":
+        session = ff1.get_testing_session(yr, 2, sn)
+        
     session.load()
     try:
         fix = session.laps.pick_fastest()
@@ -102,22 +126,26 @@ def get_races(yr):
 
 ### gets sessions of a grand prix weekend ###
 def get_sessions(yr, rc):
-    yr = int(yr)
-    sessions = []
-    i=1
-    while True:
-        sess = 'Session' + str(i)
-        fastf1_obj = ff1.get_event(yr, rc)
-        try: 
-            sessions.append((getattr(fastf1_obj, sess)))
-        except:
-            break
-        i+=1
-    return sessions
+    
+    if "Pre-Season" in rc:
+        return ['Day 1', 'Day 2', 'Day 3']
+    else:
+        yr = int(yr)
+        sessions = []
+        i=1
+        while True:
+            sess = 'Session' + str(i)
+            fastf1_obj = ff1.get_event(yr, rc)
+            try: 
+                sessions.append((getattr(fastf1_obj, sess)))
+            except:
+                break
+            i+=1
+        return sessions
  
 ### gets drivers of a session ###
 def get_drivers(yr, rc, sn):
-    session = ff1.get_session(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
     session.load()
     laps = session.laps
     ls = set(tuple(x) for x in laps[['Driver']].values.tolist())
@@ -126,7 +154,7 @@ def get_drivers(yr, rc, sn):
 
 ### gets laps of a session ###
 def get_laps(yr, rc, sn):
-    session = ff1.get_session(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
     session.load()
     laps = session.laps
     ls = set(tuple(x) for x in laps[['LapNumber']].values.tolist())
@@ -139,7 +167,7 @@ def get_laps(yr, rc, sn):
 
 ### gets distance of a session ###
 def get_distance(yr, rc, sn):
-    session = ff1.get_session(yr, rc, sn)
+    session = get_sess(yr, rc, sn)
     session.load()
     laps = session.laps
     car_data = laps.pick_fastest().get_car_data().add_distance()
@@ -160,10 +188,7 @@ def get_races_from_db(func, yr):
         doc = collection.find_one({"year": int(yr)})
         races = doc["races"]
 
-        res = []
-        for race in races:
-            if "testing" not in race.lower() and "pre-season" not in race.lower():
-                res.append(race)
+        res = races
     else:
         collection_name = "data"
         collection = db[collection_name]
@@ -173,11 +198,7 @@ def get_races_from_db(func, yr):
         for doc in docs:
             records.append(doc["race"])
         
-        res = []
-        for record in records:
-            if record not in res:
-                if "test" not in record.lower() and "pre-season" not in record.lower():
-                    res.append(record)
+        res = records
     return res
 
 def get_sessions_from_db(yr, rc):

@@ -454,13 +454,9 @@ def update_data(yr):
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
-            # if sn == "Sprint Shootout":
-                # sn = "Sprint"
             collection_name = "data"
             collection = db[collection_name]
             if collection.count_documents({"year": int(yr), "race": rc, "session": sn}) > 0:
-                pass
-            elif "testing" in rc.lower():
                 pass
             else:
                 try:
@@ -471,6 +467,7 @@ def update_data(yr):
                     try:
                         drivers = get_drivers(yr, rc, sn)
                     except Exception as exc:
+                        print(traceback.format_exc())
                         print(str(exc) + "\nNO DRIVERS DATA")
                     try:
                         laps = get_laps(yr, rc, sn)
@@ -483,7 +480,7 @@ def update_data(yr):
                         distance = 0
                         if rc.lower().__contains__("austria"):
                             distance = 4300
-                    if not (drivers == [] and laps == [] and distance == []):
+                    if drivers != [] and laps != [] and distance != []:
                         collection.insert_one({
                             "year": int(yr),
                             "race": rc,

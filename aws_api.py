@@ -136,7 +136,7 @@ def read_data_from_file(file_name):
 def delete_file_local(file_name):
     os.remove("data_dump/" + file_name)
     
-### # TODO: fix testing sessions
+###
 
 def save_laps(yr, rc, sn):
     
@@ -146,12 +146,6 @@ def save_laps(yr, rc, sn):
         
         if check_file_exists(f"laps/{file_name}"):
             raise Exception("File already exists")
-        
-        if "test" in rc.lower() or "pre-season" in rc.lower():
-            raise Exception("Test session")
-        
-        if rc == "Sprint Shootout":
-            raise Exception("Sprint Shootout")
         
         if not check_folder_exists(f"laps/{file_name}"):
             
@@ -195,12 +189,6 @@ def save_results(yr, rc, sn):
         if check_file_exists(f"results/{file_name}"):
             raise Exception("File already exists")
         
-        if "test" in rc.lower() or "pre-season" in rc.lower():
-            raise Exception("Test session")
-        
-        if rc == "Sprint Shootout":
-            raise Exception("Sprint Shootout")
-        
         if not check_folder_exists(f"results/{file_name}"):
             
             session = get_sess(yr, rc, sn)
@@ -240,7 +228,6 @@ def save_results(yr, rc, sn):
             delete_file_local(file_name)
             
     except Exception as exc:
-    
         print(traceback.format_exc())
         print("error", str(exc)) 
         
@@ -252,12 +239,6 @@ def save_car_data(yr, rc, sn):
         
         if check_folder_exists(f"car_data/{folder_name}"):
             raise Exception("Folder already exists")
-        
-        if "test" in rc.lower() or "pre-season" in rc.lower():
-            raise Exception("Test session")
-        
-        if rc == "Sprint Shootout":
-            raise Exception("Sprint Shootout")
 
         session = get_sess(yr, rc, sn)
         session.load()
@@ -310,7 +291,6 @@ def save_car_data(yr, rc, sn):
         os.rmdir("data_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn))
 
     except Exception as exc:
-        import traceback
         print(traceback.format_exc())
         print("Error:", str(exc))
     
@@ -322,12 +302,6 @@ def save_telemetry(yr, rc, sn):
         
         if check_folder_exists(f"telemetry/{folder_name}"):
             raise Exception("Folder already exists")
-        
-        if "test" in rc.lower() or "pre-season" in rc.lower():
-            raise Exception("Test session")
-        
-        if rc == "Sprint Shootout":
-            raise Exception("Sprint Shootout")
 
         session = get_sess(yr, rc, sn)
         session.load()
@@ -380,7 +354,6 @@ def save_telemetry(yr, rc, sn):
         os.rmdir("data_dump/" + str(yr) + "_" + str(rc) + "_" + str(sn))
 
     except Exception as exc:
-        import traceback
         print(traceback.format_exc())
         print("Error:", str(exc))
         

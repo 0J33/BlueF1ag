@@ -87,24 +87,48 @@ def get_path():
 # load the session
 def get_sess(yr, rc, sn):
     
-    #if session number
     try:
         rc = int(rc)
-        session = fastf1.get_session(yr, rc, sn)
-    #if session not number
     except:
-        try:
-            #check if test
-            if rc.lower().__contains__("preseason") or rc.lower().__contains__("pre-season") or rc.lower().__contains__("pre season") or rc.lower().__contains__("testing") or rc.lower().__contains__("test"):
-                try:
-                    session = fastf1.get_testing_session(yr, 1, sn)
-                except:
-                    session = fastf1.get_testing_session(yr, 2, sn)
-            #not test
-            else:
-                session = fastf1.get_session(yr, rc, sn)
-        except:
-            session = fastf1.get_session(yr, rc, sn)
+        pass
+    
+    session_type = "normal"
+
+    if yr == 2020:
+        if rc == "Pre-Season Test 1":
+            session_type = "1"
+        elif rc == "Pre-Season Test 2":
+            session_type = "2"
+    elif yr == 2021:
+        if rc == "Pre-Season Test":
+            session_type = "1"
+    elif yr == 2022:
+        if rc == "Pre-Season Track Session":
+            session_type = "1"
+        elif rc == "Pre-Season Test":
+            session_type = "2"
+    elif yr == 2023:
+        if rc == "Pre-Season Testing":
+            session_type = "1"
+    elif yr == 2024:
+        if rc == "Pre-Season Testing":
+            session_type = "1"
+            
+    if session_type == "1" or session_type == "2":
+        if sn == "Day 1":
+            sn = 1
+        elif sn == "Day 2":
+            sn = 2
+        elif sn == "Day 3":
+            sn = 3
+            
+    if session_type == "normal":
+        session = fastf1.get_session(yr, rc, sn)
+    elif session_type == "1":
+        session = fastf1.get_testing_session(yr, 1, sn)
+    elif session_type == "2":
+        session = fastf1.get_testing_session(yr, 2, sn)
+        
     session.load()
     try:
         fix = session.laps.pick_fastest()
@@ -160,8 +184,6 @@ set_font()
 
 ### END OF GENERAL FUNCTIONS ###
 
-# TODO: test all funcs
-# TODO: fix testing sessions
 
 ### PLOTTING FUNCTIONS ###
 
@@ -1615,7 +1637,7 @@ def rt_func(input_list, datetime):
     rc = input_list["race"]
     drivers = input_list["drivers"]
 
-    session = fastf1.get_session(yr, rc, 'Race')
+    session = get_sess(yr, rc, 'Race')
     session.load()
 
     queue.append(datetime)
