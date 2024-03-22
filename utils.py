@@ -202,9 +202,10 @@ def get_races_from_db(func, yr):
             records.append(doc["race"])
         
         res = []
-        for record in records:
-            if record not in res:
-                res.append(record)
+        all_races = get_races(yr)
+        for race in all_races:
+            if race in records and race not in res:
+                res.append(race)
     return res
 
 def get_sessions_from_db(yr, rc):
