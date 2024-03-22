@@ -454,8 +454,8 @@ def update_data(yr):
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
         for sn in sessions:
-            if sn == "Sprint Shootout":
-                sn = "Sprint"
+            # if sn == "Sprint Shootout":
+                # sn = "Sprint"
             collection_name = "data"
             collection = db[collection_name]
             if collection.count_documents({"year": int(yr), "race": rc, "session": sn}) > 0:
@@ -483,7 +483,7 @@ def update_data(yr):
                         distance = 0
                         if rc.lower().__contains__("austria"):
                             distance = 4300
-                    if not (drivers == [] and laps == [] and distance == 0):
+                    if not (drivers == [] and laps == [] and distance == []):
                         collection.insert_one({
                             "year": int(yr),
                             "race": rc,
@@ -500,10 +500,10 @@ def update_data(yr):
                             msg = "Sessions updated:"
                             return msg + "\n" + str(res)
                     res.append([yr, rc, sn])
-                    aws_api.save_laps(yr, rc, sn)
-                    aws_api.save_results(yr, rc, sn)
-                    aws_api.save_car_data(yr, rc, sn)
-                    aws_api.save_telemetry(yr, rc, sn)
+                    # aws_api.save_laps(yr, rc, sn)
+                    # aws_api.save_results(yr, rc, sn)
+                    # aws_api.save_car_data(yr, rc, sn)
+                    # aws_api.save_telemetry(yr, rc, sn)
                 except Exception as exc:
                     print(str(exc))
                     if res == []:
