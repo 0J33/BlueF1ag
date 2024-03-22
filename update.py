@@ -446,10 +446,8 @@ def update_data(yr):
     races_list = []
     collection_name = "races"
     collection = db[collection_name]
-    docs = collection.find({"year": int(yr)})
-    for doc in docs:
-        races_list.append(doc['races'])
-    races_list = races_list[0]
+    doc = collection.find_one({"year": int(yr)})
+    races_list = doc["races"]
     for rc in races_list:
         rc = rc.strip()
         sessions = get_sessions(yr, rc)
