@@ -1686,4 +1686,4 @@ def rt_func(input_list, datetime):
 
 ### If you want to run a function make sure to provide the correct input_list and datetime ###
 
-# results_func([2021, 'Abu Dhabi Grand Prix', 'Race'], get_datetime())
+# results_func({"year": 2021, "race": "Abu Dhabi Grand Prix", "session": "Race"}, get_datetime())
