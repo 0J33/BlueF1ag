@@ -187,8 +187,11 @@ def get_races_from_db(func, yr):
         
         doc = collection.find_one({"year": int(yr)})
         races = doc["races"]
-
-        res = races
+        
+        res = []
+        for race in races:
+            if race not in res:
+                res.append(race)    
     else:
         collection_name = "data"
         collection = db[collection_name]
@@ -198,7 +201,10 @@ def get_races_from_db(func, yr):
         for doc in docs:
             records.append(doc["race"])
         
-        res = records
+        res = []
+        for record in records:
+            if record not in res:
+                res.append(record)
     return res
 
 def get_sessions_from_db(yr, rc):
