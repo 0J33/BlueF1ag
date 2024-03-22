@@ -487,26 +487,18 @@ def update_data(yr):
                             "laps": laps,
                             "distance": distance
                         })
-                    if drivers == [] and laps == [] and distance == 0:
-                        if res == []:
-                            msg = "No sessions updated."
-                            return msg
-                        else:
-                            msg = "Sessions updated:"
-                            return msg + "\n" + str(res)
-                    res.append([yr, rc, sn])
-                    # aws_api.save_laps(yr, rc, sn)
-                    # aws_api.save_results(yr, rc, sn)
-                    # aws_api.save_car_data(yr, rc, sn)
-                    # aws_api.save_telemetry(yr, rc, sn)
+                        res.append([yr, rc, sn])
+                        # aws_api.save_laps(yr, rc, sn)
+                        # aws_api.save_results(yr, rc, sn)
+                        # aws_api.save_car_data(yr, rc, sn)
+                        # aws_api.save_telemetry(yr, rc, sn)
                 except Exception as exc:
                     print(str(exc))
-                    if res == []:
-                        msg = "No sessions updated."
-                        return msg
-                    else:
-                        msg = "Sessions updated:"
-                        return msg + "\n" + str(res)
+    if res == []:
+        msg = "No sessions updated."
+    else:
+        msg = "Sessions updated:"
+    return msg + "\n" + str(res)
 
 ### updates gd with lap and telemetry data of all sessions of a given year ###       
 def update_aws(yr):
