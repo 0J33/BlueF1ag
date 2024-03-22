@@ -152,6 +152,47 @@ def get_distance(yr, rc, sn):
 
 ### db ###
 
+def get_races_from_db(func, yr):
+    if func.lower() == "event":
+        collection_name = "races"
+        collection = db[collection_name]
+        
+        doc = collection.find_one({"year": int(yr)})
+        races = doc["races"]
+
+        res = []
+        for race in races:
+            if "testing" not in race.lower() and "pre-season" not in race.lower():
+                res.append(race)
+    else:
+        collection_name = "data"
+        collection = db[collection_name]
+        docs = collection.find({"year": int(yr)})
+        
+        records = []
+        for doc in docs:
+            records.append(doc["race"])
+        
+        res = []
+        for record in records:
+            if record not in res:
+                if "test" not in record.lower() and "pre-season" not in record.lower():
+                    res.append(record)
+    return res
+
+def get_sessions_from_db(yr, rc):
+    collection_name = "data"
+    collection = db[collection_name]
+    
+    docs = collection.find({"year": int(yr), "race": rc})
+    res = []
+    for doc in docs:
+        res.append(doc["session"])
+
+    if int(yr) <= 2018:
+        res = ['Practice 1', 'Practice 2', 'Practice 3', 'Qualifying', 'Race']
+    return res
+
 def get_drivers_from_db(yr, rc, sn):
     collection_name = "data"
     collection = db[collection_name]

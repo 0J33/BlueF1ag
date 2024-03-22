@@ -345,12 +345,12 @@ def inputs():
                     res = []
             elif input_type == "races":
                 try:
-                    res = get_races(input_data["year"])
+                    res = get_races_from_db(input_data["func"], input_data["year"])
                 except:
                     res = []
             elif input_type == "sessions":
                 try:
-                    res = get_sessions(input_data["year"], input_data["race"])
+                    res = get_sessions_from_db(input_data["year"], input_data["race"])
                 except:
                     res = []
             elif input_type == "all":
