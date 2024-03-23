@@ -243,7 +243,7 @@ def fastest_func(input_list, datetime):
 
     lap_time_string = strftimedelta(pole_lap['LapTime'], '%m:%s.%ms')
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
     plt.suptitle(
         f"{session.event.year} {session.event['EventName']} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")")
     plt.setp(ax.get_xticklabels(), fontsize=7)
@@ -274,7 +274,7 @@ def results_func(input_list, datetime):
         msg2 = msg[['Position', 'BroadcastName', 'TeamName', 'Points', 'Status']] 
     else:
         msg2 = msg[['BroadcastName', 'TeamName']]
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
     text = f"{session.event.year} {session.event['EventName']} {sn}"
 
     text = tabulate.tabulate([[text]], tablefmt='fancy_grid')
@@ -386,7 +386,7 @@ def laps_func(input_list, datetime):
             title = title + " vs " + str(drivers[i+1])
         i += 1
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
     plt.suptitle(
         f"Laps Comparison\n{session.event.year} {session.event['EventName']} {sn}\n" + title)
 
@@ -453,7 +453,7 @@ def time_func(input_list, datetime):
             title = title + " vs " + str(drivers[i+1])
         i += 1
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     if (lap == None or lap == ''):
         plt.suptitle("Fastest Lap Comparison\n" +
@@ -524,7 +524,7 @@ def distance_func(input_list, datetime):
             title = title + " vs " + str(drivers[i+1])
         i += 1
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     if (lap == None or lap == ''):
         plt.suptitle("Fastest Lap Comparison\n" +
@@ -618,7 +618,7 @@ def delta_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     plt.suptitle("Lap Comparison\n" +
                  f"{session.event.year} {session.event['EventName']} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")")
@@ -686,7 +686,7 @@ def gear_func(input_list, datetime):
     plt.tick_params(labelleft=False, left=False,
                     labelbottom=False, bottom=False)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     if (lap == None or lap == ''):
         plt.suptitle(
@@ -757,7 +757,7 @@ def speed_func(input_list, datetime):
     plt.rcParams["figure.figsize"] = [7, 5]
     plt.rcParams["figure.autolayout"] = True
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     if (lap == None or lap == ''):
         fig.suptitle("Fastest Lap Speed Visualization - " +
@@ -876,9 +876,9 @@ def tel_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     fig.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" +
                  drv1 + " (" + lap1 + ") vs " + drv2 + " (" + lap2 + ")", size=15)
@@ -1217,7 +1217,7 @@ def cornering_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" +
                  d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=20)
@@ -1357,7 +1357,7 @@ def tires_func(input_list, datetime): # very slow
         cbar.set_ticks(np.arange(1.5, 4.5))
         cbar.set_ticklabels(['Inters', 'Wets', 'Slicks'])
 
-        sn = session.event.get_session_name(sn)
+        # sn = session.event.get_session_name(sn)
 
         plt.suptitle(
             f"{session.event.year} {session.event['EventName']} {sn}\n Lap {sl} - Tire Comparison")
@@ -1620,7 +1620,7 @@ def sectors_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn} - Fastest Sectors\n" +
                  d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=25)
