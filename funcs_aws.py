@@ -1889,6 +1889,57 @@ def rt_func(input_list, datetime):
     queue.remove(datetime)
     return "success"
 
+def positions_func(input_list, datetime):
+
+    yr = input_list["year"]
+    rc = input_list["race"]
+    sn = input_list["session"]
+
+    # session = get_sess(yr, rc, sn)
+    # session.load(telemetry=False, weather=False)
+
+    laps = aws_api.get_laps(yr, rc, sn)
+
+    queue.append(datetime)
+
+    wait_for_turn(datetime)
+
+    plotting.setup_mpl()
+    fig, ax = plt.subplots(figsize=(12.0, 6))
+
+    drivers = laps['Driver'].unique()
+
+    # for drv in session.drivers:
+    for drv in drivers:
+        # drv_laps = session.laps.pick_driver(drv)
+        drv_laps = laps.loc[laps['Driver'] == drv]
+
+        abb = drv_laps['Driver'].iloc[0]
+        color = fastf1.plotting.driver_color(abb)
+
+        ax.plot(drv_laps['LapNumber'], drv_laps['Position'],
+                label=abb, color=color)
+        
+    ax.set_ylim([20.5, 0.5])
+    ax.set_yticks([1, 5, 10, 15, 20])
+    ax.set_xlabel('Lap')
+    ax.set_ylabel('Position')
+    
+    ax.legend(bbox_to_anchor=(1.0, 1.02))
+
+    # sn = session.event.get_session_name(sn)
+    plt.suptitle(
+        f"{yr} {rc} {sn}\nPositions Changes")
+    plt.setp(ax.get_xticklabels(), fontsize=7)
+    
+    plt.tight_layout()
+
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
+    
+    rstall(plt)
+    queue.remove(datetime)
+    return "success"
+
 ### END OF PLOTTING FUNCTIONS ###
 
 
