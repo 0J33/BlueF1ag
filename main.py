@@ -23,9 +23,9 @@ load_dotenv()
 FUNCS = os.getenv("FUNCS")
 
 if FUNCS == "aws":
-    from funcs import *
+    from funcs_aws import *
 elif FUNCS == "cache":
-    from funcs_cache import *
+    from funcs import *
 
 HTTPS = os.getenv("HTTPS")
 
