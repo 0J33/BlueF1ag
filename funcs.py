@@ -243,9 +243,9 @@ def fastest_func(input_list, datetime):
 
     lap_time_string = strftimedelta(pole_lap['LapTime'], '%m:%s.%ms')
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
     plt.suptitle(
-        f"{session.event.year} {session.event['EventName']} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")")
+        f"{yr} {rc} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")")
     plt.setp(ax.get_xticklabels(), fontsize=7)
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
@@ -274,8 +274,8 @@ def results_func(input_list, datetime):
         msg2 = msg[['Position', 'BroadcastName', 'TeamName', 'Points', 'Status']] 
     else:
         msg2 = msg[['BroadcastName', 'TeamName']]
-    sn = session.event.get_session_name(sn)
-    text = f"{session.event.year} {session.event['EventName']} {sn}"
+    # sn = session.event.get_session_name(sn)
+    text = f"{yr} {rc} {sn}"
 
     text = tabulate.tabulate([[text]], tablefmt='fancy_grid')
     
@@ -386,9 +386,9 @@ def laps_func(input_list, datetime):
             title = title + " vs " + str(drivers[i+1])
         i += 1
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
     plt.suptitle(
-        f"Laps Comparison\n{session.event.year} {session.event['EventName']} {sn}\n" + title)
+        f"Laps Comparison\n{yr} {rc} {sn}\n" + title)
 
     def yformat(x, pos): return dates.DateFormatter('%M:%S.%f')(x)[:-5]
     ax.yaxis.set_major_formatter(plt.FuncFormatter(yformat))
@@ -453,14 +453,14 @@ def time_func(input_list, datetime):
             title = title + " vs " + str(drivers[i+1])
         i += 1
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     if (lap == None or lap == ''):
         plt.suptitle("Fastest Lap Comparison\n" +
-                     f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
+                     f"{yr} {rc} {sn}\n" + title)
     else:
         plt.suptitle("Lap " + str(lap) + " Comparison " +
-                     f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
+                     f"{yr} {rc} {sn}\n" + title)
 
     plt.setp(ax.get_xticklabels(), fontsize=7)
 
@@ -524,14 +524,14 @@ def distance_func(input_list, datetime):
             title = title + " vs " + str(drivers[i+1])
         i += 1
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     if (lap == None or lap == ''):
         plt.suptitle("Fastest Lap Comparison\n" +
-                     f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
+                     f"{yr} {rc} {sn}\n" + title)
     else:
         plt.suptitle("Lap " + str(lap) + " Comparison " +
-                     f"{session.event.year} {session.event['EventName']} {sn}\n" + title)
+                     f"{yr} {rc} {sn}\n" + title)
 
     ax.set_xlabel('Distance in m')
     ax.set_ylabel('Speed km/h')
@@ -596,7 +596,7 @@ def delta_func(input_list, datetime):
                     color=fastf1.plotting.driver_color(d2), label=d2)
         else:
             ax.plot(compare_tel['Distance'],
-                    compare_tel['Speed'], color='#444444', label=d2)
+                    compare_tel['Speed'], color='#777777', label=d2)
     except:
         ax.plot(compare_tel['Distance'],
                 compare_tel['Speed'], color='grey', label=d2)
@@ -618,10 +618,10 @@ def delta_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     plt.suptitle("Lap Comparison\n" +
-                 f"{session.event.year} {session.event['EventName']} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")")
+                 f"{yr} {rc} {sn}\n" + d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")")
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
@@ -686,14 +686,14 @@ def gear_func(input_list, datetime):
     plt.tick_params(labelleft=False, left=False,
                     labelbottom=False, bottom=False)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     if (lap == None or lap == ''):
         plt.suptitle(
-            f"Fastest Lap Gear Shift Visualization - " + f"{d_lap['Driver']}\n" + f"{session.event.year} {session.event['EventName']} {sn}\n")
+            f"Fastest Lap Gear Shift Visualization - " + f"{d_lap['Driver']}\n" + f"{yr} {rc} {sn}\n")
     else:
         plt.suptitle(f"Lap {lap} Gear Shift Visualization - " +
-                     f"{d_lap['Driver']}\n" + f"{session.event.year} {session.event['EventName']} {sn}\n")
+                     f"{d_lap['Driver']}\n" + f"{yr} {rc} {sn}\n")
 
     cbar = plt.colorbar(mappable=lc_comp, label="Gear",
                         boundaries=np.arange(1, 10))
@@ -757,14 +757,14 @@ def speed_func(input_list, datetime):
     plt.rcParams["figure.figsize"] = [7, 5]
     plt.rcParams["figure.autolayout"] = True
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
     if (lap == None or lap == ''):
         fig.suptitle("Fastest Lap Speed Visualization - " +
-                     f"{d_lap['Driver']}" + "\n" + f"{session.event.year} {session.event['EventName']} {sn}\n", size=20, y=0.97)
+                     f"{d_lap['Driver']}" + "\n" + f"{yr} {rc} {sn}\n", size=20, y=0.97)
     else:
         fig.suptitle("Lap " + str(lap) + " Speed Visualization - " +
-                     f"{d_lap['Driver']}" + "\n" + f"{session.event.year} {session.event['EventName']} {sn}\n", size=20, y=0.97)
+                     f"{d_lap['Driver']}" + "\n" + f"{yr} {rc} {sn}\n", size=20, y=0.97)
 
     # Adjust margins and turn of axis
     plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.12)
@@ -842,7 +842,7 @@ def tel_func(input_list, datetime):
         if (d1 != d2):
             second_color = fastf1.plotting.driver_color(d2)
         else:
-            second_color = '#444444'
+            second_color = '#777777'
     except:
         second_color = 'grey'
 
@@ -876,11 +876,11 @@ def tel_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
-    fig.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" +
+    fig.suptitle(f"{yr} {rc} {sn}\n" +
                  drv1 + " (" + lap1 + ") vs " + drv2 + " (" + lap2 + ")", size=15)
 
     drs_1 = first_car['DRS']
@@ -1149,7 +1149,7 @@ def cornering_func(input_list, datetime):
                        label=driver_2, color=fastf1.plotting.driver_color(d2))
         else:
             ax[0].plot(telemetry_driver_2['Distance'],
-                       telemetry_driver_2['Speed'], label=driver_2, color='#444444')
+                       telemetry_driver_2['Speed'], label=driver_2, color='#777777')
     except:
         ax[0].plot(telemetry_driver_2['Distance'],
                    telemetry_driver_2['Speed'], label=driver_2, color='grey')
@@ -1217,9 +1217,9 @@ def cornering_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
-    plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn}\n" +
+    plt.suptitle(f"{yr} {rc} {sn}\n" +
                  d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=20)
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
@@ -1357,10 +1357,10 @@ def tires_func(input_list, datetime): # very slow
         cbar.set_ticks(np.arange(1.5, 4.5))
         cbar.set_ticklabels(['Inters', 'Wets', 'Slicks'])
 
-        sn = session.event.get_session_name(sn)
+        # sn = session.event.get_session_name(sn)
 
         plt.suptitle(
-            f"{session.event.year} {session.event['EventName']} {sn}\n Lap {sl} - Tire Comparison")
+            f"{yr} {rc} {sn}\n Lap {sl} - Tire Comparison")
 
     generate_minisector_plot(sl, sn)
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
@@ -1504,7 +1504,7 @@ def sectors_func(input_list, datetime):
         if d1 != d2:
             color_2 = fastf1.plotting.driver_color(d2)
         else:
-            color_2 = '#444444'
+            color_2 = '#777777'
     except:
         color_2 = 'grey'
 
@@ -1620,9 +1620,9 @@ def sectors_func(input_list, datetime):
     else:
         lap2 = "Lap " + str(lap2)
 
-    sn = session.event.get_session_name(sn)
+    # sn = session.event.get_session_name(sn)
 
-    plt.suptitle(f"{session.event.year} {session.event['EventName']} {sn} - Fastest Sectors\n" +
+    plt.suptitle(f"{yr} {rc} {sn} - Fastest Sectors\n" +
                  d1 + " (" + lap1 + ") vs " + d2 + " (" + lap2 + ")", size=25)
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
@@ -1693,7 +1693,7 @@ def rt_func(input_list, datetime):
     ax.set_xlabel('Lap Number')
     ax.set_ylabel('Race Trace (relative to imaginary driver)')
     ax.set_title("Race Trace - " +
-                 f"{session.event.year} {session.event['EventName']}\n" + title)
+                 f"{yr} {rc}\n" + title)
 
     ax.legend()
 
