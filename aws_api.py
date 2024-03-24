@@ -450,6 +450,23 @@ def get_standings(type, yr):
     except:
             
         return None
+    
+def get_points(yr):
+    
+    try:
+        
+        file_name = f"{yr}_POINTS.png"
+        
+        points = read_file("points/" + file_name)
+        
+        with open("res/output/" + file_name, 'wb') as f:
+            f.write(points)
+            
+        return file_name
+    
+    except:
+        
+        return None
 
 ### END OF AWS API FUNCTIONS ###
 

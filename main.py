@@ -145,7 +145,7 @@ def fix_exc(exc, input_list, comm):
         exc = "There requested data is not available for the year " + str(yr) + ".\n"
     elif exc.__contains__("invalid literal for int()"):
         exc = "I can't find the year " + str(yr) + ". Please make sure you provided all the inputs correctly and try again.\n"
-    elif exc.__contains__("No such file or directory") and (comm == "drivers" or comm == "constructors"):
+    elif exc.__contains__("No such file or directory") and (comm == "drivers" or comm == "constructors" or comm == "points"):
         exc = "There requested data is not available for the year " + str(yr) + ".\n"
         
     #rc
@@ -196,6 +196,9 @@ def command(user_id, input_list, comm, datetime):
         if comm == "drivers" or comm == "constructors":
             res = aws_api.get_standings(comm, input_list["year"])
             return res
+        elif comm == "points":
+            res = aws_api.get_points(input_list["year"])
+            return res
         else:
             if comm == "fastest":
                 res = fastest_func(input_list, datetime)
@@ -229,6 +232,8 @@ def command(user_id, input_list, comm, datetime):
                 res = sectors_func(input_list, datetime)
             elif comm == "racetrace":
                 res = rt_func(input_list, datetime)
+            elif comm == "positions":
+                res = positions_func(input_list, datetime)
             
         if res !="success" or res == None:
             raise Exception("Internal Server Error. Please try again.")
@@ -301,7 +306,7 @@ def home():
             input_list = data.get('input_list')
             user_id = data.get('user_id')
             datetime = get_datetime()
-            if not (func_name.lower() == "drivers" or func_name.lower() == "constructors"):
+            if not (func_name.lower() == "drivers" or func_name.lower() == "constructors" or func_name.lower() == "points"):
                 res = command(user_id, input_list, func_name.lower(), datetime)
                 with open("res/output/" + res + ".png", "rb") as image:
                     f = image.read()

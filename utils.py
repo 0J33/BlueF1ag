@@ -106,7 +106,7 @@ except:
 def get_years(func):
     years = []
     func = func.lower()
-    if func == "results" or func == "schedule" or func == "drivers":
+    if func == "results" or func == "schedule" or func == "drivers" or func == "points":
         for i in range(1950, dt.datetime.now().year+1):
             years.append(i)
     elif func == "constructors":
