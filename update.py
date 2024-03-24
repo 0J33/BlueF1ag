@@ -3,6 +3,9 @@ import requests
 import datetime as dt
 import fastf1 as ff1
 from fastf1 import plotting
+from fastf1.ergast import Ergast
+import plotly.express as px
+from plotly.io import show
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pymongo import MongoClient
@@ -123,11 +126,14 @@ def driver_func(yr):
     all_championship_standings_melted = pd.melt(all_championship_standings.reset_index(), ['round'])
 
     # Increase the size of the plot 
-    sns.set(rc={'figure.figsize':(11.7,8.27)})
+    # sns.set(rc={'figure.figsize':(11.7,8.27)})
+    sns.set_theme(rc={'figure.figsize':(11,8.27)})
     if yr<2005:
-        sns.set(rc={'figure.figsize':(13,8.27)})
+        # sns.set(rc={'figure.figsize':(13,8.27)})
+        sns.set_theme(rc={'figure.figsize':(13,8.27)})
         if yr<1996:
-            sns.set(rc={'figure.figsize':(14,10)})
+            # sns.set(rc={'figure.figsize':(14,10)})
+            sns.set_theme(rc={'figure.figsize':(14,10)})
 
     # Initiate the plot
     fig, ax = plt.subplots()
@@ -306,9 +312,11 @@ def const_func(yr):
     all_championship_standings_melted = pd.melt(all_championship_standings.reset_index(), ['round'])
 
     # Increase the size of the plot 
-    sns.set(rc={'figure.figsize':(15,8.27)})
+    # sns.set(rc={'figure.figsize':(15,8.27)})
+    sns.set_theme(rc={'figure.figsize':(15,8.27)})
     if yr == 1961 or yr == 1962 or yr == 1971:
-        sns.set(rc={'figure.figsize':(16,8.27)})
+        # sns.set(rc={'figure.figsize':(16,8.27)})
+        sns.set_theme(rc={'figure.figsize':(16,8.27)})
 
     # Initiate the plot
     fig, ax = plt.subplots()
@@ -393,6 +401,98 @@ def const_func(yr):
     aws_api.upload_file("data_dump/" + file, file, "standings/")
     aws_api.delete_file_local(file)
 
+# get the heatmap of the drivers standings
+def points_func(yr):
+    
+    ergast = Ergast()
+    races = ergast.get_race_schedule(yr)
+    results = []
+
+    # For each race in the season
+    for rnd, race in races['raceName'].items():
+
+        try: 
+            # Get results. Note that we use the round no. + 1, because the round no.
+            # starts from one (1) instead of zero (0)
+            temp = ergast.get_race_results(season=yr, round=rnd + 1)
+            temp = temp.content[0]
+
+            # If there is a sprint, get the results as well
+            sprint = ergast.get_sprint_results(season=yr, round=rnd + 1)
+            if sprint.content and sprint.description['round'][0] == rnd + 1:
+                temp = pd.merge(temp, sprint.content[0], on='driverCode', how='left')
+                # Add sprint points and race points to get the total
+                temp['points'] = temp['points_x'] + temp['points_y']
+                temp.drop(columns=['points_x', 'points_y'], inplace=True)
+
+            # Add round no. and grand prix name
+            temp['round'] = rnd + 1
+            temp['race'] = race.removesuffix(' Grand Prix')
+            if yr > 1990:
+                temp = temp[['round', 'race', 'driverCode', 'points']]  # Keep useful cols.
+            else:
+                temp['driverCode'] = temp['givenName'] + ' ' + temp['familyName']
+                temp = temp[['round', 'race', 'driverCode', 'points']]  # Keep useful cols.
+            results.append(temp)
+        except:
+            pass
+
+    # Append all races into a single dataframe
+    results = pd.concat(results)
+    races = results['race'].drop_duplicates()
+
+    # Group by 'driverCode' and 'round' and aggregate 'points'
+    results = results.groupby(['driverCode', 'round'])['points'].sum().reset_index()
+
+
+    # Then we “reshape” the results to a wide table, where each row represents a
+    # driver and each column refers to a race, and the cell value is the points.
+    results = results.pivot(index='driverCode', columns='round', values='points')
+
+    # Rank the drivers by their total points
+    results['total_points'] = results.sum(axis=1)
+    results = results.sort_values(by='total_points', ascending=False)
+    results.drop(columns='total_points', inplace=True)
+
+    # Use race name, instead of round no., as column names
+    results.columns = races
+
+    # The final step is to plot a heatmap using plotly
+    fig = px.imshow(
+        results,
+        text_auto=True,
+        aspect='auto',  # Automatically adjust the aspect ratio
+        color_continuous_scale=[[0, 'rgb(255, 255, 255)'],  # White
+                                [0.25, 'rgb(255, 165, 0)'], # Orange
+                                [0.5, 'rgb(255, 140, 0)'],  # Dark Orange
+                                [0.75, 'rgb(255, 69, 0)'],  # Red Orange
+                                [1, 'rgb(255, 0, 0)']],     # Red
+        labels={'x': 'Race',
+                'y': 'Driver',
+                'color': 'Points'}       # Change hover texts
+    )
+    fig.update_xaxes(title_text='')      # Remove axis titles
+    fig.update_yaxes(title_text='')
+    fig.update_yaxes(tickmode='linear')  # Show all ticks, i.e. driver names
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey',
+                    showline=False,
+                    tickson='boundaries')               # Show horizontal grid only
+    fig.update_xaxes(showgrid=False, showline=False)    # And remove vertical grid
+    # fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')   # White background
+    fig.update_layout(plot_bgcolor='rgba(0,0,0,1)',     # Black background
+                      paper_bgcolor='rgba(0,0,0,1)')    # Black background
+    fig.update_layout(coloraxis_showscale=False)        # Remove legend
+    fig.update_layout(xaxis=dict(side='top'))           # x-axis on top
+    fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))  # Remove border margins
+    fig.update_layout(font=dict(size=24, color='white'))
+    fig.update_layout(font_family="FORMULA1 DISPLAY REGULAR")
+    
+    # show(fig)
+    file = str(yr) + "_POINTS" + '.png'
+    fig.write_image("data_dump/" + file, width=1920, height=1080)
+    aws_api.upload_file("data_dump/" + file, file, "points/")
+    aws_api.delete_file_local(file)
+
 ### updates standings for both drivers and constructors ###
 def update(yr):
     
@@ -405,6 +505,9 @@ def update(yr):
         if yr >= 1958:
             const_func(yr)
             print("FINISHED UPDATE C")
+        if yr >= 1950:
+            points_func(yr)
+            print("FINISHED UPDATE P")
         stnd = True
 
     except Exception as exc:

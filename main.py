@@ -274,7 +274,7 @@ def update():
     data = ""
     try:
         # PY is string like "py stnd.py" or "python stnd.py", etc.
-        os.system(PY)
+        os.system(PY + " stnd.py")
         stnd = "stnd success"
     except:
         stnd = "stnd fail"
