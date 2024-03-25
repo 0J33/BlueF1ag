@@ -326,7 +326,7 @@ def home():
                 log(user_id, func_name, input_list, "", False, datetime)
             except:
                 pass
-            return jsonify({'result': result}), 200    
+            return jsonify({'result': result, 'datetime': datetime}), 200    
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
         
