@@ -480,10 +480,12 @@ def points_func(yr):
     fig.update_xaxes(showgrid=False, showline=False)    # And remove vertical grid
     # fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')   # White background
     fig.update_layout(plot_bgcolor='rgba(0,0,0,1)',     # Black background
-                      paper_bgcolor='rgba(0,0,0,1)')    # Black background
+                      paper_bgcolor='rgba(0,0,0,1)',    # Black background
+                      title=f"{yr} Driver Standings Heatmap")# Add Title
     fig.update_layout(coloraxis_showscale=False)        # Remove legend
     fig.update_layout(xaxis=dict(side='top'))           # x-axis on top
-    fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))  # Remove border margins
+    # fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))  # Remove border margins
+    fig.update_layout(margin=dict(l=0, r=0, b=0, t=300))  # Increase top margin
     fig.update_layout(font=dict(size=24, color='white'))
     fig.update_layout(font_family="FORMULA1 DISPLAY REGULAR")
     
