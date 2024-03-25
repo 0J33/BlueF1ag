@@ -242,17 +242,23 @@ def get_drivers_from_db(yr, rc, sn):
         return drivers
 
 def get_laps_from_db(yr, rc, sn):
-    collection_name = "data"
-    collection = db[collection_name]
-    sn = sn.capitalize()
-    doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
-    laps = doc["laps"]
-    return laps
+    if rc == None and sn == None:
+        return []
+    else:
+        collection_name = "data"
+        collection = db[collection_name]
+        sn = sn.capitalize()
+        doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
+        laps = doc["laps"]
+        return laps
 
 def get_distance_from_db(yr, rc, sn):
-    collection_name = "data"
-    collection = db[collection_name]
-    sn = sn.capitalize()
-    doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
-    dist = doc["distance"]
-    return dist
+    if rc == None and sn == None:
+        return []
+    else:
+        collection_name = "data"
+        collection = db[collection_name]
+        sn = sn.capitalize()
+        doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
+        dist = doc["distance"]
+        return dist
