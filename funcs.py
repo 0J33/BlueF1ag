@@ -3,7 +3,7 @@ import pathlib
 import fastf1
 from fastf1 import plotting
 from fastf1 import utils
-import fastf1.plotting
+from fastf1 import plotting
 from fastf1.core import Laps
 from matplotlib import pyplot as plt
 import matplotlib.pyplot as plt
@@ -1746,6 +1746,148 @@ def positions_func(input_list, datetime):
     
     plt.tight_layout()
 
+    plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
+    
+    rstall(plt)
+    queue.remove(datetime)
+    return "success"
+
+def battles_func(input_list, datetime):
+    
+    yr = input_list["year"]
+    drivers = input_list["drivers"]
+
+    def ergast_retrieve(api_endpoint: str):
+        url = f'https://ergast.com/api/f1/{api_endpoint}.json'
+        response = requests.get(url).json()
+        
+        return response['MRData']
+
+    all_quali_results = pd.DataFrame()
+
+    # We want this so that we know which driver belongs to which team, so we can color them later
+    team_drivers = {}
+
+    current_round = 1
+
+    while True:
+        race = ergast_retrieve(f'{yr}/{current_round}/qualifying')
+        
+        # If session doesn't exist, cancel loop
+        if not race['RaceTable']['Races']:
+            break
+
+        results = race['RaceTable']['Races'][0]['QualifyingResults']
+
+        quali_results = {'round': current_round}
+
+        for j in range(len(results)):
+            try:
+                driver = results[j]['Driver']['code']
+            except:
+                driver = " ".join(word[0].upper()+word[1:] for word in(results[j]['Driver']['driverId'].replace("_", "\n")).split(" "))
+            position = int(results[j]['position'])
+            team = results[j]['Constructor']['name']
+            
+            if driver not in drivers:
+                continue
+            
+            # Create mapping for driver - team
+            if not team in team_drivers:
+                team_drivers[team] = [driver]
+            else:
+                if not driver in team_drivers[team]:
+                    team_drivers[team].append(driver)
+                    
+            quali_results[driver] = position
+                
+        all_quali_results = all_quali_results.append(quali_results, ignore_index=True)
+        
+        current_round += 1
+        
+    # Now we want to know, per round, per team, who qualified higher?
+    all_quali_battle_results = []
+    team_colors_palette = []
+
+    for team in team_drivers:
+        drivers = team_drivers[team]
+        
+        quali_results = all_quali_results[drivers]
+        
+        # We do dropna() to only include the sessions in which both drivers participated
+        fastest_driver_per_round = quali_results.dropna().idxmin(axis=1)
+        
+        quali_battle_result = fastest_driver_per_round.value_counts().reset_index()
+        
+        for _, driver in quali_battle_result.iterrows():
+            all_quali_battle_results.append({
+                'driver': driver['index'],
+                'team': team,
+                'quali_score': driver[0]
+            })
+        try:
+            team_colors_palette.append(fastf1.plotting.team_color(team))
+        except:
+            team_colors_palette.append(None)
+        # If none, replace None with grey
+        team_colors_palette = ['#D3D3D3' if v is None else v for v in team_colors_palette]
+
+
+    # Finally, convert to a DataFrame so we can plot
+    all_quali_battle_results = pd.DataFrame.from_dict(all_quali_battle_results)
+
+    # Increase the size of the plot 
+    # sns.set(rc={'figure.figsize':(11.7,8.27)})
+    sns.set_theme(rc={'figure.figsize':(11.7,8.27)})
+
+    # Create custom color palette
+    # custom_palette = sns.set_palette(sns.color_palette(team_colors_palette))
+    custom_palette = sns.color_palette(team_colors_palette)
+    queue.append(datetime)
+
+    wait_for_turn(datetime)
+
+    plotting.setup_mpl()
+
+    fig, ax = plt.subplots()
+
+    ax.set_title(f"{yr} Teammate Qualifying Battle", color = 'white')
+    fig.set_facecolor("black")
+    ax.xaxis.label.set_color("white")
+    ax.yaxis.label.set_color("white")
+    # set colorbar tick color
+    ax.yaxis.set_tick_params(color='white')
+    ax.xaxis.set_tick_params(color='white')
+
+    # set colorbar ticklabels
+    plt.setp(plt.getp(ax.axes, 'yticklabels'), color='white')
+    plt.setp(plt.getp(ax.axes, 'xticklabels'), color='white')
+    ax.set_facecolor('black')
+
+    ax.spines['bottom'].set_color('black')
+    ax.spines['top'].set_color('black')
+    ax.spines['left'].set_color('black')
+    ax.spines['right'].set_color('black')
+    for t in ax.xaxis.get_ticklines(): t.set_color('black')
+    for t in ax.yaxis.get_ticklines(): t.set_color('black')
+    ax.set_facecolor('black')
+
+    g = sns.barplot(
+        x='driver',
+        y='quali_score', 
+        hue='team',
+        data=all_quali_battle_results, 
+        dodge=False,
+        palette=custom_palette,
+    )
+
+    plt.yticks(range(max(all_quali_battle_results['quali_score']) + 1))
+
+    plt.legend([],[], frameon=False)
+
+    g.set(xlabel=None)
+    g.set(ylabel=None)
+    
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
     rstall(plt)

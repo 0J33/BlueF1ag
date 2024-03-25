@@ -234,6 +234,8 @@ def command(user_id, input_list, comm, datetime):
                 res = rt_func(input_list, datetime)
             elif comm == "positions":
                 res = positions_func(input_list, datetime)
+            elif comm == "battles":
+                res = battles_func(input_list, datetime)
             
         if res !="success" or res == None:
             raise Exception("Internal Server Error. Please try again.")
