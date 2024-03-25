@@ -222,12 +222,24 @@ def get_sessions_from_db(yr, rc):
     return res
 
 def get_drivers_from_db(yr, rc, sn):
-    collection_name = "data"
-    collection = db[collection_name]
-    sn = sn.capitalize()
-    doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
-    drivers = doc["drivers"]
-    return drivers
+    if rc == None and sn == None:
+        collection_name = "data"
+        collection = db[collection_name]
+        docs = collection.find({"year": int(yr)})
+        drivers = []
+        for doc in docs:
+            temp = doc["drivers"]
+            for driver in temp:
+                if driver not in drivers:
+                    drivers.append(driver)
+        return drivers
+    else:
+        collection_name = "data"
+        collection = db[collection_name]
+        sn = sn.capitalize()
+        doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
+        drivers = doc["drivers"]
+        return drivers
 
 def get_laps_from_db(yr, rc, sn):
     collection_name = "data"
