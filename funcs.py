@@ -1707,7 +1707,8 @@ def positions_func(input_list, datetime):
 
     yr = input_list["year"]
     rc = input_list["race"]
-    sn = input_list["session"]
+    
+    sn = "Race"
 
     session = get_sess(yr, rc, sn)
     session.load(telemetry=False, weather=False)
