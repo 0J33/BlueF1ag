@@ -3,7 +3,7 @@ import requests
 import datetime as dt
 import fastf1 as ff1
 from fastf1 import plotting
-from fastf1.ergast import Ergast
+# from fastf1.ergast import Ergast
 import plotly.express as px
 from plotly.io import show
 import seaborn as sns
@@ -403,6 +403,8 @@ def const_func(yr):
 
 # get the heatmap of the drivers standings
 def points_func(yr):
+    
+    raise Exception("Function is not available")
     
     ergast = Ergast()
     races = ergast.get_race_schedule(yr)
