@@ -39,8 +39,6 @@ if not os.path.exists(dir_path + get_path() + "res"):
     os.mkdir(dir_path + get_path() + "res")
 if not os.path.exists(dir_path + get_path() + "res" + get_path() + "output"):
     os.mkdir(dir_path + get_path() + "res" + get_path() + "output")
-if not os.path.exists(dir_path + get_path() + "res" + get_path() + "stnd"):
-    os.mkdir(dir_path + get_path() + "res" + get_path() + "stnd")
 
 queue = []
 
@@ -201,10 +199,11 @@ def fastest_func(input_list, datetime):
     wait_for_turn(datetime)
 
     plotting.setup_mpl()
-    fig, ax = plt.subplots()
 
-    plt.rcParams["figure.figsize"] = [7, 5]
+    plt.rcParams["figure.figsize"] = [14, 10]
     plt.rcParams["figure.autolayout"] = True
+    
+    fig, ax = plt.subplots()
 
     drivers = pd.unique(session.laps['Driver'])
 
@@ -231,7 +230,7 @@ def fastest_func(input_list, datetime):
     ax.barh(fastest_laps.index,
             fastest_laps['LapTimeDelta'], color=team_colors, edgecolor='grey')
     ax.set_yticks(fastest_laps.index)
-    ax.set_yticklabels(fastest_laps['Driver'])
+    ax.set_yticklabels(fastest_laps['Driver'], fontsize=15)
 
     # show fastest at the top
     ax.invert_yaxis()
@@ -245,8 +244,8 @@ def fastest_func(input_list, datetime):
 
     # sn = session.event.get_session_name(sn)
     plt.suptitle(
-        f"{yr} {rc} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")")
-    plt.setp(ax.get_xticklabels(), fontsize=7)
+        f"{yr} {rc} {sn}\nFastest Lap: " + lap_time_string + " (" + pole_lap['Driver'] + ")", fontsize=20)
+    plt.setp(ax.get_xticklabels(), fontsize=12)
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     
@@ -864,7 +863,7 @@ def tel_func(input_list, datetime):
     second_car = second_driver.get_car_data().add_distance()
 
     plotting.setup_mpl()
-    fig, ax = plt.subplots(7, 1, figsize=(10, 10), gridspec_kw={
+    fig, ax = plt.subplots(7, 1, figsize=(20, 20), gridspec_kw={
                            'height_ratios': [2, 2, 2, 2, 2, 2, 3]})
 
     if (lap1 == None or lap1 == ''):
@@ -881,7 +880,7 @@ def tel_func(input_list, datetime):
     # sn = session.event.get_session_name(sn)
 
     fig.suptitle(f"{yr} {rc} {sn}\n" +
-                 drv1 + " (" + lap1 + ") vs " + drv2 + " (" + lap2 + ")", size=15)
+                 drv1 + " (" + lap1 + ") vs " + drv2 + " (" + lap2 + ")", size=30)
 
     drs_1 = first_car['DRS']
     drs_2 = second_car['DRS']
@@ -930,7 +929,7 @@ def tel_func(input_list, datetime):
         delta.extend([float(delta_time[dt])*(-1)])
         dt += 1
 
-    ax[6].set_ylabel(drv1 + " ahead | " + drv2 + " ahead")
+    ax[6].set_ylabel(drv1 + " ahead | " + drv2 + " ahead", fontsize=15)
 
     l2, = ax[0].plot(second_car['Distance'],
                      second_car['Speed'], color=second_color)
@@ -945,12 +944,12 @@ def tel_func(input_list, datetime):
     ax[3].plot(first_car['Distance'], first_car['Throttle'], color=first_color)
     ax[6].plot(first_car['Distance'], delta, color='white')
 
-    ax[0].set_ylabel("Speed [km/h]")
-    ax[1].set_ylabel("RPM [#]")
-    ax[2].set_ylabel("Gear [#]")
-    ax[3].set_ylabel("Throttle [%]")
-    ax[4].set_ylabel("Brake [%]")
-    ax[5].set_ylabel("DRS")
+    ax[0].set_ylabel("Speed [km/h]", fontsize=15)
+    ax[1].set_ylabel("RPM [#]", fontsize=15)
+    ax[2].set_ylabel("Gear [#]", fontsize=15)
+    ax[3].set_ylabel("Throttle [%]", fontsize=15)
+    ax[4].set_ylabel("Brake [%]", fontsize=15)
+    ax[5].set_ylabel("DRS", fontsize=15)
 
     ax[0].get_xaxis().set_ticklabels([])
     ax[1].get_xaxis().set_ticklabels([])
@@ -959,7 +958,7 @@ def tel_func(input_list, datetime):
     ax[4].get_xaxis().set_ticklabels([])
 
     fig.align_ylabels()
-    fig.legend((l1, l2), (drv1, drv2), 'upper right')
+    fig.legend((l1, l2), (drv1, drv2), 'upper right', fontsize=20)
 
     ax[5].fill_between(second_car['Distance'], drs2,
                        step="pre", color=second_color, alpha=1)
@@ -977,6 +976,10 @@ def tel_func(input_list, datetime):
     ticks = ax[6].get_yticks()
     # set labels to absolute values and with integer representation
     ax[6].set_yticklabels([round(abs(tick), 1) for tick in ticks])
+    
+    # Increase the font size of the ticks for all axes
+    for axis in ax:
+        axis.tick_params(axis='both', which='major', labelsize=15)
 
     plt.savefig(dir_path + get_path() + "res" + get_path() + "output" + get_path() + str(datetime) + '.png', bbox_inches='tight')
     

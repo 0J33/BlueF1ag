@@ -136,7 +136,7 @@ def read_data_from_file(file_name):
 def delete_file_local(file_name):
     os.remove("data_dump/" + file_name)
     
-###
+### TODO: switch from csv to writing df as bytes
 
 def save_laps(yr, rc, sn):
     
