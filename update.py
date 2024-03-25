@@ -491,7 +491,7 @@ def points_func(yr):
     
     # show(fig)
     file = str(yr) + "_POINTS" + '.png'
-    fig.write_image("data_dump/" + file, width=1920, height=1080)
+    fig.write_image("data_dump/" + file, width=2000, height=2000)
     aws_api.upload_file("data_dump/" + file, file, "points/")
     aws_api.delete_file_local(file)
 
