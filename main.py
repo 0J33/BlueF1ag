@@ -303,7 +303,7 @@ async def main_helper(request):
         user_id = data.get('user_id')
         datetime = get_datetime()
         if not (func_name.lower() == "drivers" or func_name.lower() == "constructors" or func_name.lower() == "points"):
-            res = command(user_id, input_list, func_name.lower(), datetime)
+            res = await command(user_id, input_list, func_name.lower(), datetime)
             with open("res/output/" + res + ".png", "rb") as image:
                 f = image.read()
                 b = bytearray(f)
