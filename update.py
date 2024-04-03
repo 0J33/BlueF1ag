@@ -1,19 +1,20 @@
+import os
 import pandas as pd
 import requests
 import datetime as dt
 import fastf1 as ff1
 from fastf1 import plotting
-# from fastf1.ergast import Ergast
 import plotly.express as px
 from plotly.io import show
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pymongo import MongoClient
-import os
 from dotenv import load_dotenv
 import traceback
 import aws_api
 from utils import *
+if os.name == 'nt':
+    from fastf1.ergast import Ergast
 
 load_dotenv()
 
@@ -404,7 +405,8 @@ def const_func(yr):
 # get the heatmap of the drivers standings
 def points_func(yr):
     
-    raise Exception("Function is not available")
+    if os.name != 'nt':
+        raise Exception("Function is not available")
     
     ergast = Ergast()
     races = ergast.get_race_schedule(yr)

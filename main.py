@@ -1,3 +1,4 @@
+import asyncio
 from flask import Flask
 from flask_cors import CORS
 from flask_sslify import SSLify
@@ -181,7 +182,7 @@ def fix_exc(exc, input_list, comm):
     return exc
 
 # command
-def command(user_id, input_list, comm, datetime):
+async def command(user_id, input_list, comm, datetime):
   
     try:
 
@@ -272,15 +273,13 @@ CORS(app)
 if HTTPS == "true":
     sslify = SSLify(app)
 
-# update data
-@app.route('/update', methods=['GET', 'POST'])
-def update():
+async def update_helper():
     yr = dt.datetime.now().year
     stnd = ""
     races = ""
     data = ""
     try:
-        # PY is string like "py stnd.py" or "python stnd.py", etc.
+        # PY is string like "py" or"python" or "ptyhon3", etc.
         os.system(PY + " stnd.py")
         stnd = "stnd success"
     except:
@@ -296,81 +295,93 @@ def update():
         data = "data fail"
     return stnd + "<br />" + races + "<br />" + data
 
+async def main_helper(request):
+    try:
+        data = request.get_json()
+        func_name = data.get('func_name')
+        input_list = data.get('input_list')
+        user_id = data.get('user_id')
+        datetime = get_datetime()
+        if not (func_name.lower() == "drivers" or func_name.lower() == "constructors" or func_name.lower() == "points"):
+            res = command(user_id, input_list, func_name.lower(), datetime)
+            with open("res/output/" + res + ".png", "rb") as image:
+                f = image.read()
+                b = bytearray(f)
+            result = list(b)
+            os.remove("res/output/" + res + ".png")
+        else:
+            res = await command(user_id, input_list, func_name.lower(), datetime)
+            with open("res/output/" + res, "rb") as image:
+                f = image.read()
+                b = bytearray(f)
+            result = list(b)
+            os.remove("res/output/" + res)
+        try:
+            log(user_id, func_name, input_list, "", False, datetime)
+        except:
+            pass
+        return jsonify({'result': result, 'datetime': datetime}), 200    
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 400
+
+async def inputs_helper(request):
+    try:
+        data = request.get_json()
+        input_type = data.get('input')
+        input_data = data.get('data')
+        
+        if input_type == "years":
+            try:
+                res = get_years(input_data["func"])
+            except:
+                res = []
+        elif input_type == "races":
+            try:
+                res = get_races_from_db(input_data["func"], input_data["year"])
+            except:
+                res = []
+        elif input_type == "sessions":
+            try:
+                res = get_sessions_from_db(input_data["year"], input_data["race"])
+            except:
+                res = []
+        elif input_type == "all":
+            try:
+                res = [[], "", ""]
+                res[0] = get_drivers_from_db(input_data["year"], input_data["race"], input_data["session"])
+                res[1] = get_laps_from_db(input_data["year"], input_data["race"], input_data["session"])
+                res[2] = get_distance_from_db(input_data["year"], input_data["race"], input_data["session"])
+            except:
+                print(traceback.format_exc())
+                res = []
+                
+        return jsonify({'result': res}), 200
+    
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 400
+
+# update data
+@app.route('/update', methods=['GET', 'POST'])
+def update():
+    return asyncio.run(update_helper())
+
 # execute function when user submits form
 @app.route('/', methods=['GET', 'POST'])
 def home():
-        
     if request.method == 'POST':
-
         try:
-            data = request.get_json()
-            func_name = data.get('func_name')
-            input_list = data.get('input_list')
-            user_id = data.get('user_id')
-            datetime = get_datetime()
-            if not (func_name.lower() == "drivers" or func_name.lower() == "constructors" or func_name.lower() == "points"):
-                res = command(user_id, input_list, func_name.lower(), datetime)
-                with open("res/output/" + res + ".png", "rb") as image:
-                    f = image.read()
-                    b = bytearray(f)
-                result = list(b)
-                os.remove("res/output/" + res + ".png")
-            else:
-                res = command(user_id, input_list, func_name.lower(), datetime)
-                with open("res/output/" + res, "rb") as image:
-                    f = image.read()
-                    b = bytearray(f)
-                result = list(b)
-                os.remove("res/output/" + res)
-            try:
-                log(user_id, func_name, input_list, "", False, datetime)
-            except:
-                pass
-            return jsonify({'result': result, 'datetime': datetime}), 200    
+            return asyncio.run(main_helper(request))
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
-        
     else:
         return "Backend is running."
 
 # get inputs
 @app.route('/inputs', methods=['GET', 'POST'])
 def inputs():
-
     if request.method == 'POST':
-        
         try:
-            data = request.get_json()
-            input_type = data.get('input')
-            input_data = data.get('data')
-            
-            if input_type == "years":
-                try:
-                    res = get_years(input_data["func"])
-                except:
-                    res = []
-            elif input_type == "races":
-                try:
-                    res = get_races_from_db(input_data["func"], input_data["year"])
-                except:
-                    res = []
-            elif input_type == "sessions":
-                try:
-                    res = get_sessions_from_db(input_data["year"], input_data["race"])
-                except:
-                    res = []
-            elif input_type == "all":
-                try:
-                    res = [[], "", ""]
-                    res[0] = get_drivers_from_db(input_data["year"], input_data["race"], input_data["session"])
-                    res[1] = get_laps_from_db(input_data["year"], input_data["race"], input_data["session"])
-                    res[2] = get_distance_from_db(input_data["year"], input_data["race"], input_data["session"])
-                except:
-                    print(traceback.format_exc())
-                    res = []
-                    
-            return jsonify({'result': res}), 200
-        
+            return asyncio.run(inputs_helper(request))
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
 
