@@ -1727,7 +1727,10 @@ def positions_func(input_list, datetime):
         drv_laps = session.laps.pick_driver(drv)
 
         abb = drv_laps['Driver'].iloc[0]
-        color = fastf1.plotting.driver_color(abb)
+        try:
+            color = fastf1.plotting.driver_color(abb)
+        except:
+            color = 'grey'
 
         ax.plot(drv_laps['LapNumber'], drv_laps['Position'],
                 label=abb, color=color)
