@@ -106,79 +106,66 @@ def fix_exc(exc, input_list, comm):
     
     yr = input_list["year"]
     
-    rcint = False
-    
     try:
         rc = input_list["race"]
-        try:
+        if type(rc) == int:
             rc = int(rc)
-            rcint = True
-        except:
-            pass
     except:
-        pass
-    
-    #yr
+        rc = None
+        
+    try:
+        sn = input_list["session"]
+    except:
+        sn = None
+
     if exc.__contains__("The data you are trying to access has not been loaded yet.") and yr < 2018:
         exc = "The FastF1 API has data starting from 2018. Please make sure you provided all the inputs correctly and try again.\n"
-    elif exc.__contains__("The data you are trying to access has not been loaded yet.") and yr >= datetime.datetime.now().year:
-        try:
-            sn = ""
-            try:
-                sn = " " + str(input_list["session"])
-            except:
-                sn = ""
-            if rcint:
-                exc = "I can't find any F1 data for the requested grand prix (" + str(input_list["year"]) + " Round " + str(rc) + sn + "). It may have not been loaded yet.\n"
-            else:
-                exc = "I can't find any F1 data for the requested grand prix (" + str(input_list["year"]) + " " + str(rc) + sn + "). It may have not been loaded yet.\n"
-        except:
-            exc = "I can't find any F1 data for the requested Grand Prix. It may have not been loaded yet.\n"
+
     elif exc.__contains__("The data you are trying to access has not been loaded yet.") and (yr < datetime.datetime.now().year and yr >= 2018):
-        try:
-            if rcint:
-                exc = "I can't find any F1 data for the requested grand prix (" + str(input_list["year"]) + " Round " + str(rc) + ").\n"
+        if rc != None:
+            if type(rc) == int:
+                exc = "I can't find any F1 data for the requested grand prix (" + str(yr) + " Round " + str(rc) + ").\n"
             else:
-                exc = "I can't find any F1 data for the requested grand prix (" + str(input_list["year"]) + " " + str(rc) + ").\n"
-        except:
-            exc = "I can't find any F1 data for the requested Grand Prix.\n"
-    elif exc.__contains__("list index out of range") or exc.__contains__("'code'") or exc.__contains__("integer division or modulo by zero"): 
-        exc = "There requested data is not available for the year " + str(yr) + ".\n"
-    elif exc.__contains__("invalid literal for int()"):
-        exc = "I can't find the year " + str(yr) + ". Please make sure you provided all the inputs correctly and try again.\n"
-    elif exc.__contains__("No such file or directory") and (comm == "drivers" or comm == "constructors" or comm == "points"):
+                exc = "I can't find any F1 data for the requested grand prix (" + str(yr) + " " + str(rc) + ").\n"
+        else:
+            exc = "I can't find any F1 data for the requested Grand Prix. It may have not been loaded yet.\n"
+        
+    elif exc.__contains__("The data you are trying to access has not been loaded yet.") and yr >= datetime.datetime.now().year:
+        if rc != None and sn != None:
+            if type(rc) == int:
+                exc = "I can't find any F1 data for the requested grand prix (" + str(yr) + " Round " + str(rc) + " " + sn + "). It may have not been loaded yet.\n"
+            else:
+                exc = "I can't find any F1 data for the requested grand prix (" + str(yr) + " " + str(rc) + " " + sn + "). It may have not been loaded yet.\n"
+        else:
+            exc = "I can't find any F1 data for the requested Grand Prix. It may have not been loaded yet.\n"
+    
+    elif exc.__contains__("'code'") or exc.__contains__("integer division or modulo by zero"): 
         exc = "There requested data is not available for the year " + str(yr) + ".\n"
         
-    #rc
     elif exc.__contains__("cannot find race"):
         exc = "I can't find the requested race (" + str(rc) + "). Please make sure you provided all the inputs correctly and try again.\n"
 
-    #sn
     elif exc.__contains__("Invalid session type"):
-        exc = "I can't find the requested session (" + input_list["session"] + "). Make sure to provide one of the following: FP1, FP2, FP3, Q, Sprint, R.\n"
+        exc = "I can't find the requested session (" + input_list["session"] + "). Please make sure you provided all the inputs correctly and try again.\n"
 
-    #driver
     elif exc.__contains__("Invalid driver identifier"):
         exc = "I can't find the requested driver(s). Make sure to provide a driver abbreviation, like 'VER' or 'LEC'.\n"
     
-    #lap
-    elif exc.__contains__("None of [Index") and exc.__contains__("are in the [columns]" and comm == "tires"):
+    elif exc.__contains__("None of [Index") and exc.__contains__("are in the [columns]") and comm == "tires":
         exc = "An error has occured. Try a different lap number\n"
         
-    #other errors
-    elif exc.__contains__("'NoneType' object is not subscriptable") or exc.__contains__("'NaTType' object has no attribute 'upper'") or exc.__contains__("single positional indexer is out-of-bounds") or exc=="0" or exc.__contains__ ("'Lap' object has no attribute 'session'") or exc.__contains__("No such file or directory") or exc.__contains__("attempt to get argmin of an empty sequence") or exc == "":
+    elif exc.__contains__("single positional indexer is out-of-bounds") or exc=="0" or exc.__contains__ ("'Lap' object has no attribute 'session'") or exc.__contains__("attempt to get argmin of an empty sequence") or exc == "":
         exc = "An unknown error occured. Please make sure you provided all the command inputs correctly.\n"
         
-    #connection error
     elif exc.__contains__("Cannot connect to host") or exc.__contains__("Unauthorized") or exc.__contains__("HTTP"):
-        exc = "A connection error has occured. Please try again later.\n"
+        exc = "A network error has occured. Please try again later.\n"
         
-    #api error
     elif exc.__contains__("Expecting value: line 1 column 1 (char 0)"):
         exc = "An error occured while fetching data from the API. Please try again later.\n"
     
     else:
         exc = "An unknown error occured.\n"
+        
     return exc
 
 # command
