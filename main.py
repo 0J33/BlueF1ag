@@ -347,6 +347,10 @@ async def inputs_helper(request):
     except Exception as exc:
         return jsonify({'error': str(exc)}), 400
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify(status="UP"), 200
+
 # update data
 @app.route('/update', methods=['GET', 'POST'])
 def update():
