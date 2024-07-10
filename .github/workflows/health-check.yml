@@ -21,11 +21,11 @@ jobs:
       run: |
         STATUS="DOWN"
         CUSTOM_MESSAGE="The backend server is currently down. Please try again later."
-        IMAGE='<img alt=\"status\" title=\"Status\" src=\"https://custom-icon-badges.demolab.com/badge/-server status: offline-aa0000?style=for-the-badge&logo=server&logoColor=white\"/>'
+        IMAGE='<img alt="status" title="Status" src="https://custom-icon-badges.demolab.com/badge/-server status: offline-aa0000?style=for-the-badge&logo=server&logoColor=white"/>'
         if curl -s https://harmless-ram-luckily.ngrok-free.app/health | grep -q 'UP'; then
           STATUS="UP"
           CUSTOM_MESSAGE="The backend server is up and running smoothly."
-          IMAGE='<img alt=\"status\" title=\"Status\" src=\"https://custom-icon-badges.demolab.com/badge/-server status: online-00aa00?style=for-the-badge&logo=server&logoColor=white\"/>'
+          IMAGE='<img alt="status" title="Status" src="https://custom-icon-badges.demolab.com/badge/-server status: online-00aa00?style=for-the-badge&logo=server&logoColor=white"/>'
         fi
         echo "::set-output name=status::$STATUS"
         echo "::set-output name=message::$CUSTOM_MESSAGE"
@@ -34,7 +34,7 @@ jobs:
     - name: Update README with status
       run: |
         IMAGE=${{ steps.health.outputs.image }}
-        sed -i '/<!-- health-status -->/c\ '"$IMAGE"'' README.md
+        sed -i '/<!-- health-status -->/c\'"$IMAGE"'' README.md
 
     - name: Commit and push status update
       env:
