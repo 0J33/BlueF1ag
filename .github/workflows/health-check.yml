@@ -19,7 +19,7 @@ jobs:
         STATUS="DOWN"
         CUSTOM_MESSAGE="The backend server is currently down. Please try again later."
         IMAGE="<img alt="status" title="Status" src="https://custom-icon-badges.demolab.com/badge/-server status: offline-aa0000?style=for-the-badge&logo=server&logoColor=white%22"/></a>"
-        if curl -s http://your-backend-server-ip:5000/health | grep -q 'UP'; then
+        if curl -s https://harmless-ram-luckily.ngrok-free.app/health | grep -q 'UP'; then
           STATUS="UP"
           CUSTOM_MESSAGE="The backend server is up and running smoothly."
           IMAGE="<img alt="status" title="Status" src="https://custom-icon-badges.demolab.com/badge/-server status: online-00aa00?style=for-the-badge&logo=server&logoColor=white%22"/></a>"
