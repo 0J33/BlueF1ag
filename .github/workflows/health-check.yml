@@ -30,8 +30,8 @@ jobs:
 
     - name: Update README with status
       run: |
-        MESSAGE=${{ steps.health.outputs.message }}
-        sed -i '/<!-- health-status -->/c\'$IMAGE'' README.md
+        IMAGE=${{ steps.health.outputs.image }}
+        sed -i '/<!-- health-status -->/c\'"$IMAGE"'' README.md
 
     - name: Commit and push status update
       run: |
