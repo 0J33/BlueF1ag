@@ -34,7 +34,7 @@ jobs:
     - name: Update README with status
       run: |
         IMAGE="${{ steps.health.outputs.image }}"
-        sed -i "s|<!-- health-status -->.*|${IMAGE}|g" README.md
+        sed -i "s|<!-- health-status -->.*|${IMAGE//&/\\&}|g" README.md
 
     - name: Commit and push status update
       env:
