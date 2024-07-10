@@ -32,4 +32,4 @@ Data is from the [FastF1](https://github.com/theOehrly/Fast-F1) and [Ergast](htt
 
 # Status
 
-<img alt='status' title='Status' src='https://custom-icon-badges.demolab.com/badge/-server%20status:%20ONLINE-00aa00?style=for-the-badge<!-- health-status -->logo=server<!-- health-status -->logoColor=white'/>
+<img alt='status' title='Status' src='https://custom-icon-badges.demolab.com/badge/-server%20status:%20ONLINE-00aa00?style=for-the-badge<img alt='status' title='Status' src='https://custom-icon-badges.demolab.com/badge/-server%20status:%20ONLINE-00aa00?style=for-the-badge<!-- health-status -->logo=server<!-- health-status -->logoColor=white'/>logo=server<!-- health-status -->logoColor=white'/>
