@@ -29,6 +29,7 @@ jobs:
         fi
         echo "::set-output name=status::$STATUS"
         echo "::set-output name=message::$CUSTOM_MESSAGE"
+        echo "::set-output name=color::$COLOR"
 
     - name: Update README with status
       if: ${{ steps.health.outputs.status == 'ONLINE' }}
