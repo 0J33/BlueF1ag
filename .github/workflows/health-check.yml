@@ -19,26 +19,28 @@ jobs:
     - name: Check backend health
       id: health
       run: |
-        STATUS="DOWN"
+        STATUS="OFFLINE"
         CUSTOM_MESSAGE="The backend server is currently down. Please try again later."
-        IMAGE='<img alt="status" title="Status" src="https://custom-icon-badges.demolab.com/badge/-server%20status:%20offline-aa0000?style=for-the-badge&logo=server&logoColor=white"/>'
+        COLOR="aa0000"
         if curl -s https://harmless-ram-luckily.ngrok-free.app/health | grep -q 'UP'; then
-          STATUS="UP"
+          STATUS="ONLINE"
           CUSTOM_MESSAGE="The backend server is up and running smoothly."
-          IMAGE='<img alt="status" title="Status" src="https://custom-icon-badges.demolab.com/badge/-server%20status:%20online-00aa00?style=for-the-badge&logo=server&logoColor=white"/>'
+          COLOR="00aa00"
         fi
         echo "::set-output name=status::$STATUS"
         echo "::set-output name=message::$CUSTOM_MESSAGE"
-        echo "::set-output name=image::$IMAGE"
 
     - name: Update README with status
+      if: ${{ steps.health.outputs.status == 'ONLINE' }}
       run: |
-        IMAGE="${{ steps.health.outputs.image }}"
-        sed -i "s|<!-- health-status -->.*|${IMAGE//&/\\&}|g" README.md
+        STATUS="${{ steps.health.outputs.status }}"
+        COLOR="${{ steps.health.outputs.color }}"
+        sed -i "s|<!-- health-status -->|<img alt='status' title='Status' src='https://custom-icon-badges.demolab.com/badge/-server%20status:%20${STATUS}-${COLOR}?style=for-the-badge&logo=server&logoColor=white'/>|" README.md
 
     - name: Commit and push status update
+      if: ${{ steps.health.outputs.status == 'ONLINE' }}
       env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
