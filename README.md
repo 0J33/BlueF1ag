@@ -29,3 +29,8 @@ Run `pip install -r requirements.txt` to install dependencies.
 # Data
 
 Data is from the [FastF1](https://github.com/theOehrly/Fast-F1) and [Ergast](https://ergast.com/mrd/).
+
+# Status
+
+<!-- health-status -->
+<img alt="status" title="Status" src="https://custom-icon-badges.demolab.com/badge/-server status: offline-aa0000?style=for-the-badge&logo=server&logoColor=white%22"/></a>
