@@ -1761,7 +1761,7 @@ def battles_func(input_list, datetime):
     drivers = input_list["drivers"]
 
     def ergast_retrieve(api_endpoint: str):
-        url = f'https://ergast.com/api/f1/{api_endpoint}.json'
+        url = f'https://api.jolpi.ca/ergast/f1/{api_endpoint}.json'
         response = requests.get(url).json()
         
         return response['MRData']

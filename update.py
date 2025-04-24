@@ -37,7 +37,7 @@ yr = dt.datetime.now().year
 
 # get driver standings
 def get_drivers_standings():
-    url = "https://ergast.com/api/f1/" + str(yr) + "/driverStandings.json"
+    url = "https://api.jolpi.ca/ergast/f1/" + str(yr) + "/driverStandings.json"
     response = requests.get(url)
     data = response.json()
     drivers_standings = data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']  # noqa: E501
@@ -58,7 +58,7 @@ def driver_func(yr):
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
     def ergast_retrieve(api_endpoint: str):
-        url = f'https://ergast.com/api/f1/{api_endpoint}.json'
+        url = f'https://api.jolpi.ca/ergast/f1/{api_endpoint}.json'
         
         try:
             # Disable SSL verification
@@ -224,7 +224,7 @@ def driver_func(yr):
 
 # get constructorss standings
 def get_constructors_standings():
-    url = "https://ergast.com/api/f1/" + \
+    url = "https://api.jolpi.ca/ergast/f1/" + \
         str(yr) + "/constructorStandings.json"
     response = requests.get(url)
     data = response.json()
@@ -246,7 +246,7 @@ def const_func(yr):
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
     def ergast_retrieve(api_endpoint: str):
-        url = f'https://ergast.com/api/f1/{api_endpoint}.json'
+        url = f'https://api.jolpi.ca/ergast/f1/{api_endpoint}.json'
         
         try:
             # Disable SSL verification
