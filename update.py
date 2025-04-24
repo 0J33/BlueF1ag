@@ -14,7 +14,6 @@ import matplotlib.font_manager as fm
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import traceback
-import aws_api
 from utils import *
 if os.name == 'nt':
     from fastf1.ergast import Ergast
@@ -233,8 +232,6 @@ def driver_func(yr):
     file = str(yr) + "_DRIVERS_STANDINGS" + '.png'
     plt.savefig("data_dump/" + file)
     upload_drivers_standings("data_dump/" + file)
-    # aws_api.upload_file("data_dump/" + file, file, "standings/")
-    # aws_api.delete_file_local(file)
 
 # get constructorss standings
 def get_constructors_standings():
@@ -417,8 +414,6 @@ def const_func(yr):
     file = str(yr) + "_CONSTRUCTORS_STANDINGS" + '.png'
     plt.savefig("data_dump/" + file)
     upload_constructors_standings("data_dump/" + file)
-    # aws_api.upload_file("data_dump/" + file, file, "standings/")
-    # aws_api.delete_file_local(file)
 
 # get the heatmap of the drivers standings
 def points_func(yr):
@@ -515,8 +510,6 @@ def points_func(yr):
     file = str(yr) + "_POINTS" + '.png'
     fig.write_image("data_dump/" + file, width=2000, height=2000)
     upload_points("data_dump/" + file)
-    # aws_api.upload_file("data_dump/" + file, file, "points/")
-    # aws_api.delete_file_local(file)
 
 ### updates standings for both drivers and constructors ###
 def update(yr):
@@ -616,10 +609,6 @@ def update_data(yr):
                             "distance": distance
                         })
                         res.append([yr, rc, sn])
-                        # aws_api.save_laps(yr, rc, sn)
-                        # aws_api.save_results(yr, rc, sn)
-                        # aws_api.save_car_data(yr, rc, sn)
-                        # aws_api.save_telemetry(yr, rc, sn)
                 except Exception as exc:
                     print(str(exc))
     if res == []:
@@ -627,13 +616,6 @@ def update_data(yr):
     else:
         msg = "Sessions updated:"
     return msg + "\n" + str(res)
-
-### updates gd with lap and telemetry data of all sessions of a given year ###       
-# def update_aws(yr):
-#     aws_api.save(yr, "laps")
-#     aws_api.save(yr, "results")
-#     aws_api.save(yr, "car_data")
-#     aws_api.save(yr, "telemetry")
    
 # update(yr)
 
