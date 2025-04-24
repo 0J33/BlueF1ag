@@ -545,6 +545,17 @@ def update_from(i):
             print(str(exc) + "\nFAILED UPDATE " + str(i))
         i -= 1
 
+### updates standings for both drivers and constructors from a given year to a given year ###
+def update_to(i):
+    yr = 1950
+    while yr <= i:
+        try:
+            update(yr)
+            print("FINISHED UPDATE " + str(yr))
+        except Exception as exc:
+            print(str(exc) + "\nFAILED UPDATE " + str(yr))
+        yr += 1
+
 ### updates mongo with races of a given year ###
 def update_races(yr):
     collection_name = "races"
@@ -620,6 +631,8 @@ def update_data(yr):
 # update(yr)
 
 # update_from(yr)
+
+# update_to(yr)
 
 # update_races(yr)
 
