@@ -231,7 +231,7 @@ def driver_func(yr):
     # plt.show()
     file = str(yr) + "_DRIVERS_STANDINGS" + '.png'
     plt.savefig("data_dump/" + file)
-    upload_drivers_standings("data_dump/" + file)
+    upload_drivers_standings(yr, "data_dump/" + file)
 
 # get constructorss standings
 def get_constructors_standings():
@@ -619,7 +619,7 @@ def update_data(yr):
    
 # update(yr)
 
-# update_from(yr)
+update_from(yr)
 
 # update_races(yr)
 
