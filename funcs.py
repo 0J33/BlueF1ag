@@ -1105,7 +1105,7 @@ def cornering_func(input_list, datetime):
                          'DistanceDelta'] = actions_driver_2.loc[0, 'Distance']
 
     # Merging together
-    all_actions = actions_driver_1.append(actions_driver_2)
+    all_actions = actions_driver_1._append(actions_driver_2)
 
     # Calculating average speed
     avg_speed_driver_1 = np.mean(telemetry_driver_1['Speed'].loc[
