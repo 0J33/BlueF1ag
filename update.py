@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 import requests
+import urllib3
+from urllib3.exceptions import InsecureRequestWarning
 import datetime as dt
 import fastf1 as ff1
 from fastf1 import plotting
@@ -8,6 +10,7 @@ import plotly.express as px
 from plotly.io import show
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import traceback
@@ -27,10 +30,8 @@ db = client[db_name]
 
 
 # enable cache
-try:
-    ff1.Cache.enable_cache("doc_cache")
-except: 
-    pass
+if os.path.exists(dir_path + get_path() + "doc_cache"):
+    ff1.Cache.enable_cache(dir_path + get_path() + "doc_cache")
 
 # set yr to current year
 yr = dt.datetime.now().year
@@ -54,8 +55,6 @@ def drvr(driver_standings):
 
 # gets the driver standings and plots them
 def driver_func(yr):
-    
-    from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
     def ergast_retrieve(api_endpoint: str):
         url = f'https://api.jolpi.ca/ergast/f1/{api_endpoint}.json'
@@ -96,13 +95,21 @@ def driver_func(yr):
             # Initiate a dictionary to store the current rounds' standings in
             current_round = {'round': i}
             
+            temp_pos = 1
+            
             # Loop through all the drivers to collect their information
             for i in range(len(standings)):
                 try:
                     driver = standings[i]['Driver']['code']
                 except:
                     driver = " ".join(word[0].upper()+word[1:] for word in(standings[i]['Driver']['driverId'].replace("_", " ")).split(" "))
-                position = standings[i]['position']
+                
+                if 'position' not in standings[i]:
+                    position = temp_pos
+                    temp_pos += 1
+                else:
+                    position = standings[i]['position']
+                    
                 points = standings[i]['points']
                 
                 # Store the drivers' position
@@ -114,8 +121,9 @@ def driver_func(yr):
                 driver_point_mapping[driver] = points
 
             # Append the current round to our fial dataframe
-            all_championship_standings = all_championship_standings.append(current_round, ignore_index=True)
-        except:
+            all_championship_standings = all_championship_standings._append(current_round, ignore_index=True)
+        except Exception as exc:
+            print(traceback.format_exc())
             break
         
     rounds = i
@@ -136,11 +144,15 @@ def driver_func(yr):
             # sns.set(rc={'figure.figsize':(14,10)})
             sns.set_theme(rc={'figure.figsize':(14,10)})
 
+    # Load custom font
+    font_path = "fonts/Formula1-Regular_web.ttf"  # adjust path if needed
+    font_prop = fm.FontProperties(fname=font_path)
+
     # Initiate the plot
     fig, ax = plt.subplots()
 
     # Set the title of the plot
-    ax.set_title(str(yr) + " Championship Standing", color = 'white')
+    ax.set_title(str(yr) + " Championship Standing", color = 'white', fontproperties=font_prop)
     fig.set_facecolor("black")
     ax.xaxis.label.set_color("white")
     ax.yaxis.label.set_color("white")
@@ -180,8 +192,8 @@ def driver_func(yr):
     ax.xaxis.set_tick_params(color='white')
 
     # set colorbar ticklabels
-    plt.setp(plt.getp(ax.axes, 'yticklabels'), color='white')
-    plt.setp(plt.getp(ax.axes, 'xticklabels'), color='white')
+    plt.setp(plt.getp(ax.axes, 'yticklabels'), color='white', fontproperties=font_prop)
+    plt.setp(plt.getp(ax.axes, 'xticklabels'), color='white', fontproperties=font_prop)
     ax.set_facecolor('black')
 
     ax.spines['bottom'].set_color('black')
@@ -192,8 +204,8 @@ def driver_func(yr):
     for t in ax.yaxis.get_ticklines(): t.set_color('black')
 
     # Set the labels of the axes
-    ax.set_xlabel("Round", color = 'white')
-    ax.set_ylabel("Championship position", color = 'white')
+    ax.set_xlabel("Round", color = 'white', fontproperties=font_prop)
+    ax.set_ylabel("Championship position", color = 'white', fontproperties=font_prop)
 
     # Disable the gridlines 
     ax.grid(False)
@@ -212,7 +224,8 @@ def driver_func(yr):
                 ax.get_xaxis_transform(),
                 ax.get_yaxis_transform()
             ),
-            textcoords="offset points"
+            textcoords="offset points",
+            fontproperties=font_prop
         )
 
     # Save the plot
@@ -242,8 +255,6 @@ def constr(constructor_standings):
 
 # get the constructors standings and plots them
 def const_func(yr):
-    
-    from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
     def ergast_retrieve(api_endpoint: str):
         url = f'https://api.jolpi.ca/ergast/f1/{api_endpoint}.json'
@@ -300,7 +311,7 @@ def const_func(yr):
 
 
             # Append the current round to our fial dataframe
-            all_championship_standings = all_championship_standings.append(current_round, ignore_index=True)
+            all_championship_standings = all_championship_standings._append(current_round, ignore_index=True)
         except:
             break
         
@@ -319,11 +330,15 @@ def const_func(yr):
         # sns.set(rc={'figure.figsize':(16,8.27)})
         sns.set_theme(rc={'figure.figsize':(16,8.27)})
 
+    # Load custom font
+    font_path = "fonts/Formula1-Regular_web.ttf"  # adjust path if needed
+    font_prop = fm.FontProperties(fname=font_path)
+
     # Initiate the plot
     fig, ax = plt.subplots()
 
     # Set the title of the plot
-    ax.set_title(str(yr) + " Championship Standing", color = 'white')
+    ax.set_title(str(yr) + " Championship Standing", color = 'white', fontproperties=font_prop)
     fig.set_facecolor("black")
     ax.xaxis.label.set_color("white")
     ax.yaxis.label.set_color("white")
@@ -360,8 +375,8 @@ def const_func(yr):
     ax.xaxis.set_tick_params(color='white')
 
     # set colorbar ticklabels
-    plt.setp(plt.getp(ax.axes, 'yticklabels'), color='white')
-    plt.setp(plt.getp(ax.axes, 'xticklabels'), color='white')
+    plt.setp(plt.getp(ax.axes, 'yticklabels'), color='white', fontproperties=font_prop)
+    plt.setp(plt.getp(ax.axes, 'xticklabels'), color='white', fontproperties=font_prop)
     ax.set_facecolor('black')
 
     ax.spines['bottom'].set_color('black')
@@ -372,8 +387,8 @@ def const_func(yr):
     for t in ax.yaxis.get_ticklines(): t.set_color('black')
 
     # Set the labels of the axes
-    ax.set_xlabel("Round", color = 'white')
-    ax.set_ylabel("Championship position", color = 'white')
+    ax.set_xlabel("Round", color = 'white', fontproperties=font_prop)
+    ax.set_ylabel("Championship position", color = 'white', fontproperties=font_prop)
 
     # Disable the gridlines 
     ax.grid(False)
@@ -392,7 +407,8 @@ def const_func(yr):
                 ax.get_xaxis_transform(),
                 ax.get_yaxis_transform()
             ),
-            textcoords="offset points"
+            textcoords="offset points",
+            fontproperties=font_prop
         )
 
     # Save the plot

@@ -1804,7 +1804,7 @@ def battles_func(input_list, datetime):
                     
             quali_results[driver] = position
                 
-        all_quali_results = all_quali_results.append(quali_results, ignore_index=True)
+        all_quali_results = all_quali_results._append(quali_results, ignore_index=True)
         
         current_round += 1
         
@@ -1822,12 +1822,13 @@ def battles_func(input_list, datetime):
         
         quali_battle_result = fastest_driver_per_round.value_counts().reset_index()
         
-        for _, driver in quali_battle_result.iterrows():
+        for _, row in quali_battle_result.iterrows():
             all_quali_battle_results.append({
-                'driver': driver['index'],
+                'driver': row['index'],
                 'team': team,
-                'quali_score': driver[0]
+                'quali_score': int(row['count'])  # Correctly fetch the score
             })
+
         try:
             team_colors_palette.append(fastf1.plotting.team_color(team))
         except:
@@ -1851,10 +1852,14 @@ def battles_func(input_list, datetime):
     wait_for_turn(datetime)
 
     plotting.setup_mpl()
+    
+    # Load custom font
+    font_path = "fonts/Formula1-Regular_web.ttf"  # adjust path if needed
+    font_prop = fm.FontProperties(fname=font_path)
 
     fig, ax = plt.subplots()
 
-    ax.set_title(f"{yr} Teammate Qualifying Battle", color = 'white')
+    ax.set_title(f"{yr} Teammate Qualifying Battle", color = 'white', fontproperties=font_prop)
     fig.set_facecolor("black")
     ax.xaxis.label.set_color("white")
     ax.yaxis.label.set_color("white")
@@ -1863,8 +1868,8 @@ def battles_func(input_list, datetime):
     ax.xaxis.set_tick_params(color='white')
 
     # set colorbar ticklabels
-    plt.setp(plt.getp(ax.axes, 'yticklabels'), color='white')
-    plt.setp(plt.getp(ax.axes, 'xticklabels'), color='white')
+    plt.setp(plt.getp(ax.axes, 'yticklabels'), color='white', fontproperties=font_prop)
+    plt.setp(plt.getp(ax.axes, 'xticklabels'), color='white', fontproperties=font_prop)
     ax.set_facecolor('black')
 
     ax.spines['bottom'].set_color('black')
@@ -1883,7 +1888,7 @@ def battles_func(input_list, datetime):
         dodge=False,
         palette=custom_palette,
     )
-
+    
     plt.yticks(range(max(all_quali_battle_results['quali_score']) + 1))
 
     plt.legend([],[], frameon=False)

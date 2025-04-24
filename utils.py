@@ -95,10 +95,8 @@ def get_sess(yr, rc, sn):
     return session
 
 # enable cache
-try:
-    ff1.Cache.enable_cache("doc_cache")
-except: 
-    pass
+if os.path.exists(dir_path + get_path() + "doc_cache"):
+    ff1.Cache.enable_cache(dir_path + get_path() + "doc_cache")
 
 ###
 
