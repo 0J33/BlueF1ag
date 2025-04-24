@@ -413,7 +413,7 @@ def const_func(yr):
     #plt.show()
     file = str(yr) + "_CONSTRUCTORS_STANDINGS" + '.png'
     plt.savefig("data_dump/" + file)
-    upload_constructors_standings("data_dump/" + file)
+    upload_constructors_standings(yr, "data_dump/" + file)
 
 # get the heatmap of the drivers standings
 def points_func(yr):
@@ -509,7 +509,7 @@ def points_func(yr):
     # show(fig)
     file = str(yr) + "_POINTS" + '.png'
     fig.write_image("data_dump/" + file, width=2000, height=2000)
-    upload_points("data_dump/" + file)
+    upload_points(yr, "data_dump/" + file)
 
 ### updates standings for both drivers and constructors ###
 def update(yr):
