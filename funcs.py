@@ -144,34 +144,41 @@ def rstall(plt):
     set_font()
 
 # turn text into image
+from PIL import Image, ImageDraw, ImageFont
+import os
+
+def get_path():
+    return os.sep  # cross-platform separator
+
+# Full image generation function
 def make_img(datetime, text):
-    # Create a new image with a white background
+    # Font paths (update these if needed)
+    font_path = dir_path + get_path() + "fonts" + get_path() + "JetBrainsMono-Medium.ttf"
+    
+    # Load font
+    font = ImageFont.truetype(font_path, 60)
+
+    # Split the text into lines
+    lines = text.split('\n')
     line_height = 60
     line_spacing = 10
-    lines = text.split('\n')
-    height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing) + 25
-    width = max([len(line) for line in lines]) * 36 + 25
 
-    # Create a new image with a white background
+    # Create a temporary draw object to measure text size
+    temp_img = Image.new("RGB", (1, 1))
+    temp_draw = ImageDraw.Draw(temp_img)
+    
+    # Determine image dimensions
+    width = max([temp_draw.textbbox((0, 0), line, font=font)[2] for line in lines]) + 25
+    height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing) + 25
+
+    # Create the final image
     img = Image.new('RGB', (width, height), color=(0, 0, 0))
-    # Create a new ImageDraw object
     draw = ImageDraw.Draw(img)
 
-    # Define the fonts to use (change to fonts installed on your system)
-    interval_font = ImageFont.truetype(dir_path + get_path() + "fonts" + get_path() + "Interval Bold.otf", 60)
-    consola_font = ImageFont.truetype(dir_path + get_path() + "fonts" + get_path() + "consola.ttf", 70)
-
-    # Draw the text on the image
+    # Draw each line
     y = 10
     for line in lines:
-        x = 10
-        for char in line:
-            # Use the "consola" font for characters that are not supported by the "Interval Bold" font
-            if not interval_font.getmask(char).getbbox():
-                draw.text((x, y), char, fill=(255, 255, 255), font=consola_font)
-            else:
-                draw.text((x, y), char, fill=(255, 255, 255), font=interval_font)
-            x += interval_font.getsize(char)[0]
+        draw.text((10, y), line, fill=(255, 255, 255), font=font)
         y += line_height + line_spacing
 
     # Save the image
