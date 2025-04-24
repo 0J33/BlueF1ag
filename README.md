@@ -28,7 +28,14 @@ Run `pip install -r requirements.txt` to install dependencies.
 
 # Data
 
-Data is from the [FastF1](https://github.com/theOehrly/Fast-F1) and [Ergast](https://ergast.com/mrd/).
+Data is from the [FastF1](https://github.com/theOehrly/Fast-F1) and [Jolpica F1](https://github.com/jolpica/jolpica-f1).
+
+# Supporting the Project
+
+If you want to support the development of Blue F1ag, you can sponsor me on GitHub or buy me a coffee.
+
+<a href="https://www.buymeacoffee.com/ojee">
+  <img alt="buymeacoffee" title="Buy me a coffee" src="https://img.shields.io/badge/buy_me_a_coffee-FFE01A?style=for-the-badge&logo=buymeacoffee&logoColor=black"/></a>
 
 # Status
 
