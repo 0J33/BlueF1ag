@@ -284,20 +284,18 @@ async def main_helper(request):
         input_list = data.get('input_list')
         user_id = data.get('user_id')
         datetime = get_datetime()
-        if not (func_name.lower() == "drivers" or func_name.lower() == "constructors" or func_name.lower() == "points"):
-            res = await command(user_id, input_list, func_name.lower(), datetime)
-            with open("res/output/" + res + ".png", "rb") as image:
-                f = image.read()
-                b = bytearray(f)
-            result = list(b)
-            os.remove("res/output/" + res + ".png")
-        else:
-            res = await command(user_id, input_list, func_name.lower(), datetime)
-            with open("res/output/" + res, "rb") as image:
-                f = image.read()
-                b = bytearray(f)
-            result = list(b)
-            os.remove("res/output/" + res)
+        res = await command(user_id, input_list, func_name.lower(), datetime)
+        with open("res/output/" + res, "rb") as image:
+            f = image.read()
+            b = bytearray(f)
+        result = list(b)
+        os.remove("res/output/" + res)
+        res = await command(user_id, input_list, func_name.lower(), datetime)
+        with open("res/output/" + res, "rb") as image:
+            f = image.read()
+            b = bytearray(f)
+        result = list(b)
+        os.remove("res/output/" + res)
         try:
             log(user_id, func_name, input_list, "", False, datetime)
         except:
