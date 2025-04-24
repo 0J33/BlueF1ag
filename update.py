@@ -232,8 +232,9 @@ def driver_func(yr):
     # plt.show()
     file = str(yr) + "_DRIVERS_STANDINGS" + '.png'
     plt.savefig("data_dump/" + file)
-    aws_api.upload_file("data_dump/" + file, file, "standings/")
-    aws_api.delete_file_local(file)
+    upload_drivers_standings("data_dump/" + file)
+    # aws_api.upload_file("data_dump/" + file, file, "standings/")
+    # aws_api.delete_file_local(file)
 
 # get constructorss standings
 def get_constructors_standings():
@@ -415,8 +416,9 @@ def const_func(yr):
     #plt.show()
     file = str(yr) + "_CONSTRUCTORS_STANDINGS" + '.png'
     plt.savefig("data_dump/" + file)
-    aws_api.upload_file("data_dump/" + file, file, "standings/")
-    aws_api.delete_file_local(file)
+    upload_constructors_standings("data_dump/" + file)
+    # aws_api.upload_file("data_dump/" + file, file, "standings/")
+    # aws_api.delete_file_local(file)
 
 # get the heatmap of the drivers standings
 def points_func(yr):
@@ -512,8 +514,9 @@ def points_func(yr):
     # show(fig)
     file = str(yr) + "_POINTS" + '.png'
     fig.write_image("data_dump/" + file, width=2000, height=2000)
-    aws_api.upload_file("data_dump/" + file, file, "points/")
-    aws_api.delete_file_local(file)
+    upload_points("data_dump/" + file)
+    # aws_api.upload_file("data_dump/" + file, file, "points/")
+    # aws_api.delete_file_local(file)
 
 ### updates standings for both drivers and constructors ###
 def update(yr):
@@ -626,11 +629,11 @@ def update_data(yr):
     return msg + "\n" + str(res)
 
 ### updates gd with lap and telemetry data of all sessions of a given year ###       
-def update_aws(yr):
-    aws_api.save(yr, "laps")
-    aws_api.save(yr, "results")
-    aws_api.save(yr, "car_data")
-    aws_api.save(yr, "telemetry")
+# def update_aws(yr):
+#     aws_api.save(yr, "laps")
+#     aws_api.save(yr, "results")
+#     aws_api.save(yr, "car_data")
+#     aws_api.save(yr, "telemetry")
    
 # update(yr)
 

@@ -260,3 +260,87 @@ def get_distance_from_db(yr, rc, sn):
         doc = collection.find_one({"year": int(yr), "race": rc, "session": sn})
         dist = doc["distance"]
         return dist
+    
+def upload_drivers_standings(file):
+    with open(file, 'rb') as f:
+        file_data = f.read()
+        collection_name = "drivers_standings"
+        collection = db[collection_name]
+        year = int(file.split("_")[0])
+        doc = collection.find_one({"year": year})
+        if doc:
+            collection.update_one({"year": year}, {"$set": {"file": file_data}})
+            print(f"Updated {year} Drivers Standings")
+        else:
+            collection.insert_one({"year": year, "file": file_data})
+            print(f"Inserted {year} Drivers Standings")
+        f.close()
+        os.remove(file)
+    return
+    
+def upload_constructors_standings(file):
+    with open(file, 'rb') as f:
+        file_data = f.read()
+        collection_name = "constructors_standings"
+        collection = db[collection_name]
+        year = int(file.split("_")[0])
+        doc = collection.find_one({"year": year})
+        if doc:
+            collection.update_one({"year": year}, {"$set": {"file": file_data}})
+            print(f"Updated {year} Constructors Standings")
+        else:
+            collection.insert_one({"year": year, "file": file_data})
+            print(f"Inserted {year} Constructors Standings")
+        f.close()
+        os.remove(file)
+    return
+    
+def upload_points(file):
+    with open(file, 'rb') as f:
+        file_data = f.read()
+        collection_name = "points"
+        collection = db[collection_name]
+        year = int(file.split("_")[0])
+        doc = collection.find_one({"year": year})
+        if doc:
+            collection.update_one({"year": year}, {"$set": {"file": file_data}})
+            print(f"Updated {year} Points")
+        else:
+            collection.insert_one({"year": year, "file": file_data})
+            print(f"Inserted {year} Points")
+        f.close()
+        os.remove(file)
+    return
+    
+def get_drivers_standings(yr):
+    collection_name = "drivers_standings"
+    collection = db[collection_name]
+    doc = collection.find_one({"year": int(yr)})
+    # turn file into png
+    file = doc["file"]
+    with open(dir_path + get_path() + "drivers_standings_" + str(yr) + ".png", 'wb') as f:
+        f.write(file)
+        f.close()
+    return f"{yr}_DRIVERS_STANDINGS.png"
+    
+def get_constructors_standings(yr):
+    collection_name = "constructors_standings"
+    collection = db[collection_name]
+    doc = collection.find_one({"year": int(yr)})
+    # turn file into png
+    file = doc["file"]
+    with open(dir_path + get_path() + "constructors_standings_" + str(yr) + ".png", 'wb') as f:
+        f.write(file)
+        f.close()
+    return f"{yr}_CONSTRUCTORS_STANDINGS.png"
+    
+def get_points(yr):
+    collection_name = "points"
+    collection = db[collection_name]
+    doc = collection.find_one({"year": int(yr)})
+    # turn file into png
+    file = doc["file"]
+    with open(dir_path + get_path() + "points_" + str(yr) + ".png", 'wb') as f:
+        f.write(file)
+        f.close()
+    return f"{yr}_POINTS.png"

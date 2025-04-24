@@ -23,14 +23,15 @@ load_dotenv()
 
 FUNCS = os.getenv("FUNCS")
 
-if FUNCS == "aws":
-    from funcs_aws import *
-elif FUNCS == "cache":
-    from funcs import *
+# if FUNCS == "aws":
+#     from funcs_aws import *
+# elif FUNCS == "cache":
+#     from funcs import *
+from funcs import *
 
 HTTPS = os.getenv("HTTPS")
 
-aws_url = os.getenv("aws_url")
+# aws_url = os.getenv("aws_url")
 IDS = os.getenv("IDS")
 PY = os.getenv("PY")
 connection_string = os.getenv("connection_string")
@@ -181,11 +182,22 @@ async def command(user_id, input_list, comm, datetime):
         
         print("STARTED " + message + " " + datetime)
 
-        if comm == "drivers" or comm == "constructors":
-            res = aws_api.get_standings(comm, input_list["year"])
+        # if comm == "drivers" or comm == "constructors":
+            # res = aws_api.get_standings(comm, input_list["year"])
+            # return res
+        # elif comm == "points":
+            # res = aws_api.get_points(input_list["year"])
+            # return res
+        # else:
+        
+        if comm == "drivers":
+            res = utils.get_drivers_standings(input_list["year"])
+            return res
+        elif comm == "constructors":
+            res = utils.get_constructors_standings(input_list["year"])
             return res
         elif comm == "points":
-            res = aws_api.get_points(input_list["year"])
+            res = utils.get_points(input_list["year"])
             return res
         else:
             if comm == "fastest":
@@ -276,10 +288,10 @@ async def update_helper():
         races = "race success"
     except:
         races = "races fail"
-    try:
-        data = str(update_data(yr)) + "\naws success"
-    except:
-        data = "data fail"
+    # try:
+    #     data = str(update_data(yr)) + "\naws success"
+    # except:
+    #     data = "data fail"
     return stnd + "<br />" + races + "<br />" + data
 
 async def main_helper(request):
