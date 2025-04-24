@@ -314,7 +314,7 @@ def get_d_standings(yr):
     collection = db[collection_name]
     doc = collection.find_one({"year": int(yr)})
     file = doc["file"]
-    with open(dir_path + get_path() + f"{yr}_DRIVERS_STANDINGS" + ".png", 'wb') as f:
+    with open(dir_path + get_path() + "res" + get_path() + "output" + get_path() + f"{yr}_DRIVERS_STANDINGS" + ".png", 'wb') as f:
         f.write(file)
         f.close()
     return f"{yr}_DRIVERS_STANDINGS"
@@ -324,7 +324,7 @@ def get_c_standings(yr):
     collection = db[collection_name]
     doc = collection.find_one({"year": int(yr)})
     file = doc["file"]
-    with open(dir_path + get_path() + f"{yr}_CONSTRUCTORS_STANDINGS" + ".png", 'wb') as f:
+    with open(dir_path + get_path() + "res" + get_path() + "output" + get_path() + f"{yr}_CONSTRUCTORS_STANDINGS" + ".png", 'wb') as f:
         f.write(file)
         f.close()
     return f"{yr}_CONSTRUCTORS_STANDINGS"
@@ -334,7 +334,7 @@ def get_p(yr):
     collection = db[collection_name]
     doc = collection.find_one({"year": int(yr)})
     file = doc["file"]
-    with open(dir_path + get_path() + f"{yr}_POINTS" + ".png", 'wb') as f:
+    with open(dir_path + get_path() + "res" + get_path() + "output" + get_path() + f"{yr}_POINTS" + ".png", 'wb') as f:
         f.write(file)
         f.close()
     return f"{yr}_POINTS"
