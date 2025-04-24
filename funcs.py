@@ -1275,7 +1275,7 @@ def tires_func(input_list, datetime): # very slow
             driver_telemetry['Lap'] = lap[1]['RaceLapNumber']
             driver_telemetry['Compound'] = lap[1]['Compound']
 
-            telemetry = telemetry.append(driver_telemetry)
+            telemetry = telemetry._append(driver_telemetry)
 
     # Only keep required columns
     telemetry = telemetry[['Lap', 'Distance', 'Compound', 'Speed', 'X', 'Y']]
