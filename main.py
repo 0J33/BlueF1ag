@@ -178,13 +178,13 @@ async def command(user_id, input_list, comm, datetime):
         print("STARTED " + message + " " + datetime)
         
         if comm == "drivers":
-            res = utils.get_drivers_standings(input_list["year"])
+            res = get_d_standings(input_list["year"])
             return res
         elif comm == "constructors":
-            res = utils.get_constructors_standings(input_list["year"])
+            res = get_c_standings(input_list["year"])
             return res
         elif comm == "points":
-            res = utils.get_points(input_list["year"])
+            res = get_p(input_list["year"])
             return res
         else:
             if comm == "fastest":

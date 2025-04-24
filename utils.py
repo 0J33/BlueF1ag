@@ -309,7 +309,7 @@ def upload_points(year, file):
         os.remove(file)
     return
     
-def get_drivers_standings(yr):
+def get_d_standings(yr):
     collection_name = "drivers_standings"
     collection = db[collection_name]
     doc = collection.find_one({"year": int(yr)})
@@ -319,7 +319,7 @@ def get_drivers_standings(yr):
         f.close()
     return f"{yr}_DRIVERS_STANDINGS"
     
-def get_constructors_standings(yr):
+def get_c_standings(yr):
     collection_name = "constructors_standings"
     collection = db[collection_name]
     doc = collection.find_one({"year": int(yr)})
@@ -329,7 +329,7 @@ def get_constructors_standings(yr):
         f.close()
     return f"{yr}_CONSTRUCTORS_STANDINGS"
     
-def get_points(yr):
+def get_p(yr):
     collection_name = "points"
     collection = db[collection_name]
     doc = collection.find_one({"year": int(yr)})
