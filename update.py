@@ -619,7 +619,7 @@ def update_data(yr):
    
 # update(yr)
 
-update_from(yr)
+# update_from(yr)
 
 # update_races(yr)
 
