@@ -160,7 +160,7 @@ def driver_func(yr):
     # The reason we do it this way is so that we can specify the team color per driver
     for driver in pd.unique(all_championship_standings_melted['variable']):
         try:
-            color=ff1.plotting.team_color(driver_team_mapping[driver])
+            color=ff1.plotting.get_team_color(driver_team_mapping[driver])
         except:
             color=colors[color_counter]
         sns.lineplot(
@@ -170,7 +170,7 @@ def driver_func(yr):
             color=color
         )
         try:
-            color=ff1.plotting.team_color(driver_team_mapping[driver])
+            color=ff1.plotting.get_team_color(driver_team_mapping[driver])
         except:
             color_counter += 1
             if color_counter >= len(colors):
@@ -345,7 +345,7 @@ def const_func(yr):
     # The reason we do it this way is so that we can specify the team color per driver
     for constructor in pd.unique(all_championship_standings_melted['variable']):
         try:
-            color=ff1.plotting.team_color(constructor_team_mapping[constructor])
+            color=ff1.plotting.get_team_color(constructor_team_mapping[constructor])
         except:
             color=colors[color_counter]
         sns.lineplot(
@@ -355,7 +355,7 @@ def const_func(yr):
             color=color
         )
         try:
-            color=ff1.plotting.team_color(constructor_team_mapping[constructor])
+            color=ff1.plotting.get_team_color(constructor_team_mapping[constructor])
         except:
             color_counter += 1
             if color_counter >= len(colors):
@@ -518,14 +518,23 @@ def update(yr):
     
     try:
         if yr >= 1950:
-            driver_func(yr)              
-            print("FINISHED UPDATE D")
+            try:
+                driver_func(yr)              
+                print("FINISHED UPDATE D")
+            except:
+                print("FAILED UPDATE D")
         if yr >= 1958:
-            const_func(yr)
-            print("FINISHED UPDATE C")
+            try:
+                const_func(yr)
+                print("FINISHED UPDATE C")
+            except:
+                print("FAILED UPDATE C")
         if yr >= 1950:
-            points_func(yr)
-            print("FINISHED UPDATE P")
+            try:
+                points_func(yr)
+                print("FINISHED UPDATE P")
+            except:
+                print("FAILED UPDATE P")
         stnd = True
 
     except Exception as exc:
@@ -547,7 +556,6 @@ def update_from(i):
 
 ### updates standings for both drivers and constructors from a given year to a given year ###
 def update_to(i):
-    yr = 1950
     while yr <= i:
         try:
             update(yr)

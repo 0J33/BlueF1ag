@@ -229,7 +229,7 @@ def fastest_func(input_list, datetime):
     team_colors = list()
     for index, lap in fastest_laps.iterlaps():
         try:
-            color = fastf1.plotting.team_color(lap['Team'])
+            color = fastf1.plotting.get_team_color(lap['Team'])
         except:
             color = 'grey'
         team_colors.append(color)
@@ -1837,7 +1837,7 @@ def battles_func(input_list, datetime):
             })
 
         try:
-            team_colors_palette.append(fastf1.plotting.team_color(team))
+            team_colors_palette.append(fastf1.plotting.get_team_color(team))
         except:
             team_colors_palette.append(None)
         # If none, replace None with grey
